@@ -4,8 +4,8 @@
   "description": "3-ellim-community-fe",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app.js"
+    "start": "node app.js",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -20,11 +20,13 @@
   "homepage": "https://github.com/gguip1/community-fe#readme",
   "dependencies": {
     "bootstrap": "^5.3.8",
-    "express": "^5.1.0",
-    "http-proxy-middleware": "^3.0.5"
+    "express": "^5.1.0"
   },
   "directories": {
     "test": "tests"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "jest": "^30.2.0",
+    "supertest": "^7.1.4"
+  }
 }
