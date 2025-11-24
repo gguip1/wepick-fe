@@ -4,12 +4,8 @@
   "description": "3-ellim-community-fe",
   "main": "index.js",
   "scripts": {
-<<<<<<< Updated upstream
-    "test": "echo \"Error: no test specified\" && exit 1"
-=======
     "start": "node app.js",
     "test": "jest"
->>>>>>> Stashed changes
   },
   "repository": {
     "type": "git",
