@@ -20,9 +20,12 @@
   "homepage": "https://github.com/gguip1/community-fe#readme",
   "dependencies": {
     "bootstrap": "^5.3.8",
-    "http-proxy-middleware": "^3.0.5"
+    "express": "^5.1.0"
   },
   "directories": {
     "test": "tests"
+  },
+  "devDependencies": {
+    "jest": "^30.2.0"
   }
 }
