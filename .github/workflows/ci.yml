@@ -60,9 +60,9 @@ jobs:
           mask-password: true
 
       - name: Debug ECR Login
-        env: 
+        env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        run: echo "ECR Registry: $ECR_REGISTRY"
+        run: echo "$ECR_REGISTRY"
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
