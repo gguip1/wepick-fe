@@ -4,14 +4,23 @@ on:
     branches:
       - main
       - dev
+    paths-ignore:
+      - "docs/**"
+      - "**.md"
   pull_request:
     branches:
       - main
       - dev
+    paths-ignore:
+      - "docs/**"
+      - "**.md"
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [19.x, 22.x, 24.x]
 
     steps:
       - name: Checkout repository
@@ -20,8 +29,45 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "22.20.0"
+          node-version: ${{ matrix.node-version }}
+
       - name: Install dependencies
         run: npm ci
+
       - name: Run tests
         run: npm test
+
+    build-and-push:
+      needs: test
+      runs-on: ubuntu-latest
+
+      steps:
+        - name: Checkout repository
+          uses: actions/checkout@v4
+
+        - name: Configure AWS credentials
+          uses: aws-actions/configure-aws-credentials@v2
+          with:
+            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            aws-region: ap-northeast-2
+
+        - name: Login to Amazon ECR
+          id: login-ecr
+          uses: aws-actions/amazon-ecr-login@v1
+
+        - name: Set up QEMU
+          uses: docker/setup-qemu-action@v2
+
+        - name: Build and push Docker image to ECR
+          uses: docker/build-push-action@v4
+          env:
+            ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+            ECR_REPOSITORY: ktb-community/fe-registry
+            IMAGE_TAG: ${{ github.sha }}
+          with:
+            context: .
+            push: true
+            tags: |
+              ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
+              ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
