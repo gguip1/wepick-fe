@@ -1,12 +1,18 @@
-FROM node:22.20.0-alpine
+FROM node:22.20.0 AS builder
 
 WORKDIR /app
 
-COPY package*.json /app/
+COPY package*.json ./
 
-RUN npm install
+RUN npm ci --omit=dev
 
-COPY . /app
+COPY . .
+
+FROM node:22.20.0-alpine AS runner
+
+WORKDIR /app
+
+COPY --from=builder /app ./
 
 EXPOSE 3000
 
