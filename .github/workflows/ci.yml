@@ -64,14 +64,9 @@ jobs:
 
       - name: Build and push Docker image to ECR
         uses: docker/build-push-action@v4
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_ALIAS: a3y4e2t5
-          ECR_REPOSITORY: ktb-community/fe-registry
-          IMAGE_TAG: ${{ github.sha }}
         with:
           context: .
           push: true
           tags: |
-            ${{ env.ECR_REGISTRY }}/${{ env.ECR_ALIAS }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
-            ${{ env.ECR_REGISTRY }}/${{ env.ECR_ALIAS }}/${{ env.ECR_REPOSITORY }}:latest
+            ${{ steps.login-ecr.outputs.registry }}/a3y4e2t5/ktb-community/fe-registry:${{ github.sha }}
+            ${{ steps.login-ecr.outputs.registry }}/a3y4e2t5/ktb-community/fe-registry:latest
