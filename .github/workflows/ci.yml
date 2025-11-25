@@ -67,6 +67,12 @@ jobs:
         with:
           context: .
           push: true
+          platforms: linux/arm64
           tags: |
             ${{ steps.login-ecr.outputs.registry }}/a3y4e2t5/ktb-community/fe-registry:${{ github.sha }}
             ${{ steps.login-ecr.outputs.registry }}/a3y4e2t5/ktb-community/fe-registry:latest
+          # 캐시 활용 설정 / GitHub Actions 캐시 스토리지 사용
+          cache-from: type=gha
+          # 중간 빌드 단계의 모든 레이어를 최대한 캐시로 저장
+          # npm install 단계 캐싱에 효과적
+          cache-to: type=gha,mode=max
