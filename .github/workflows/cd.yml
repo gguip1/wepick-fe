@@ -25,39 +25,23 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-2
 
-      - name: Install Session Manager Plugin
+      # - name: Install Session Manager Plugin
+      #   run: |
+      #     curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_64bit/session-manager-plugin.deb" -o "session-manager-plugin.deb"
+      #     sudo dpkg -i session-manager-plugin.deb
+
+      - name: Upload Docker Compose file to S3
         run: |
-          curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_64bit/session-manager-plugin.deb" -o "session-manager-plugin.deb"
-          sudo dpkg -i session-manager-plugin.deb
-
-      - name: Setup SSH Config & Key
-        run: |
-          mkdir -p ~/.ssh
-
-          echo "host i-*" >> ~/.ssh/config
-          echo "  ProxyCommand sh -c \"aws ssm start-session --target %h --document-name AWS-StartSSHSession --parameters 'portNumber=%p'\"" >> ~/.ssh/config
-          echo "  StrictHostKeyChecking no" >> ~/.ssh/config
-
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > key.pem
-          chmod 400 key.pem
-
-      - name: Copy Docker Compose file to Server
-        run: |
-          scp -i key.pem -o StrictHostKeyChecking=no docker-compose.yml ${{ secrets.SERVER_USER }}@${{ secrets.AWS_EC2_INSTANCE_ID }}:/home/${{ secrets.SERVER_USER }}/
+          aws s3 cp docker-compose.yml s3://${{ secrets.AWS_S3_BUCKET_NAME }}/fe/docker-compose.yml
 
       - name: Deploy to EC2 with Docker
-        uses: peterkimzz/aws-ssm-send-command@master
-        with:
-          aws-region: "ap-northeast-2"
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          instance-ids: ${{ secrets.AWS_EC2_INSTANCE_ID }}
-
-          working-directory: "/home/${{ secrets.SERVER_USER }}/"
-          command: |
-            sudo su - ${{ secrets.SERVER_USER }} -c '
-              cd /home/${{ secrets.SERVER_USER }}/
-              docker compose pull
-              docker compose up -d
-              docker image prune -f
-            '
+        run: |
+          aws ssm send-command \
+            --region ap-northeast-2 \
+            --instance-ids ${{ secrets.AWS_EC2_INSTANCE_ID }} \
+            --document-name "AWS-RunShellScript" \
+            --comment "Executed by Github Actions" \
+            --parameters commands=[
+              "aws s3 cp s3://${{ secrets.AWS_S3_BUCKET_NAME }}/fe/docker-compose.yml /home/${{ secrets.SERVER_USER }}/",
+              "sudo su - ${{ secrets.SERVER_USER }} -c 'cd /home/${{ secrets.SERVER_USER }}/ && docker compose pull && docker compose up -d && docker image prune -f'"
+            ]
