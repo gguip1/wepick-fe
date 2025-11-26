@@ -1,8 +1,4 @@
 services:
-  # community-fe:
-  #   image: public.ecr.aws/a3y4e2t5/ktb-community/fe-registry:latest
-  #   ports:
-  #     - "3000:3000"
   community-fe:
     image: ${AWS_FE_IMAGE}:latest
     ports:
