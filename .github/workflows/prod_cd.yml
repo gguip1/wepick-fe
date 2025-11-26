@@ -53,16 +53,14 @@ jobs:
 
       - name: Health Check
         run: |
-          MAX_RETRIES=10
-          DELAY = 5
-
-          for i in $(seq 1 $MAX_RETRIES); do
-            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/health)
-            if [ "$HTTP_STATUS" -eq 200 ]; then
-              echo "Health check passed!"
-              exit 0
-            else
-              echo "Health check failed (status: $HTTP_STATUS). Retrying in $DELAY seconds..."
-              sleep $DELAY
-            fi
-          done
+          aws ssm send-commnad \
+            --region ap-northeast-2 \
+            --instance-ids ${{ secrets.AWS_EC2_INSTANCE_ID }} \
+            --document-name "AWS-RunShellScript" \
+            --comment "Health Check by Github Actions" \
+            --parameters '{
+              "commands": [
+                "sleep 15",
+                "curl -f http://localhost:3000/health || exit 1"
+              ]
+            }'
