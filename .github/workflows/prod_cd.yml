@@ -51,9 +51,12 @@ jobs:
               ]
             }'
 
+      # Health Check Step
+      # 실제 적절한 버전이 반영되었는지 확인 불가능
+      # 추후 github.sha 태그를 활용한 검증 로직 추가 고려
       - name: Health Check
         run: |
-          aws ssm send-commnad \
+          aws ssm send-command \
             --region ap-northeast-2 \
             --instance-ids ${{ secrets.AWS_EC2_INSTANCE_ID }} \
             --document-name "AWS-RunShellScript" \
