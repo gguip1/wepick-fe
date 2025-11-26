@@ -4,6 +4,6 @@ services:
   #   ports:
   #     - "3000:3000"
   community-fe:
-    image: ${AWS_ECR_REGISTRY_IMAGE}
+    image: ${AWS_FE_IMAGE}:latest
     ports:
       - "3000:3000"
