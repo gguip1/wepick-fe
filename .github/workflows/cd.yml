@@ -51,8 +51,9 @@ jobs:
 
           working-directory: "/home/${{ secrets.SERVER_USER }}/"
           command: |
-            set -e
-            cd /home/${{ secrets.SERVER_USER }}/
-            docker compose pull
-            docker compose up -d
-            docker image prune -f
+            sudo su - ${{ secrets.SERVER_USER }} -c '
+              cd /home/${{ secrets.SERVER_USER }}/
+              docker compose pull
+              docker compose up -d
+              docker image prune -f
+            '
