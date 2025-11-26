@@ -1,8 +1,8 @@
-name: FE CD
+name: FE CD - PROD
 
 on:
   workflow_run:
-    workflows: ["FE CI"]
+    workflows: ["FE CI - PROD"]
     types:
       - completed
     paths-ignore:
@@ -31,7 +31,12 @@ jobs:
       #     sudo dpkg -i session-manager-plugin.deb
 
       - name: Upload Docker Compose file to S3
+        # ECR_REGISTRY_IMAGE 변수를 실제 이미지 URI로 치환
+        # 현재는 GitHub Secrets에 저장된 값을 사용하지만 AWS SSM Parameter Store 등을 활용할 수도 있음
         run: |
+
+          sed -i "s|\\$AWS_ECR_REGISTRY_IMAGE|${{ secrets.AWS_ECR_REGISTRY_IMAGE }}|" docker-compose.yml
+
           aws s3 cp docker-compose.yml s3://${{ secrets.AWS_S3_BUCKET_NAME }}/fe/docker-compose.yml
 
       - name: Deploy to EC2 with Docker
@@ -43,7 +48,7 @@ jobs:
             --comment "Executed by Github Actions" \
             --parameters '{
               "commands": [
-                "aws s3 cp s3://your-bucket-name/fe/docker-compose.yml /home/ec2-user/docker-compose.yml",
+                "aws s3 cp s3://${{ secrets.AWS_S3_BUCKET_NAME }}/fe/docker-compose.yml /home/ec2-user/docker-compose.yml",
                 "sudo su - ec2-user -c \"cd /home/ec2-user && docker compose pull && docker compose up -d && docker image prune -f\""
               ]
             }'

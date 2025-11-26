@@ -1,4 +1,5 @@
-name: FE CI
+name: FE CI - PROD
+
 on:
   push:
     branches:
@@ -45,35 +46,34 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
-
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
-        with:
-          registry-type: public
-          mask-password: true
-
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
       - name: Build and push Docker image to ECR
         uses: docker/build-push-action@v4
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         with:
           context: .
           push: true
           platforms: linux/arm64
           tags: |
-            ${{ steps.login-ecr.outputs.registry }}/a3y4e2t5/ktb-community/fe-registry:${{ github.sha }}
-            ${{ steps.login-ecr.outputs.registry }}/a3y4e2t5/ktb-community/fe-registry:latest
+            ${{ env.ECR_REGISTRY }}/ktb-community/fe-registry:${{ github.sha }}
+            ${{ env.ECR_REGISTRY }}/ktb-community/fe-registry:latest
           # 캐시 활용 설정 / GitHub Actions 캐시 스토리지 사용
           cache-from: type=gha
           # 중간 빌드 단계의 모든 레이어를 최대한 캐시로 저장
