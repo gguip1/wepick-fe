@@ -41,7 +41,4 @@ jobs:
             --instance-ids ${{ secrets.AWS_EC2_INSTANCE_ID }} \
             --document-name "AWS-RunShellScript" \
             --comment "Executed by Github Actions" \
-            --parameters commands=[
-              "aws s3 cp s3://${{ secrets.AWS_S3_BUCKET_NAME }}/fe/docker-compose.yml /home/${{ secrets.SERVER_USER }}/",
-              "sudo su - ${{ secrets.SERVER_USER }} -c 'cd /home/${{ secrets.SERVER_USER }}/ && docker compose pull && docker compose up -d && docker image prune -f'"
-            ]
+            --parameters "commands=aws s3 cp s3://${{ secrets.AWS_S3_BUCKET_NAME }}/fe/docker-compose.yml /home/${{ secrets.SERVER_USER }}/docker-compose.yml && sudo su - ${{ secrets.SERVER_USER }} -c 'cd /home/${{ secrets.SERVER_USER }}/ && docker compose pull && docker compose up -d && docker image prune -f'"
