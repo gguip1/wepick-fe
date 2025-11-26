@@ -50,7 +50,7 @@ jobs:
           instance-ids: ${{ secrets.AWS_EC2_INSTANCE_ID }}
 
           working-directory: "/home/${{ secrets.SERVER_USER }}/"
-          commands: |
+          command: |
             set -e
             cd /home/${{ secrets.SERVER_USER }}/
             docker compose pull
