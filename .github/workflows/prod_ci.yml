@@ -18,7 +18,7 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     strategy:
       matrix:
         node-version: [20.x, 22.x, 24.x]
@@ -40,14 +40,14 @@ jobs:
 
   build-and-push:
     needs: test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+      # - name: Set up QEMU
+      #   uses: docker/setup-qemu-action@v2
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -72,7 +72,7 @@ jobs:
         with:
           context: .
           push: true
-          platforms: linux/arm64
+          # platforms: linux/arm64
           tags: |
             ${{ env.ECR_REGISTRY }}/ktb-community/fe-registry:${{ github.sha }}
             ${{ env.ECR_REGISTRY }}/ktb-community/fe-registry:latest

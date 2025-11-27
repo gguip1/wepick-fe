@@ -34,7 +34,6 @@ jobs:
         # ECR_REGISTRY_IMAGE 변수를 실제 이미지 URI로 치환
         # 현재는 GitHub Secrets에 저장된 값을 사용하지만 AWS SSM Parameter Store 등을 활용할 수도 있음
         run: |
-
           aws s3 cp docker-compose.yml s3://${{ secrets.AWS_S3_BUCKET_NAME }}/fe/docker-compose.yml
 
       - name: Deploy to EC2 with Docker
