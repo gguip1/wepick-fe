@@ -7,3 +7,7 @@ services:
       - community-network
     ports:
       - "3000:3000"
+
+networks:
+  community-network:
+    driver: bridge
