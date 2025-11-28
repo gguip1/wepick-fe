@@ -10,4 +10,5 @@ services:
 
 networks:
   community-network:
-    driver: bridge
+    external: true
+    name: community-network
