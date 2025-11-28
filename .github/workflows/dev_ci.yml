@@ -70,7 +70,7 @@ jobs:
           file: ./docker/prod/dockerfile
           push: true
           tags: |
-            ${{ steps.login-ecr.outputs.registry }}/a3y4e2t5/ktb-community/prod/fe-registry:${{ github.sha }}
-            ${{ steps.login-ecr.outputs.registry }}/a3y4e2t5/ktb-community/prod/fe-registry:latest
+            ${{ steps.login-ecr.outputs.registry }}/a3y4e2t5/ktb-community/dev/fe-registry:${{ github.sha }}
+            ${{ steps.login-ecr.outputs.registry }}/a3y4e2t5/ktb-community/dev/fe-registry:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
