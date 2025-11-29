@@ -7,9 +7,10 @@ const port = 3000;
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/assets', express.static(path.join(__dirname, 'assets')));
 
-// API routes
+// Routers
 const postRouter = require('./routes/posts');
 const userRouter = require('./routes/users');
+const wepickRouter = require('./routes/wepick');
 
 app.use('/posts', postRouter);
 app.use('/users', userRouter);
@@ -19,10 +20,8 @@ app.get('/health', (req, res) => {
     res.status(200).send('OK');
 });
 
-// Root redirect to posts list
-app.get('/', (req, res) => {
-    res.redirect('/posts');
-});
+// WePick routes (루트 경로에 마운트 - 반드시 마지막에)
+app.use('/', wepickRouter);
 
 // 404 handler - must be last
 app.use((req, res) => {
