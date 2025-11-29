@@ -137,6 +137,70 @@ await Toast.show("중요한 메시지", 0);
 
 ---
 
+### 5. Gauge Bar (gauge-bar.html)
+
+재사용 가능한 VS 게이지 바 컴포넌트 (Bootstrap 독립형)
+
+**사용법:**
+
+```html
+<!-- CSS 포함 -->
+<link rel="stylesheet" href="/css/components/gauge-bar.css" />
+
+<!-- HTML 컴포넌트 -->
+<div class="gauge-bar-component">
+  <div class="gauge-percentages">
+    <div class="gauge-percentage-item gauge-percentage-a">
+      <div class="gauge-option-label">Option A</div>
+      <div class="gauge-option-percentage" data-option="a">50%</div>
+    </div>
+    <div class="gauge-percentage-item gauge-percentage-b">
+      <div class="gauge-option-percentage" data-option="b">50%</div>
+      <div class="gauge-option-label">Option B</div>
+    </div>
+  </div>
+  <div class="gauge-progress-bar">
+    <div class="gauge-bar-fill" data-fill="a"></div>
+  </div>
+</div>
+
+<!-- JavaScript -->
+<script src="/js/components/gauge-bar.js"></script>
+<script>
+  const gauge = new GaugeBar('.gauge-bar-component', {
+    percentageA: 60,
+    percentageB: 40,
+    animate: true
+  });
+</script>
+```
+
+**기능:**
+
+- 실시간 퍼센트 업데이트
+- 부드러운 애니메이션
+- 자동 업데이트 모드 (랜덤 시뮬레이션)
+- 크기 변형 (small, medium, large)
+- 완전 반응형
+
+**API:**
+
+```javascript
+// 수동 업데이트
+gauge.update(55, 45);
+
+// 자동 업데이트 시작
+gauge.startAutoUpdate(4000); // 4초마다
+
+// 자동 업데이트 중지
+gauge.stopAutoUpdate();
+
+// 정리
+gauge.destroy();
+```
+
+---
+
 ## 🎨 스타일링
 
 모든 컴포넌트는 Bootstrap 5.3.8 클래스를 사용하며, 추가 커스텀 스타일은 `/css/custom.css`에 정의되어 있습니다.
