@@ -15,12 +15,11 @@ router.get('/', (req, res) => {
 });
 
 // 오늘의 선택/결과 페이지
-// TODO: 구현 예정
-// router.get('/today', (req, res) => {
-//   res.sendFile(
-//     path.join(__dirname, '..', 'public', 'pages', 'wepick', 'today-choice.html')
-//   );
-// });
+router.get('/today', (req, res) => {
+  res.sendFile(
+    path.join(__dirname, '..', 'public', 'pages', 'wepick', 'today-choice.html')
+  );
+});
 
 // 이전 토픽 리스트
 // TODO: 구현 예정
