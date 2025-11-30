@@ -118,3 +118,6 @@ class GaugeBar {
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = GaugeBar;
 }
+
+// Export as ES6 module
+export { GaugeBar };

@@ -1,3 +1,5 @@
+import { GaugeBar } from '../components/gauge-bar.js';
+
 /**
  * WePick Landing Page - Gauge Animation
  */

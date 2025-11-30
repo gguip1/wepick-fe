@@ -138,7 +138,7 @@ async function handleHttpError(status, apiResponse, skipAuthRedirect = false) {
         // skipAuthRedirect가 true면 리다이렉트하지 않음 (로그인/회원가입 페이지용)
         if (!skipAuthRedirect) {
             auth.clear();
-            window.location.href = config.ROUTES.SIGNIN;
+            // window.location.href = config.ROUTES.SIGNIN;
         }
         throw error;
     }
