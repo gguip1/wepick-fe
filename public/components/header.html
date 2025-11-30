@@ -1,65 +1,87 @@
-<nav class="navbar navbar-light bg-white border-bottom shadow-sm">
-  <div class="container-fluid">
-    <!-- 뒤로가기 버튼 -->
-    <button class="btn btn-link back-btn p-0 border-0" aria-label="뒤로가기">
+<!-- Global Header Component -->
+<header class="global-header" id="globalHeader">
+  <div class="header-container">
+    <!-- Logo -->
+    <a href="/" class="header-logo">
       <img
-        src="/assets/imgs/back_button.svg"
-        alt="뒤로가기"
-        width="24"
-        height="24"
+        src="/assets/imgs/wepick-logo-64.png"
+        alt="Wepick Logo"
+        class="header-logo-image"
       />
-    </button>
+      <span class="header-logo-text">Wepick</span>
+    </a>
 
-    <!-- 브랜드/타이틀 -->
-    <a
-      href="/posts"
-      class="navbar-brand mx-auto mb-0 h5 fw-bold text-decoration-none text-dark"
-      >WePick</a
-    >
+    <!-- Desktop Navigation -->
+    <nav class="header-nav">
+      <a href="/today" class="header-nav-link">오늘의 선택</a>
+      <a href="/topics" class="header-nav-link">이전 토픽</a>
+      <a href="/community" class="header-nav-link">커뮤니티</a>
+    </nav>
 
-    <!-- 프로필 드롭다운 -->
-    <div class="dropdown">
-      <button
-        class="btn btn-link profile-btn p-0 border-0"
-        type="button"
-        aria-label="프로필 메뉴"
-        aria-expanded="false"
-      >
-        <img
-          src="/assets/imgs/profile_icon.svg"
-          alt="프로필 메뉴"
-          width="40"
-          height="40"
-          class="profile-image"
-        />
-      </button>
-      <ul class="dropdown-menu profile-dropdown" role="menu" aria-hidden="true">
-        <li role="none">
-          <a class="dropdown-item" href="/users/edit" role="menuitem">
-            <i class="bi bi-person-circle me-2"></i>
-            <span>회원정보 수정</span>
+    <!-- User Menu -->
+    <div class="header-user-menu">
+      <!-- Not Logged In -->
+      <div class="header-auth-links" id="headerAuthLinks">
+        <a href="/users/signin" class="header-auth-link">로그인</a>
+        <a href="/users/signup" class="header-auth-link header-signup">
+          회원가입
+        </a>
+      </div>
+
+      <!-- Logged In -->
+      <div class="header-user-dropdown" id="headerUserDropdown" hidden>
+        <button class="header-user-button" id="headerUserButton">
+          <span id="headerUserName">사용자</span>
+          <span class="header-dropdown-arrow">▼</span>
+        </button>
+        <div class="header-dropdown-menu" id="headerDropdownMenu" hidden>
+          <a href="/users/edit" class="header-dropdown-item">프로필 수정</a>
+          <a href="/users/edit-password" class="header-dropdown-item">
+            비밀번호 변경
           </a>
-        </li>
-        <li role="none">
-          <a class="dropdown-item" href="/users/edit/password" role="menuitem">
-            <i class="bi bi-key me-2"></i>
-            <span>비밀번호 수정</span>
-          </a>
-        </li>
-        <li role="none">
-          <hr class="dropdown-divider" />
-        </li>
-        <li role="none">
-          <button
-            class="dropdown-item logout-btn text-danger"
-            type="button"
-            role="menuitem"
-          >
-            <i class="bi bi-box-arrow-right me-2"></i>
-            <span>로그아웃</span>
+          <button class="header-dropdown-item" id="headerLogoutButton">
+            로그아웃
           </button>
-        </li>
-      </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Menu Toggle -->
+    <button class="header-mobile-toggle" id="headerMobileToggle">
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+    </button>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div class="header-mobile-menu" id="headerMobileMenu" hidden>
+    <nav class="header-mobile-nav">
+      <a href="/today" class="header-mobile-link">오늘의 선택</a>
+      <a href="/topics" class="header-mobile-link">이전 토픽</a>
+      <a href="/community" class="header-mobile-link">커뮤니티</a>
+    </nav>
+
+    <div class="header-mobile-auth">
+      <!-- Not Logged In -->
+      <div class="header-mobile-auth-links" id="headerMobileAuthLinks">
+        <a href="/users/signin" class="header-mobile-auth-link">로그인</a>
+        <a href="/users/signup" class="header-mobile-auth-link">회원가입</a>
+      </div>
+
+      <!-- Logged In -->
+      <div class="header-mobile-user" id="headerMobileUser" hidden>
+        <span class="header-mobile-username" id="headerMobileUserName">
+          사용자
+        </span>
+        <a href="/users/edit" class="header-mobile-link">프로필 수정</a>
+        <a href="/users/edit-password" class="header-mobile-link">
+          비밀번호 변경
+        </a>
+        <button class="header-mobile-link" id="headerMobileLogoutButton">
+          로그아웃
+        </button>
+      </div>
     </div>
   </div>
-</nav>
+</header>

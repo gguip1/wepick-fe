@@ -1,28 +1,329 @@
-/* ===== 헤더 컴포넌트 ===== */
-header {
+/* ===== Global Header Component ===== */
+.global-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(2, 5, 28, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 1000;
+    padding: 1rem 0;
+}
+
+.header-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 var(--spacing-lg);
-    height: 60px;
-    background-color: var(--color-bg-primary);
-    border-bottom: 1px solid var(--color-border-light);
-    box-shadow: var(--shadow-sm);
-    position: relative;
-    z-index: var(--z-sticky);
+    gap: 2rem;
 }
 
-/* ===== 헤더 제목 ===== */
-header .title {
+/* Logo */
+.header-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    flex-shrink: 0;
+}
+
+.header-logo-image {
+    height: 40px;
+    width: auto;
+}
+
+.header-logo-text {
+    color: white;
+    font-weight: 600;
+    font-size: 1.25rem;
+}
+
+/* Desktop Navigation */
+.header-nav {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.header-nav-link {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 500;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.header-nav-link:hover {
+    color: white;
+    background: rgba(59, 130, 246, 0.1);
+}
+
+.header-nav-link.active {
+    color: #3b82f6;
+    background: rgba(59, 130, 246, 0.2);
+}
+
+/* User Menu */
+.header-user-menu {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Auth Links (Not Logged In) */
+.header-auth-links {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.header-auth-links[hidden] {
+    display: none;
+}
+
+.header-auth-link {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 500;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.header-auth-link:hover {
+    color: white;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.header-auth-link.header-signup {
+    background: #3b82f6;
+    color: white;
+}
+
+.header-auth-link.header-signup:hover {
+    background: #2563eb;
+}
+
+/* User Dropdown (Logged In) */
+.header-user-dropdown {
+    position: relative;
+}
+
+.header-user-dropdown[hidden] {
+    display: none;
+}
+
+.header-user-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.header-user-button:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.header-dropdown-arrow {
+    font-size: 0.75rem;
+    transition: transform 0.3s ease;
+}
+
+.header-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    background: rgba(2, 5, 28, 0.98);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    min-width: 200px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+}
+
+.header-dropdown-menu[hidden] {
+    display: none;
+}
+
+.header-dropdown-item {
+    display: block;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: none;
+    font-size: 0.9375rem;
+    border: none;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.header-dropdown-item:hover {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+}
+
+/* Mobile Menu Toggle */
+.header-mobile-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+    background: none;
+    border: none;
+    padding: 0.5rem;
+    cursor: pointer;
+}
+
+.hamburger-line {
+    width: 24px;
+    height: 2px;
+    background: white;
+    transition: all 0.3s ease;
+}
+
+/* Mobile Menu */
+.header-mobile-menu {
+    display: none;
+    position: fixed;
+    top: 60px;
+    left: 0;
+    right: 0;
+    background: rgba(2, 5, 28, 0.98);
+    padding: 1rem;
+    max-height: calc(100vh - 60px);
+    overflow-y: auto;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.header-mobile-menu[hidden] {
+    display: none;
+}
+
+.header-mobile-auth-links[hidden] {
+    display: none;
+}
+
+.header-mobile-user[hidden] {
+    display: none;
+}
+
+.header-mobile-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.header-mobile-link {
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: none;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+}
+
+.header-mobile-link:hover {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+}
+
+.header-mobile-auth {
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.header-mobile-auth-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.header-mobile-auth-link {
+    display: block;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: none;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+}
+
+.header-mobile-auth-link:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.header-mobile-user {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.header-mobile-username {
+    color: white;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+}
+
+.header-mobile-user .header-mobile-link {
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+}
+
+.header-mobile-user #headerMobileLogoutButton {
+    color: #10b981;
+    font-weight: 500;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .header-nav {
+        display: none;
+    }
+
+    .header-mobile-toggle {
+        display: flex;
+    }
+
+    .header-user-menu {
+        display: none;
+    }
+
+    .header-container {
+        padding: 0 1rem;
+    }
+}
+
+/* ===== Old Header Styles (keep for compatibility) ===== */
+/* header .title {
     font-size: var(--font-size-xl);
     font-weight: var(--font-weight-bold);
     color: var(--color-text-primary);
     margin: 0;
     line-height: var(--line-height-tight);
-}
+} */
 
 /* ===== 헤더 버튼들 ===== */
-header .back-btn, 
+/* header .back-btn, 
 header .profile-btn {
     background: none;
     border: none;
@@ -45,10 +346,10 @@ header .back-btn:focus,
 header .profile-btn:focus {
     outline: 2px solid var(--color-primary);
     outline-offset: 2px;
-}
+} */
 
 /* ===== 헤더 아이콘 ===== */
-header .back-btn img, 
+/* header .back-btn img, 
 header .profile-btn img {
     width: 30px;
     height: 30px;
@@ -61,10 +362,10 @@ header .profile-btn img {
 header .back-btn:hover img,
 header .profile-btn:hover img {
     transform: scale(1.1);
-}
+} */
 
 /* ===== 프로필 드롭다운 ===== */
-header .profile-dropdown {
+/* header .profile-dropdown {
     position: absolute;
     top: 100%;
     right: var(--spacing-lg);
@@ -91,10 +392,10 @@ header .profile-dropdown.show {
     opacity: 1;
     transform: translateY(0) scale(1);
     pointer-events: auto;
-}
+} */
 
 /* ===== 드롭다운 아이템 ===== */
-header .profile-dropdown-item {
+/* header .profile-dropdown-item {
     margin: 0;
     padding: 0;
 }
@@ -128,20 +429,20 @@ header .profile-dropdown-item:last-child a,
 header .profile-dropdown-item:last-child button {
     border-bottom-left-radius: var(--border-radius-md);
     border-bottom-right-radius: var(--border-radius-md);
-}
+} */
 
 /* ===== 드롭다운 호버 효과 ===== */
-header .profile-dropdown-item a:hover,
+/* header .profile-dropdown-item a:hover,
 header .profile-dropdown-item a:focus-visible,
 header .profile-dropdown-item button:hover,
 header .profile-dropdown-item button:focus-visible {
     background-color: var(--color-primary-bg);
     color: var(--color-primary);
     outline: none;
-}
+} */
 
 /* ===== 로그아웃 버튼 특별 스타일 ===== */
-header .profile-dropdown-item .logout-btn {
+/* header .profile-dropdown-item .logout-btn {
     color: var(--color-danger);
 }
 
@@ -150,10 +451,10 @@ header .profile-dropdown-item .logout-btn:focus-visible {
     background-color: var(--color-danger-bg);
     color: var(--color-danger);
     outline: none;
-}
+} */
 
 /* ===== 반응형 디자인 ===== */
-@media (max-width: 768px) {
+/* @media (max-width: 768px) {
     header {
         padding: 0 var(--spacing-md);
         height: 56px;
@@ -179,4 +480,4 @@ header .profile-dropdown-item .logout-btn:focus-visible {
         right: var(--spacing-md);
         min-width: 180px;
     }
-}
+} */
