@@ -10,19 +10,27 @@ import { UsersAPI } from '../api/users.js';
  * @returns {Promise<void>}
  */
 export async function initHeaderAuth() {
+  // Initialize bottom navigation active state
+  initBottomNav();
   const headerAuthLinks = document.getElementById('headerAuthLinks');
   const headerUserDropdown = document.getElementById('headerUserDropdown');
   const headerUserName = document.getElementById('headerUserName');
+  const headerUserImage = document.getElementById('headerUserImage');
   const headerUserButton = document.getElementById('headerUserButton');
   const headerDropdownMenu = document.getElementById('headerDropdownMenu');
+  const headerDropdownUserName = document.getElementById('headerDropdownUserName');
+  const headerDropdownUserEmail = document.getElementById('headerDropdownUserEmail');
+  const headerDropdownImage = document.getElementById('headerDropdownImage');
   const headerLogoutButton = document.getElementById('headerLogoutButton');
 
   // Mobile elements
   const headerMobileToggle = document.getElementById('headerMobileToggle');
+  const headerMobileToggleImage = document.getElementById('headerMobileToggleImage');
+  const headerMobileAuthButtons = document.getElementById('headerMobileAuthButtons');
   const headerMobileMenu = document.getElementById('headerMobileMenu');
-  const headerMobileAuthLinks = document.getElementById('headerMobileAuthLinks');
-  const headerMobileUser = document.getElementById('headerMobileUser');
   const headerMobileUserName = document.getElementById('headerMobileUserName');
+  const headerMobileUserEmail = document.getElementById('headerMobileUserEmail');
+  const headerMobileMenuImage = document.getElementById('headerMobileMenuImage');
   const headerMobileLogoutButton = document.getElementById('headerMobileLogoutButton');
 
   // Setup mobile menu toggle
@@ -47,15 +55,32 @@ export async function initHeaderAuth() {
    * Show logged in state
    */
   function showLoggedInState(user) {
+    const profileImageUrl = user.profileImageUrl || '/assets/imgs/profile_icon.svg';
+
     // Desktop
     if (headerAuthLinks) headerAuthLinks.setAttribute('hidden', '');
     if (headerUserDropdown) headerUserDropdown.removeAttribute('hidden');
     if (headerUserName) headerUserName.textContent = user.nickname || user.email;
 
-    // Mobile
-    if (headerMobileAuthLinks) headerMobileAuthLinks.setAttribute('hidden', '');
-    if (headerMobileUser) headerMobileUser.removeAttribute('hidden');
+    // Set profile image (desktop button)
+    if (headerUserImage) {
+      headerUserImage.src = profileImageUrl;
+    }
+
+    // Set dropdown user info (desktop)
+    if (headerDropdownUserName) headerDropdownUserName.textContent = user.nickname || user.email;
+    if (headerDropdownUserEmail) headerDropdownUserEmail.textContent = user.email;
+    if (headerDropdownImage) headerDropdownImage.src = profileImageUrl;
+
+    // Mobile - Hide auth buttons, show profile toggle
+    if (headerMobileAuthButtons) headerMobileAuthButtons.setAttribute('hidden', '');
+    if (headerMobileToggle) headerMobileToggle.removeAttribute('hidden');
+
+    // Set mobile menu user info
     if (headerMobileUserName) headerMobileUserName.textContent = user.nickname || user.email;
+    if (headerMobileUserEmail) headerMobileUserEmail.textContent = user.email;
+    if (headerMobileToggleImage) headerMobileToggleImage.src = profileImageUrl;
+    if (headerMobileMenuImage) headerMobileMenuImage.src = profileImageUrl;
 
     // Setup event listeners
     setupDropdown();
@@ -70,9 +95,9 @@ export async function initHeaderAuth() {
     if (headerAuthLinks) headerAuthLinks.removeAttribute('hidden');
     if (headerUserDropdown) headerUserDropdown.setAttribute('hidden', '');
 
-    // Mobile
-    if (headerMobileAuthLinks) headerMobileAuthLinks.removeAttribute('hidden');
-    if (headerMobileUser) headerMobileUser.setAttribute('hidden', '');
+    // Mobile - Show auth buttons, hide profile toggle
+    if (headerMobileAuthButtons) headerMobileAuthButtons.removeAttribute('hidden');
+    if (headerMobileToggle) headerMobileToggle.setAttribute('hidden', '');
   }
 
   /**
@@ -164,10 +189,36 @@ export async function initHeaderAuth() {
     window.addEventListener('resize', () => {
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(() => {
-        if (window.innerWidth > 768) {
+        if (window.innerWidth > 1024) {
           closeMobileMenu();
         }
       }, 250);
+    });
+  }
+
+  /**
+   * Initialize bottom navigation active state
+   */
+  function initBottomNav() {
+    const activeNav = document.body.dataset.activeNav;
+    if (!activeNav) return;
+
+    // Map activeNav values to bottom nav hrefs
+    const navMap = {
+      'today': '/today',
+      'topics': '/topics',
+      'community': '/community'
+    };
+
+    const targetHref = navMap[activeNav];
+    if (!targetHref) return;
+
+    // Add active class to matching bottom nav item
+    const bottomNavItems = document.querySelectorAll('.bottom-nav-item');
+    bottomNavItems.forEach(item => {
+      if (item.getAttribute('href') === targetHref) {
+        item.classList.add('active');
+      }
     });
   }
 }

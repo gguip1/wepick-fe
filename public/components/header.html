@@ -31,57 +31,92 @@
       <!-- Logged In -->
       <div class="header-user-dropdown" id="headerUserDropdown" hidden>
         <button class="header-user-button" id="headerUserButton">
+          <img
+            id="headerUserImage"
+            src="/assets/imgs/profile_icon.svg"
+            alt="Profile"
+            class="header-user-image"
+          />
           <span id="headerUserName">사용자</span>
           <span class="header-dropdown-arrow">▼</span>
         </button>
         <div class="header-dropdown-menu" id="headerDropdownMenu" hidden>
-          <a href="/users/edit" class="header-dropdown-item">프로필 수정</a>
-          <a href="/users/edit-password" class="header-dropdown-item">
-            비밀번호 변경
-          </a>
-          <button class="header-dropdown-item" id="headerLogoutButton">
-            로그아웃
-          </button>
+          <div class="header-dropdown-user-info">
+            <img
+              id="headerDropdownImage"
+              src="/assets/imgs/profile_icon.svg"
+              alt="Profile"
+              class="header-dropdown-image"
+            />
+            <div class="header-dropdown-user-details">
+              <span class="header-dropdown-username" id="headerDropdownUserName">사용자</span>
+              <span class="header-dropdown-useremail" id="headerDropdownUserEmail">user@example.com</span>
+            </div>
+          </div>
+          <div class="header-dropdown-divider"></div>
+          <div class="header-dropdown-items">
+            <a href="/users/edit" class="header-dropdown-item">프로필 수정</a>
+            <a href="/users/edit-password" class="header-dropdown-item">비밀번호 변경</a>
+            <button class="header-dropdown-item logout-item" id="headerLogoutButton">로그아웃</button>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Mobile Menu Toggle -->
-    <button class="header-mobile-toggle" id="headerMobileToggle">
-      <span class="hamburger-line"></span>
-      <span class="hamburger-line"></span>
-      <span class="hamburger-line"></span>
-    </button>
-  </div>
-
-  <!-- Mobile Menu -->
-  <div class="header-mobile-menu" id="headerMobileMenu" hidden>
-    <nav class="header-mobile-nav">
-      <a href="/today" class="header-mobile-link">오늘의 선택</a>
-      <a href="/topics" class="header-mobile-link">이전 토픽</a>
-      <a href="/community" class="header-mobile-link">커뮤니티</a>
-    </nav>
-
-    <div class="header-mobile-auth">
+    <div class="header-mobile-user-section">
       <!-- Not Logged In -->
-      <div class="header-mobile-auth-links" id="headerMobileAuthLinks">
-        <a href="/users/signin" class="header-mobile-auth-link">로그인</a>
-        <a href="/users/signup" class="header-mobile-auth-link">회원가입</a>
+      <div class="header-mobile-auth-buttons" id="headerMobileAuthButtons">
+        <a href="/users/signin" class="header-mobile-signin-btn">로그인</a>
       </div>
 
       <!-- Logged In -->
-      <div class="header-mobile-user" id="headerMobileUser" hidden>
-        <span class="header-mobile-username" id="headerMobileUserName">
-          사용자
-        </span>
-        <a href="/users/edit" class="header-mobile-link">프로필 수정</a>
-        <a href="/users/edit-password" class="header-mobile-link">
-          비밀번호 변경
-        </a>
-        <button class="header-mobile-link" id="headerMobileLogoutButton">
-          로그아웃
-        </button>
+      <button class="header-mobile-toggle" id="headerMobileToggle" hidden>
+        <img
+          id="headerMobileToggleImage"
+          src="/assets/imgs/profile_icon.svg"
+          alt="Profile"
+          class="header-mobile-toggle-image"
+        />
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile User Menu (Logged In Only) -->
+  <div class="header-mobile-menu" id="headerMobileMenu" hidden>
+    <div class="header-mobile-user-info">
+      <img
+        id="headerMobileMenuImage"
+        src="/assets/imgs/profile_icon.svg"
+        alt="Profile"
+        class="header-mobile-menu-image"
+      />
+      <div class="header-mobile-user-details">
+        <span class="header-mobile-username" id="headerMobileUserName">사용자</span>
+        <span class="header-mobile-useremail" id="headerMobileUserEmail">user@example.com</span>
       </div>
+    </div>
+    <div class="header-mobile-menu-divider"></div>
+    <div class="header-mobile-menu-items">
+      <a href="/users/edit" class="header-mobile-menu-item">프로필 수정</a>
+      <a href="/users/edit-password" class="header-mobile-menu-item">비밀번호 변경</a>
+      <button class="header-mobile-menu-item logout-item" id="headerMobileLogoutButton">로그아웃</button>
     </div>
   </div>
 </header>
+
+<!-- Bottom Navigation (Mobile Only) -->
+<nav class="bottom-nav" id="bottomNav">
+  <a href="/today" class="bottom-nav-item">
+    <span class="bottom-nav-icon">🎯</span>
+    <span class="bottom-nav-label">오늘의 선택</span>
+  </a>
+  <a href="/topics" class="bottom-nav-item">
+    <span class="bottom-nav-icon">📋</span>
+    <span class="bottom-nav-label">이전 토픽</span>
+  </a>
+  <a href="/community" class="bottom-nav-item">
+    <span class="bottom-nav-icon">💬</span>
+    <span class="bottom-nav-label">커뮤니티</span>
+  </a>
+</nav>
