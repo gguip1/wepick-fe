@@ -10,8 +10,10 @@ import { UsersAPI } from '../api/users.js';
  * @returns {Promise<void>}
  */
 export async function initHeaderAuth() {
-  // Initialize bottom navigation active state
+  // Initialize navigation active state
   initBottomNav();
+  initHeaderNav();
+
   const headerAuthLinks = document.getElementById('headerAuthLinks');
   const headerUserDropdown = document.getElementById('headerUserDropdown');
   const headerUserName = document.getElementById('headerUserName');
@@ -193,6 +195,32 @@ export async function initHeaderAuth() {
           closeMobileMenu();
         }
       }, 250);
+    });
+  }
+
+  /**
+   * Initialize header navigation active state
+   */
+  function initHeaderNav() {
+    const activeNav = document.body.dataset.activeNav;
+    if (!activeNav) return;
+
+    // Map activeNav values to header nav hrefs
+    const navMap = {
+      'today': '/today',
+      'topics': '/topics',
+      'community': '/community'
+    };
+
+    const targetHref = navMap[activeNav];
+    if (!targetHref) return;
+
+    // Add active class to matching header nav item
+    const headerNavLinks = document.querySelectorAll('.header-nav-link');
+    headerNavLinks.forEach(link => {
+      if (link.getAttribute('href') === targetHref) {
+        link.classList.add('active');
+      }
     });
   }
 
