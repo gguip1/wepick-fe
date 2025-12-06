@@ -39,8 +39,8 @@ async function init() {
   // 이벤트 리스너 설정
   setupEventListeners();
 
-  // 초기 게시물 로드
-  await loadPosts();
+  // 초기 게시물 로드 (전역 로딩 사용)
+  await loadPosts(true);
 
   // 무한 스크롤 설정
   setupInfiniteScroll();
@@ -73,6 +73,11 @@ function cacheElements() {
     endMessage: document.querySelector(".end-message"),
     scrollTrigger: document.querySelector(".scroll-trigger"),
   };
+
+  // 초기 상태: 로딩 인디케이터 명시적으로 숨김
+  if (elements.loadingIndicator) {
+    elements.loadingIndicator.style.display = 'none';
+  }
 
   // Set active navigation
   const activeNav = document.body.dataset.activeNav;
@@ -143,18 +148,29 @@ function setupInfiniteScroll() {
 
 /**
  * 게시물 로드
+ * @param {boolean} isInitialLoad - 첫 로딩 여부
  */
-async function loadPosts() {
+async function loadPosts(isInitialLoad = false) {
   if (state.isLoading || !state.hasNext) {
     return;
   }
 
   state.isLoading = true;
-  showLoading();
+
+  // 첫 로딩이 아닐 때만 스켈레톤 UI 표시
+  if (!isInitialLoad) {
+    showLoading();
+  }
+
+  // 타임아웃 설정 (10초)
+  const timeoutPromise = new Promise((_, reject) => {
+    setTimeout(() => reject(new Error('Request timeout')), 10000);
+  });
 
   try {
-    // 로컬 로딩 인디케이터를 사용하므로 전역 로딩 비활성화
-    const response = await PostsAPI.getList(state.lastPostId, { showLoading: false });
+    // 첫 로딩은 전역 로딩 사용, 이후는 로컬 스켈레톤 사용
+    const apiPromise = PostsAPI.getList(state.lastPostId, { showLoading: isInitialLoad });
+    const response = await Promise.race([apiPromise, timeoutPromise]);
 
     if (response.status >= 200 && response.status < 300 && response.data) {
       const { posts, lastPostId, hasNext } = response.data;
@@ -167,18 +183,32 @@ async function loadPosts() {
       state.hasNext = hasNext;
     } else {
       console.error("Failed to load posts:", response.error);
+      showErrorMessage("게시물을 불러오는데 실패했습니다.");
+      state.hasNext = false;
     }
   } catch (error) {
     console.error("Error loading posts:", error);
+
+    // 타임아웃 또는 네트워크 에러 처리
+    if (error.message === 'Request timeout') {
+      showErrorMessage("서버 연결 시간이 초과되었습니다. 잠시 후 다시 시도해주세요.");
+    } else {
+      showErrorMessage("게시물을 불러올 수 없습니다. 네트워크 연결을 확인해주세요.");
+    }
+    state.hasNext = false;
   } finally {
     state.isLoading = false;
 
-    // 더 이상 게시물이 없으면 종료 메시지 표시 후 로딩 숨김
-    if (!state.hasNext) {
+    // 첫 로딩이 아닐 때만 로딩 숨김
+    if (!isInitialLoad) {
       hideLoading();
+      // 더 이상 게시물이 없으면 종료 메시지 표시
+      if (!state.hasNext && elements.postList.children.length > 0) {
+        showEndMessage();
+      }
+    } else if (!state.hasNext && elements.postList.children.length > 0) {
+      // 첫 로딩이면서 더 이상 게시물이 없을 때만 종료 메시지 표시
       showEndMessage();
-    } else {
-      hideLoading();
     }
   }
 }
@@ -203,123 +233,115 @@ function renderPosts(posts) {
 }
 
 /**
- * 게시물 아이템 생성
+ * 게시물 카드 생성
  * @param {Object} post - Post data
  * @returns {HTMLElement}
  */
 function createPostItem(post) {
-  const item = document.createElement('div');
-  item.className = 'post-item';
-  item.dataset.postId = post.postId;
-  item.addEventListener('click', () => {
+  const card = document.createElement('div');
+  card.className = 'post-card';
+  card.dataset.postId = post.postId;
+  card.addEventListener('click', () => {
     navigation.goTo(`/posts/${post.postId}`);
   });
 
-  // Post Header
+  // Card Header (Author + Date + Badge)
   const header = document.createElement('div');
-  header.className = 'post-header';
+  header.className = 'card-header';
 
-  const titleSection = document.createElement('div');
-  titleSection.className = 'post-title-section';
-
-  const postNumber = document.createElement('span');
-  postNumber.className = 'post-number';
-  postNumber.textContent = `#${post.postId}`;
-
-  const title = document.createElement('h3');
-  title.className = 'post-title';
-  title.textContent = post.title;
-
-  titleSection.appendChild(postNumber);
-  titleSection.appendChild(title);
-
-  // Topic badge if linked
-  if (post.topicId) {
-    const badge = document.createElement('span');
-    badge.className = 'topic-badge';
-    badge.textContent = 'WePick';
-    titleSection.appendChild(badge);
-  }
-
-  header.appendChild(titleSection);
-
-  // Post Meta
-  const meta = document.createElement('div');
-  meta.className = 'post-meta';
-
-  // Author section with profile image
   const authorSection = document.createElement('div');
-  authorSection.className = 'post-author-section';
+  authorSection.className = 'card-author-section';
 
   const authorImage = document.createElement('img');
-  authorImage.className = 'post-author-image';
+  authorImage.className = 'card-author-image';
   authorImage.src = post.author?.profileImageUrl || '/assets/imgs/profile_icon.svg';
   authorImage.alt = 'Profile';
 
-  const author = document.createElement('span');
-  author.className = 'post-author';
-  author.textContent = post.author?.nickname || '알 수 없음';
+  const authorInfo = document.createElement('div');
+  authorInfo.className = 'card-author-info';
 
-  authorSection.appendChild(authorImage);
-  authorSection.appendChild(author);
+  const authorName = document.createElement('div');
+  authorName.className = 'card-author-name';
+  authorName.textContent = post.author?.nickname || '알 수 없음';
 
-  const separator1 = document.createElement('span');
-  separator1.className = 'meta-separator';
-  separator1.textContent = '·';
-
-  const date = document.createElement('span');
-  date.className = 'post-date';
+  const date = document.createElement('div');
+  date.className = 'card-date';
   date.textContent = formatDate(post.createdAt);
 
-  const stats = document.createElement('div');
-  stats.className = 'post-stats';
+  authorInfo.appendChild(authorName);
+  authorInfo.appendChild(date);
+  authorSection.appendChild(authorImage);
+  authorSection.appendChild(authorInfo);
+  header.appendChild(authorSection);
 
-  const viewsItem = document.createElement('div');
-  viewsItem.className = 'post-stat-item';
-  const viewsIcon = document.createElement('span');
-  viewsIcon.className = 'post-stat-icon';
-  viewsIcon.textContent = '👁';
-  const views = document.createElement('span');
-  views.className = 'post-views';
-  views.textContent = post.viewCount || 0;
-  viewsItem.appendChild(viewsIcon);
-  viewsItem.appendChild(views);
+  // Topic badge if linked
+  if (post.topicId) {
+    const badge = document.createElement('div');
+    badge.className = 'card-topic-badge';
+    badge.textContent = 'WePick';
+    header.appendChild(badge);
+  }
 
-  const likesItem = document.createElement('div');
-  likesItem.className = 'post-stat-item';
-  const likesIcon = document.createElement('span');
-  likesIcon.className = 'post-stat-icon';
-  likesIcon.textContent = '♡';
-  const likes = document.createElement('span');
-  likes.className = 'post-likes';
-  likes.textContent = post.likeCount || 0;
-  likesItem.appendChild(likesIcon);
-  likesItem.appendChild(likes);
+  card.appendChild(header);
 
-  const commentsItem = document.createElement('div');
-  commentsItem.className = 'post-stat-item';
-  const commentsIcon = document.createElement('span');
-  commentsIcon.className = 'post-stat-icon';
-  commentsIcon.textContent = '💬';
-  const comments = document.createElement('span');
-  comments.className = 'post-comments';
-  comments.textContent = post.commentCount || 0;
-  commentsItem.appendChild(commentsIcon);
-  commentsItem.appendChild(comments);
+  // Card Title
+  const title = document.createElement('h3');
+  title.className = 'card-title';
+  title.textContent = post.title;
+  card.appendChild(title);
 
-  stats.appendChild(viewsItem);
-  stats.appendChild(likesItem);
-  stats.appendChild(commentsItem);
+  // Card Content Preview (최대 2줄)
+  if (post.content) {
+    const content = document.createElement('div');
+    content.className = 'card-content';
+    content.textContent = post.content;
+    card.appendChild(content);
+  }
 
-  meta.appendChild(authorSection);
-  meta.appendChild(separator1);
-  meta.appendChild(date);
-  meta.appendChild(stats);
+  // Card Footer (Stats)
+  const footer = document.createElement('div');
+  footer.className = 'card-footer';
 
-  item.appendChild(header);
-  item.appendChild(meta);
+  const viewsStat = document.createElement('div');
+  viewsStat.className = 'card-stat';
+  const viewsIcon = document.createElement('img');
+  viewsIcon.className = 'card-stat-icon';
+  viewsIcon.src = '/assets/imgs/view_icon.svg';
+  viewsIcon.alt = 'views';
+  const viewsCount = document.createElement('span');
+  viewsCount.textContent = post.viewCount || 0;
+  viewsStat.appendChild(viewsIcon);
+  viewsStat.appendChild(viewsCount);
 
-  return item;
+  const likesStat = document.createElement('div');
+  likesStat.className = 'card-stat';
+  const likesIcon = document.createElement('img');
+  likesIcon.className = 'card-stat-icon';
+  likesIcon.src = '/assets/imgs/like_icon.svg';
+  likesIcon.alt = 'likes';
+  const likesCount = document.createElement('span');
+  likesCount.textContent = post.likeCount || 0;
+  likesStat.appendChild(likesIcon);
+  likesStat.appendChild(likesCount);
+
+  const commentsStat = document.createElement('div');
+  commentsStat.className = 'card-stat';
+  const commentsIcon = document.createElement('img');
+  commentsIcon.className = 'card-stat-icon';
+  commentsIcon.src = '/assets/imgs/comment_icon.svg';
+  commentsIcon.alt = 'comments';
+  const commentsCount = document.createElement('span');
+  commentsCount.textContent = post.commentCount || 0;
+  commentsStat.appendChild(commentsIcon);
+  commentsStat.appendChild(commentsCount);
+
+  footer.appendChild(viewsStat);
+  footer.appendChild(likesStat);
+  footer.appendChild(commentsStat);
+
+  card.appendChild(footer);
+
+  return card;
 }
 
 /**
@@ -372,6 +394,18 @@ function hideLoading() {
  */
 function showEndMessage() {
   if (elements.endMessage) {
+    elements.endMessage.removeAttribute('hidden');
+    elements.endMessage.style.display = 'block';
+  }
+}
+
+/**
+ * 에러 메시지 표시
+ */
+function showErrorMessage(message) {
+  // 종료 메시지 요소를 에러 메시지로 재사용
+  if (elements.endMessage) {
+    elements.endMessage.innerHTML = `<p style="color: #ef4444;">${message}</p>`;
     elements.endMessage.removeAttribute('hidden');
     elements.endMessage.style.display = 'block';
   }

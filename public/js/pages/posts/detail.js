@@ -12,8 +12,7 @@ import { config } from "../../config.js";
 import { createCommentCard } from "../../components/card.js";
 import { Modal } from "../../components/modal.js";
 import { Toast } from "../../components/toast.js";
-import { initHeader } from "../../components/header.js";
-import { initFooter } from "../../components/footer.js";
+import { initHeaderAuth } from "../../utils/header-init.js";
 
 const PAGE_ID = "posts-detail";
 
@@ -111,7 +110,7 @@ async function getCurrentUser() {
  */
 function renderPostDetail(post) {
   const section = dom.qs("#post-detail-section");
-  
+
   // 스켈레톤 로더 제거
   const skeletonLoader = dom.qs(".skeleton-loader", section);
   if (skeletonLoader) {
@@ -120,85 +119,88 @@ function renderPostDetail(post) {
 
   // 게시물 컨테이너 생성
   const article = document.createElement("article");
-  article.className = "post-detail-content mt-3";
+  article.className = "post-detail-content";
   article.dataset.postId = post.postId;
+
+  // Topic badge if linked
+  if (post.topicId) {
+    const badge = document.createElement("div");
+    badge.className = "topic-badge";
+    badge.textContent = "🎯 WePick Today와 연동된 게시물";
+    article.appendChild(badge);
+  }
 
   // 1. 제목
   const title = document.createElement("h1");
-  title.className = "post-title fw-bold mb-3";
+  title.className = "post-title";
   title.textContent = post.title;
   article.appendChild(title);
 
   // 2. 작성자 정보 + 통계 + 수정/삭제 버튼
   const metaBar = document.createElement("div");
-  metaBar.className = "meta-bar d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom";
+  metaBar.className = "meta-bar";
 
   const leftSection = document.createElement("div");
-  leftSection.className = "d-flex align-items-center gap-3";
+  leftSection.className = "meta-bar-left";
 
   // 작성자 정보
   const authorSection = document.createElement("div");
-  authorSection.className = "d-flex align-items-center gap-2";
+  authorSection.className = "author-section";
 
   const authorImage = document.createElement("img");
   authorImage.src = post.author.profileImageUrl || "/assets/imgs/profile_icon.svg";
   authorImage.alt = post.author.nickname;
-  authorImage.className = "rounded-circle";
-  authorImage.style.width = "32px";
-  authorImage.style.height = "32px";
-  authorImage.style.objectFit = "cover";
+  authorImage.className = "author-image";
 
   const authorInfo = document.createElement("div");
-  authorInfo.className = "d-flex align-items-center gap-2 flex-wrap";
+  authorInfo.className = "author-info";
 
   const authorName = document.createElement("span");
-  authorName.className = "fw-semibold small";
+  authorName.className = "author-name";
   authorName.textContent = post.author.nickname;
 
-  const separator1 = document.createElement("span");
-  separator1.className = "text-muted small";
-  separator1.textContent = "·";
+  const metaStats = document.createElement("div");
+  metaStats.className = "post-meta-stats";
 
   const postDate = document.createElement("span");
-  postDate.className = "text-muted small";
   postDate.textContent = formatRelativeTime(post.createdAt);
 
-  const separator2 = document.createElement("span");
-  separator2.className = "text-muted small";
-  separator2.textContent = "·";
+  const separator1 = document.createElement("span");
+  separator1.className = "meta-separator";
+  separator1.textContent = "·";
 
   // 통계 (조회수, 좋아요, 댓글)
   const viewStat = document.createElement("span");
-  viewStat.className = "text-muted small d-flex align-items-center gap-1";
-  viewStat.innerHTML = `<i class="bi bi-eye"></i>${post.viewCount || 0}`;
+  viewStat.className = "post-stat";
+  viewStat.textContent = `👁 ${post.viewCount || 0}`;
 
-  const separator3 = document.createElement("span");
-  separator3.className = "text-muted small";
-  separator3.textContent = "·";
+  const separator2 = document.createElement("span");
+  separator2.className = "meta-separator";
+  separator2.textContent = "·";
 
   const likeStat = document.createElement("span");
-  likeStat.className = `small d-flex align-items-center gap-1 ${post.isLiked ? "text-danger" : "text-muted"}`;
+  likeStat.className = `post-stat ${post.isLiked ? "liked" : ""}`;
   likeStat.id = "like-stat";
-  likeStat.innerHTML = `<i class="bi bi-heart${post.isLiked ? "-fill" : ""}"></i>${post.likeCount || 0}`;
+  likeStat.textContent = `♡ ${post.likeCount || 0}`;
 
-  const separator4 = document.createElement("span");
-  separator4.className = "text-muted small";
-  separator4.textContent = "·";
+  const separator3 = document.createElement("span");
+  separator3.className = "meta-separator";
+  separator3.textContent = "·";
 
   const commentStat = document.createElement("span");
-  commentStat.className = "text-muted small d-flex align-items-center gap-1";
-  commentStat.innerHTML = `<i class="bi bi-chat"></i>${post.commentCount || 0}`;
+  commentStat.className = "post-stat";
+  commentStat.textContent = `💬 ${post.commentCount || 0}`;
+
+  metaStats.appendChild(postDate);
+  metaStats.appendChild(separator1);
+  metaStats.appendChild(viewStat);
+  metaStats.appendChild(separator2);
+  metaStats.appendChild(likeStat);
+  metaStats.appendChild(separator3);
+  metaStats.appendChild(commentStat);
 
   authorInfo.appendChild(authorName);
-  authorInfo.appendChild(separator1);
-  authorInfo.appendChild(postDate);
-  authorInfo.appendChild(separator2);
-  authorInfo.appendChild(viewStat);
-  authorInfo.appendChild(separator3);
-  authorInfo.appendChild(likeStat);
-  authorInfo.appendChild(separator4);
-  authorInfo.appendChild(commentStat);
-
+  authorInfo.appendChild(metaStats);
   authorSection.appendChild(authorImage);
   authorSection.appendChild(authorInfo);
   leftSection.appendChild(authorSection);
@@ -207,18 +209,16 @@ function renderPostDetail(post) {
   // 작성자인 경우 수정/삭제 버튼
   if (post.isAuthor) {
     const actions = document.createElement("div");
-    actions.className = "d-flex gap-2";
+    actions.className = "post-actions";
 
     const editBtn = document.createElement("button");
-    editBtn.className = "btn btn-sm btn-outline-secondary";
-    editBtn.innerHTML = '<i class="bi bi-pencil"></i>';
-    editBtn.title = "수정";
+    editBtn.className = "action-btn";
+    editBtn.textContent = "수정";
     editBtn.dataset.action = "edit";
 
     const deleteBtn = document.createElement("button");
-    deleteBtn.className = "btn btn-sm btn-outline-danger";
-    deleteBtn.innerHTML = '<i class="bi bi-trash"></i>';
-    deleteBtn.title = "삭제";
+    deleteBtn.className = "action-btn delete-btn";
+    deleteBtn.textContent = "삭제";
     deleteBtn.dataset.action = "delete";
 
     actions.appendChild(editBtn);
@@ -230,17 +230,16 @@ function renderPostDetail(post) {
 
   // 4. 이미지
   const images = post.images || (post.imageUrls ? post.imageUrls.map(url => ({ imageUrl: url })) : []);
-  
+
   if (images.length > 0) {
     const imageContainer = document.createElement("div");
-    imageContainer.className = "post-images mb-4";
+    imageContainer.className = "post-images";
 
     images.forEach((image, index) => {
       const img = document.createElement("img");
       img.src = image.imageUrl || image;
       img.alt = `Post image ${index + 1}`;
-      img.className = "img-fluid rounded mb-3";
-      img.style.maxWidth = "100%";
+      img.className = "post-image";
       img.loading = "lazy";
       imageContainer.appendChild(img);
     });
@@ -250,23 +249,18 @@ function renderPostDetail(post) {
 
   // 5. 내용
   const content = document.createElement("div");
-  content.className = "post-content mb-5";
-  content.style.whiteSpace = "pre-wrap";
-  content.style.wordBreak = "break-word";
-  content.style.overflowWrap = "break-word";
-  content.style.lineHeight = "1.8";
-  content.style.fontSize = "1.05rem";
+  content.className = "post-content";
   content.textContent = post.content;
   article.appendChild(content);
 
-  // 6. 좋아요 버튼 (심플하게)
+  // 6. 좋아요 버튼
   const likeSection = document.createElement("div");
-  likeSection.className = "text-center py-4 my-4";
+  likeSection.className = "like-section";
 
   const likeBtn = document.createElement("button");
-  likeBtn.className = `btn ${post.isLiked ? "btn-danger" : "btn-outline-danger"}`;
+  likeBtn.className = `like-btn ${post.isLiked ? "liked" : ""}`;
   likeBtn.id = "like-btn";
-  likeBtn.innerHTML = `<i class="bi bi-heart${post.isLiked ? "-fill" : ""} me-2"></i>좋아요 ${post.likeCount}`;
+  likeBtn.textContent = `♡ 좋아요 ${post.likeCount}`;
 
   likeSection.appendChild(likeBtn);
   article.appendChild(likeSection);
@@ -360,15 +354,15 @@ async function handleLikeToggle() {
       // 좋아요 버튼 UI 업데이트
       const likeBtn = dom.qs("#like-btn");
       if (likeBtn) {
-        likeBtn.className = `btn ${state.post.isLiked ? "btn-danger" : "btn-outline-danger"}`;
-        likeBtn.innerHTML = `<i class="bi bi-heart${state.post.isLiked ? "-fill" : ""} me-2"></i>좋아요 ${state.post.likeCount}`;
+        likeBtn.className = `like-btn ${state.post.isLiked ? "liked" : ""}`;
+        likeBtn.textContent = `♡ 좋아요 ${state.post.likeCount}`;
       }
 
       // 통계 영역의 좋아요 수 업데이트
       const likeStat = dom.qs("#like-stat");
       if (likeStat) {
-        likeStat.className = `small d-flex align-items-center gap-1 ${state.post.isLiked ? "text-danger" : "text-muted"}`;
-        likeStat.innerHTML = `<i class="bi bi-heart${state.post.isLiked ? "-fill" : ""}"></i>${state.post.likeCount}`;
+        likeStat.className = `post-stat ${state.post.isLiked ? "liked" : ""}`;
+        likeStat.textContent = `♡ ${state.post.likeCount}`;
       }
     } else {
       Toast.error(response.error?.message || "좋아요 처리에 실패했습니다.");
@@ -425,7 +419,7 @@ async function loadMoreComments() {
   const loadMoreBtn = dom.qs("#load-more-btn");
   if (loadMoreBtn) {
     loadMoreBtn.disabled = true;
-    loadMoreBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>로딩 중...';
+    loadMoreBtn.textContent = '로딩 중...';
   }
 
   // 스크롤 위치 보정을 위해 첫 번째 댓글을 기준점으로 저장
@@ -472,10 +466,11 @@ async function loadMoreComments() {
     console.error("Failed to load more comments:", error);
   } finally {
     state.isLoadingComments = false;
-    
+
+
     if (loadMoreBtn) {
       loadMoreBtn.disabled = false;
-      loadMoreBtn.innerHTML = '<i class="bi bi-arrow-up-circle me-1"></i>이전 댓글 보기';
+      loadMoreBtn.textContent = '↑ 이전 댓글 보기';
     }
   }
 }
@@ -529,7 +524,11 @@ function renderComments(comments, prepend = false) {
 function updateLoadMoreButton() {
   const loadMoreContainer = dom.qs("#load-more-container");
   if (loadMoreContainer) {
-    loadMoreContainer.style.display = state.hasNext ? "block" : "none";
+    if (state.hasNext) {
+      loadMoreContainer.removeAttribute('hidden');
+    } else {
+      loadMoreContainer.setAttribute('hidden', '');
+    }
   }
 }
 
@@ -569,7 +568,7 @@ async function handleCommentSubmit(e) {
   // 버튼 비활성화 (중복 제출 방지)
   if (submitBtn) {
     submitBtn.disabled = true;
-    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>등록 중...';
+    submitBtn.textContent = '등록 중...';
   }
 
   // 낙관적 업데이트: 임시 댓글 생성
@@ -591,12 +590,15 @@ async function handleCommentSubmit(e) {
 
   // 폼 초기화
   form.reset();
-  
+
   // 글자 수 카운터 초기화
-  const charCount = dom.qs("#char-count");
-  if (charCount) {
-    charCount.textContent = "0";
-    charCount.className = "text-muted";
+  const charCounter = dom.qs(".char-counter");
+  if (charCounter) {
+    const charCount = dom.qs("#char-count", charCounter);
+    if (charCount) {
+      charCount.textContent = "0";
+    }
+    charCounter.className = "char-counter";
   }
 
   // 게시물의 댓글 수 업데이트 (낙관적)
@@ -678,7 +680,7 @@ async function handleCommentSubmit(e) {
     // 버튼 활성화
     if (submitBtn) {
       submitBtn.disabled = false;
-      submitBtn.innerHTML = '<i class="bi bi-send me-1"></i>댓글 등록';
+      submitBtn.textContent = '댓글 등록';
     }
   }
 }
@@ -710,27 +712,27 @@ function handleEditComment(commentId) {
   editForm.className = "comment-edit-form";
 
   const textarea = document.createElement("textarea");
-  textarea.className = "form-control mb-2";
+  textarea.className = "comment-textarea";
   textarea.rows = 3;
   textarea.maxLength = 300;
   textarea.value = originalContent;
 
   const controlsDiv = document.createElement("div");
-  controlsDiv.className = "d-flex justify-content-between align-items-center";
+  controlsDiv.className = "comment-edit-controls";
 
   const charCountSmall = document.createElement("small");
-  charCountSmall.className = "text-muted";
+  charCountSmall.className = "char-counter";
   charCountSmall.innerHTML = `<span class="edit-char-count">${originalContent.length}</span> / 300자`;
 
   const buttonsDiv = document.createElement("div");
-  buttonsDiv.className = "d-flex gap-2";
+  buttonsDiv.className = "comment-edit-buttons";
 
   const saveBtn = document.createElement("button");
-  saveBtn.className = "btn btn-sm btn-primary";
+  saveBtn.className = "comment-edit-btn save-btn";
   saveBtn.textContent = "댓글 수정하기";
 
   const cancelBtn = document.createElement("button");
-  cancelBtn.className = "btn btn-sm btn-secondary";
+  cancelBtn.className = "comment-edit-btn";
   cancelBtn.textContent = "취소";
 
   buttonsDiv.appendChild(saveBtn);
@@ -755,13 +757,13 @@ function handleEditComment(commentId) {
     const charCountSpan = editForm.querySelector(".edit-char-count");
     if (charCountSpan) {
       charCountSpan.textContent = currentLength;
-      
+
       if (currentLength >= 300) {
-        charCountSpan.parentElement.className = "text-danger fw-bold";
+        charCountSpan.parentElement.className = "char-counter danger";
       } else if (currentLength >= 270) {
-        charCountSpan.parentElement.className = "text-warning fw-bold";
+        charCountSpan.parentElement.className = "char-counter warning";
       } else {
-        charCountSpan.parentElement.className = "text-muted";
+        charCountSpan.parentElement.className = "char-counter";
       }
     }
   };
@@ -800,7 +802,7 @@ function handleEditComment(commentId) {
 
     // 버튼 비활성화
     saveBtn.disabled = true;
-    saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>수정 중...';
+    saveBtn.textContent = '수정 중...';
 
     try {
       const response = await PostsAPI.updateComment(
@@ -921,16 +923,17 @@ function setupEventListeners() {
 function updateCharCount(textarea, countElement) {
   const currentLength = textarea.value.length;
   const maxLength = 300;
-  
+
   countElement.textContent = currentLength;
-  
+
   // 글자 수에 따라 색상 변경
+  const parentElement = countElement.parentElement;
   if (currentLength >= maxLength) {
-    countElement.className = "text-danger fw-bold";
+    parentElement.className = "char-counter danger";
   } else if (currentLength >= maxLength * 0.9) {
-    countElement.className = "text-warning fw-bold";
+    parentElement.className = "char-counter warning";
   } else {
-    countElement.className = "text-muted";
+    parentElement.className = "char-counter";
   }
 }
 
@@ -938,11 +941,11 @@ function updateCharCount(textarea, countElement) {
  * 페이지 초기화
  */
 async function init() {
-  // 헤더 초기화
-  await initHeader(PAGE_ID);
+  // Load header HTML
+  await loadHeader();
 
-  // 푸터 초기화
-  await initFooter();
+  // Initialize header auth state
+  await initHeaderAuth();
 
   // 인증 필요 및 현재 사용자 정보 가져오기
   await getCurrentUser();
@@ -963,6 +966,22 @@ async function init() {
 
   // 이벤트 리스너 설정
   setupEventListeners();
+}
+
+/**
+ * 헤더 HTML 로드
+ */
+async function loadHeader() {
+  const headerContainer = document.getElementById('headerContainer');
+  if (!headerContainer) return;
+
+  try {
+    const response = await fetch('/components/header.html');
+    const html = await response.text();
+    headerContainer.innerHTML = html;
+  } catch (error) {
+    console.error('Failed to load header:', error);
+  }
 }
 
 /**

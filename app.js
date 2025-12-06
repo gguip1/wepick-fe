@@ -12,7 +12,7 @@ const postRouter = require('./routes/posts');
 const userRouter = require('./routes/users');
 const wepickRouter = require('./routes/wepick');
 
-app.use('/posts', postRouter);
+app.use('/community/posts', postRouter);
 app.use('/users', userRouter);
 
 // Health check endpoint
