@@ -21,16 +21,12 @@ export function showMessage(message, type = 'error') {
   const messageElement = document.querySelector('#form-message');
   if (messageElement) {
     messageElement.textContent = message;
-    
-    // 타입에 따라 색상 클래스 설정
-    let colorClass = 'text-danger'; // 기본값: 에러 (빨간색)
-    if (type === 'success') {
-      colorClass = 'text-success';
-    } else if (type === 'warning') {
-      colorClass = 'text-warning';
-    }
-    
-    messageElement.className = `small mb-3 ${colorClass}`;
+
+    // 기존 클래스 제거
+    messageElement.classList.remove('error', 'success', 'warning');
+
+    // 타입에 따라 클래스 추가
+    messageElement.classList.add(type, 'show');
   }
 }
 
@@ -41,6 +37,6 @@ export function hideMessage() {
   const messageElement = document.querySelector('#form-message');
   if (messageElement) {
     messageElement.textContent = '';
-    messageElement.className = 'small mb-3';
+    messageElement.classList.remove('error', 'success', 'warning', 'show');
   }
 }
