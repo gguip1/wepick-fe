@@ -10,10 +10,12 @@ app.use('/assets', express.static(path.join(__dirname, 'assets')));
 // Routers
 const postRouter = require('./routes/posts');
 const userRouter = require('./routes/users');
+const policyRouter = require('./routes/policy');
 const wepickRouter = require('./routes/wepick');
 
 app.use('/community/posts', postRouter);
 app.use('/users', userRouter);
+app.use('/policy', policyRouter);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
