@@ -1,10 +1,15 @@
 /* ===================================
-   AUTH PAGES (SIGNIN/SIGNUP)
+   AUTH PAGES (SIGNIN/SIGNUP/EDIT)
    =================================== */
 
 /* Global Reset for Auth Pages */
 body[data-page="users-signin"],
-body[data-page="users-signup"] {
+body[data-page="users-signup"],
+body[data-page="users-edit"],
+body[data-page="users-edit-profile"],
+body[data-page="users-edit-profile-img"],
+body[data-page="users-edit-nickname"],
+body[data-page="users-edit-password"] {
   margin: 0;
   padding: 0;
   min-height: 100vh;
@@ -16,18 +21,30 @@ body[data-page="users-signup"] {
 
 /* Box-sizing for all elements */
 body[data-page="users-signin"] *,
-body[data-page="users-signup"] * {
+body[data-page="users-signup"] *,
+body[data-page="users-edit"] *,
+body[data-page="users-edit-profile"] *,
+body[data-page="users-edit-profile-img"] *,
+body[data-page="users-edit-nickname"] *,
+body[data-page="users-edit-password"] * {
   box-sizing: border-box;
 }
 
 /* Hidden Elements */
 body[data-page="users-signin"] .hidden,
-body[data-page="users-signup"] .hidden {
+body[data-page="users-signup"] .hidden,
+body[data-page="users-edit"] .hidden,
+body[data-page="users-edit-profile"] .hidden,
+body[data-page="users-edit-profile-img"] .hidden,
+body[data-page="users-edit-nickname"] .hidden,
+body[data-page="users-edit-password"] .hidden {
   display: none;
 }
 
 /* Completely hide file inputs */
-body[data-page="users-signup"] input[type="file"]#profileImage {
+body[data-page="users-signup"] input[type="file"]#profileImage,
+body[data-page="users-edit-profile"] input[type="file"]#profileImage,
+body[data-page="users-edit-profile-img"] input[type="file"]#profileImage {
   position: absolute;
   left: -9999px;
   width: 0;
