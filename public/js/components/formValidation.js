@@ -12,23 +12,23 @@ import { dom } from "../utils/dom.js";
  */
 export function showValidationFeedback(input, validationResult) {
   if (!input) return;
-  
+
   // 기존 피드백 제거
   clearValidationFeedback(input);
-  
+
   const { isValid, errors } = validationResult;
-  
+
   if (isValid) {
     input.classList.remove('is-invalid');
     input.classList.add('is-valid');
   } else {
     input.classList.remove('is-valid');
     input.classList.add('is-invalid');
-    
+
     // 에러 메시지 표시
     if (errors && errors.length > 0) {
       const feedback = document.createElement('div');
-      feedback.className = 'invalid-feedback';
+      feedback.className = 'invalid-feedback show';
       feedback.textContent = errors[0]; // 첫 번째 에러만 표시
       input.parentElement.appendChild(feedback);
     }
@@ -41,12 +41,13 @@ export function showValidationFeedback(input, validationResult) {
  */
 export function clearValidationFeedback(input) {
   if (!input) return;
-  
+
   input.classList.remove('is-valid', 'is-invalid');
-  
+
   // 기존 피드백 메시지 제거
   const existingFeedback = input.parentElement.querySelector('.invalid-feedback');
   if (existingFeedback) {
+    existingFeedback.classList.remove('show');
     existingFeedback.remove();
   }
 }
