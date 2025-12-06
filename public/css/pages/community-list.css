@@ -115,10 +115,10 @@ body[data-page="posts-list"] {
 }
 
 .post-card:hover {
-  background: rgba(255, 255, 255, 0.02);
-  border-bottom-color: rgba(255, 255, 255, 0.15);
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
+  background: rgba(255, 255, 255, 0.04);
+  border-bottom-color: rgba(255, 255, 255, 0.18);
+  /* padding-left: 0.5rem; */
+  /* padding-right: 0.5rem; */
 }
 
 /* Card Header */
