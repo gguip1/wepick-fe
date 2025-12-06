@@ -21,6 +21,38 @@
     gap: 2rem;
 }
 
+/* Back Button (Mobile Only) */
+.header-back-btn {
+    display: none;
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.header-back-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+}
+
+.header-back-btn[hidden] {
+    display: none;
+}
+
+.header-back-icon {
+    width: 24px;
+    height: 24px;
+    filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%);
+}
+
 /* Logo */
 .header-logo {
     display: flex;
@@ -492,18 +524,27 @@
     .header-container {
         padding: 0 1rem;
         position: relative;
+        justify-content: center;
     }
 
-    /* Center logo on mobile */
+    /* Show back button on mobile for specific pages */
+    .header-back-btn:not([hidden]) {
+        display: flex;
+    }
+
+    /* Center logo on mobile - always centered regardless of other elements */
     .header-logo {
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
+        position: static;
+        transform: none;
+        margin: 0;
     }
 
-    /* Mobile user section takes right side */
+    /* Mobile user section on right side */
     .header-mobile-user-section {
-        margin-left: auto;
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
     }
 
     /* Add padding to body to prevent content from being hidden by bottom nav */

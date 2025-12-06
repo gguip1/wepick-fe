@@ -172,7 +172,14 @@ function renderPostDetail(post) {
   // 통계 (조회수, 좋아요, 댓글)
   const viewStat = document.createElement("span");
   viewStat.className = "post-stat";
-  viewStat.textContent = `👁 ${post.viewCount || 0}`;
+  const viewIcon = document.createElement("img");
+  viewIcon.className = "post-stat-icon";
+  viewIcon.src = "/assets/imgs/view_icon.svg";
+  viewIcon.alt = "조회수";
+  const viewCount = document.createElement("span");
+  viewCount.textContent = post.viewCount || 0;
+  viewStat.appendChild(viewIcon);
+  viewStat.appendChild(viewCount);
 
   const separator2 = document.createElement("span");
   separator2.className = "meta-separator";
@@ -181,7 +188,14 @@ function renderPostDetail(post) {
   const likeStat = document.createElement("span");
   likeStat.className = `post-stat ${post.isLiked ? "liked" : ""}`;
   likeStat.id = "like-stat";
-  likeStat.textContent = `♡ ${post.likeCount || 0}`;
+  const likeIcon = document.createElement("img");
+  likeIcon.className = "post-stat-icon";
+  likeIcon.src = "/assets/imgs/like_icon.svg";
+  likeIcon.alt = "좋아요";
+  const likeCount = document.createElement("span");
+  likeCount.textContent = post.likeCount || 0;
+  likeStat.appendChild(likeIcon);
+  likeStat.appendChild(likeCount);
 
   const separator3 = document.createElement("span");
   separator3.className = "meta-separator";
@@ -189,7 +203,14 @@ function renderPostDetail(post) {
 
   const commentStat = document.createElement("span");
   commentStat.className = "post-stat";
-  commentStat.textContent = `💬 ${post.commentCount || 0}`;
+  const commentIcon = document.createElement("img");
+  commentIcon.className = "post-stat-icon";
+  commentIcon.src = "/assets/imgs/comment_icon.svg";
+  commentIcon.alt = "댓글";
+  const commentCount = document.createElement("span");
+  commentCount.textContent = post.commentCount || 0;
+  commentStat.appendChild(commentIcon);
+  commentStat.appendChild(commentCount);
 
   metaStats.appendChild(postDate);
   metaStats.appendChild(separator1);
@@ -979,9 +1000,29 @@ async function loadHeader() {
     const response = await fetch('/components/header.html');
     const html = await response.text();
     headerContainer.innerHTML = html;
+
+    // 뒤로가기 버튼 활성화 및 이벤트 추가
+    initBackButton();
   } catch (error) {
     console.error('Failed to load header:', error);
   }
+}
+
+/**
+ * 뒤로가기 버튼 초기화
+ */
+function initBackButton() {
+  const backBtn = document.getElementById('headerBackBtn');
+  if (!backBtn) return;
+
+  // 버튼 표시
+  backBtn.removeAttribute('hidden');
+
+  // 클릭 이벤트 추가
+  backBtn.addEventListener('click', () => {
+    // 커뮤니티 목록 페이지로 이동
+    navigation.goTo('/community/posts');
+  });
 }
 
 /**

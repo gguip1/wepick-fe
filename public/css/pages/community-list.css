@@ -1,9 +1,32 @@
-/* Community List Page Styles */
+/* ═══════════════════════════════════════════════════════════
+   Community List Page - Complete Rewrite
+   ═══════════════════════════════════════════════════════════ */
 
-/* Background */
+/* ═══════════════════════════════════
+   GLOBAL RESET (Page-specific)
+   ═══════════════════════════════════ */
+html {
+  box-sizing: border-box;
+  -webkit-text-size-adjust: 100%;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+  margin: 0;
+  padding: 0;
+}
+
+/* ═══════════════════════════════════
+   BASE LAYOUT
+   ═══════════════════════════════════ */
 body[data-page="posts-list"] {
   background: linear-gradient(135deg, #02051c 0%, #0a0f2c 100%);
   min-height: 100vh;
+  overflow-x: hidden;
+  max-width: 100vw;
+  position: relative;
 }
 
 /* Page Container */
@@ -11,15 +34,20 @@ body[data-page="posts-list"] {
   min-height: 100vh;
   padding-top: 80px;
   padding-bottom: 3rem;
+  max-width: 100vw;
+  overflow-x: hidden;
 }
 
 .community-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 2rem;
+  padding: 0 clamp(1rem, 4vw, 2rem);
+  width: 100%;
 }
 
-/* ===== FLOATING WRITE BUTTON ===== */
+/* ═══════════════════════════════════
+   FLOATING WRITE BUTTON
+   ═══════════════════════════════════ */
 .action-bar {
   position: fixed;
   bottom: 2rem;
@@ -29,7 +57,7 @@ body[data-page="posts-list"] {
 
 .write-button {
   display: flex;
-  align-items: center; 
+  align-items: center;
   gap: 0.5rem;
   padding: 0.875rem 1.75rem;
   font-size: 1rem;
@@ -41,10 +69,12 @@ body[data-page="posts-list"] {
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+  white-space: nowrap;
 }
 
 .write-button:hover {
   box-shadow: 0 8px 28px rgba(16, 185, 129, 0.6);
+  transform: translateY(-2px);
 }
 
 .write-button:active {
@@ -55,15 +85,20 @@ body[data-page="posts-list"] {
   font-size: 1.25rem;
 }
 
-/* ===== POST LIST ===== */
+/* ═══════════════════════════════════
+   POST LIST
+   ═══════════════════════════════════ */
 .post-list {
   display: flex;
   flex-direction: column;
   gap: 0;
   margin-bottom: 2rem;
+  width: 100%;
 }
 
-/* ===== POST CARD - OPEN FEEL DESIGN ===== */
+/* ═══════════════════════════════════
+   POST CARD - OPEN DESIGN
+   ═══════════════════════════════════ */
 .post-card {
   background: transparent;
   border: none;
@@ -75,22 +110,26 @@ body[data-page="posts-list"] {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  width: 100%;
+  max-width: 100%;
 }
 
 .post-card:hover {
   background: rgba(255, 255, 255, 0.02);
   border-bottom-color: rgba(255, 255, 255, 0.15);
-  padding-left: 0.2rem;
-  padding-right: 0.2rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
 }
 
-/* Card Header (Author + Date + Badge) */
+/* Card Header */
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   gap: 0.75rem;
   margin-bottom: 0.25rem;
+  width: 100%;
+  max-width: 100%;
 }
 
 .card-author-section {
@@ -99,6 +138,7 @@ body[data-page="posts-list"] {
   gap: 0.75rem;
   flex: 1;
   min-width: 0;
+  overflow: hidden;
 }
 
 .card-author-image {
@@ -115,6 +155,7 @@ body[data-page="posts-list"] {
   flex-direction: column;
   gap: 0.25rem;
   min-width: 0;
+  overflow: hidden;
 }
 
 .card-author-name {
@@ -129,9 +170,10 @@ body[data-page="posts-list"] {
 .card-date {
   color: rgba(255, 255, 255, 0.5);
   font-size: 0.75rem;
+  white-space: nowrap;
 }
 
-/* Topic Badge (WePick) */
+/* Topic Badge */
 .card-topic-badge {
   display: inline-flex;
   align-items: center;
@@ -143,6 +185,7 @@ body[data-page="posts-list"] {
   font-weight: 700;
   border-radius: 20px;
   flex-shrink: 0;
+  white-space: nowrap;
 }
 
 /* Card Title */
@@ -156,11 +199,13 @@ body[data-page="posts-list"] {
   text-overflow: ellipsis;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   word-break: break-word;
+  max-width: 100%;
 }
 
-/* Card Content Preview */
+/* Card Content */
 .card-content {
   color: rgba(255, 255, 255, 0.7);
   font-size: 0.9375rem;
@@ -170,17 +215,21 @@ body[data-page="posts-list"] {
   text-overflow: ellipsis;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   word-break: break-word;
+  max-width: 100%;
 }
 
-/* Card Footer (Stats) */
+/* Card Footer */
 .card-footer {
   display: flex;
   align-items: center;
   gap: 1.5rem;
   padding-top: 0.75rem;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
+  width: 100%;
+  max-width: 100%;
 }
 
 .card-stat {
@@ -190,6 +239,7 @@ body[data-page="posts-list"] {
   color: rgba(255, 255, 255, 0.6);
   font-size: 0.875rem;
   font-weight: 500;
+  white-space: nowrap;
 }
 
 .card-stat-icon {
@@ -200,12 +250,15 @@ body[data-page="posts-list"] {
   filter: brightness(0) saturate(100%) invert(78%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%);
 }
 
-/* ===== LOADING SKELETON ===== */
+/* ═══════════════════════════════════
+   LOADING SKELETON
+   ═══════════════════════════════════ */
 .loading-indicator {
   display: flex;
   flex-direction: column;
   gap: 0;
   margin-bottom: 2rem;
+  width: 100%;
 }
 
 .skeleton-post-item {
@@ -213,6 +266,7 @@ body[data-page="posts-list"] {
   border: none;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   padding: 1.5rem 0;
+  width: 100%;
 }
 
 .skeleton-header {
@@ -227,6 +281,7 @@ body[data-page="posts-list"] {
   height: 32px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
 }
 
 .skeleton-author {
@@ -239,6 +294,7 @@ body[data-page="posts-list"] {
 .skeleton-title {
   height: 28px;
   width: 80%;
+  max-width: 400px;
   margin-bottom: 0.75rem;
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.1);
@@ -249,6 +305,7 @@ body[data-page="posts-list"] {
   flex-direction: column;
   gap: 0.5rem;
   margin-bottom: 1rem;
+  width: 100%;
 }
 
 .skeleton-content-line {
@@ -276,45 +333,50 @@ body[data-page="posts-list"] {
   background: rgba(255, 255, 255, 0.1);
 }
 
-/* End Message */
+/* ═══════════════════════════════════
+   END MESSAGE
+   ═══════════════════════════════════ */
 .end-message {
   text-align: center;
   padding: 2rem 1rem;
   color: rgba(255, 255, 255, 0.5);
   font-size: 0.9375rem;
   margin-bottom: 2rem;
+  width: 100%;
 }
 
 .end-message p {
   margin: 0;
 }
 
-/* Scroll Trigger (invisible) */
+/* Scroll Trigger */
 .scroll-trigger {
   height: 1px;
   width: 100%;
 }
 
-/* ===== RESPONSIVE DESIGN ===== */
+/* ═══════════════════════════════════
+   RESPONSIVE DESIGN
+   ═══════════════════════════════════ */
 
-/* Tablet (1024px 이하) - Bottom nav appears */
+/* Tablet and Mobile - Bottom nav appears */
 @media (max-width: 1024px) {
+  body[data-page="posts-list"] {
+    padding-bottom: 80px;
+  }
+
   .community-container {
-    max-width: 100%;
-    padding: 0 1.5rem;
+    padding: 0 clamp(1rem, 3vw, 1.5rem);
   }
 
   .action-bar {
     bottom: 6.5rem;
+    right: clamp(1rem, 3vw, 2rem);
   }
 }
 
-/* Mobile (768px 이하) */
+/* Mobile specific */
 @media (max-width: 768px) {
-  body[data-page="posts-list"] {
-    padding-bottom: 70px;
-  }
-
   .community-page {
     padding-top: 70px;
   }
@@ -347,5 +409,28 @@ body[data-page="posts-list"] {
 
   .card-content {
     font-size: 0.875rem;
+  }
+
+  .card-footer {
+    gap: 1rem;
+  }
+
+  .card-stat {
+    font-size: 0.8125rem;
+  }
+}
+
+/* Very small screens */
+@media (max-width: 360px) {
+  .community-container {
+    padding: 0 0.75rem;
+  }
+
+  .card-header {
+    gap: 0.5rem;
+  }
+
+  .card-footer {
+    gap: 0.75rem;
   }
 }

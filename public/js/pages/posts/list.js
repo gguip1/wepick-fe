@@ -242,7 +242,7 @@ function createPostItem(post) {
   card.className = 'post-card';
   card.dataset.postId = post.postId;
   card.addEventListener('click', () => {
-    navigation.goTo(`/posts/${post.postId}`);
+    navigation.goTo(`/community/posts/${post.postId}`);
   });
 
   // Card Header (Author + Date + Badge)
@@ -415,7 +415,7 @@ function showErrorMessage(message) {
  * 게시물 작성 버튼 클릭 핸들러
  */
 function handleCreateClick() {
-  navigation.goTo("/posts/create");
+  navigation.goTo("/community/posts/create");
 }
 
 // 페이지 로드 시 자동 실행
