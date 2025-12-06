@@ -9,10 +9,8 @@ import { events } from "../../utils/events.js";
 import { dom } from "../../utils/dom.js";
 import { navigation } from "../../utils/navigation.js";
 import { auth } from "../../utils/auth.js";
-import { initHeader } from "../../components/header.js";
-import { initFooter } from "../../components/footer.js";
-import { Modal } from "../../components/modal.js";
-import { showMessage } from "../../utils/message.js";
+import { initHeaderAuth } from "../../utils/header-init.js";
+import { showMessage, hideMessage } from "../../utils/message.js";
 import { setupRealtimeValidation, validateForm } from "../../utils/validation.js";
 import { createDraggableList } from "../../utils/drag-drop.js";
 import { validateImageFile, uploadImage, createImagePreview, revokeImagePreview } from "../../utils/image-upload.js";
@@ -42,14 +40,51 @@ let titleCounter = null;
 let contentCounter = null;
 
 /**
+ * 헤더 로드
+ */
+async function loadHeader() {
+  const headerContainer = document.getElementById('headerContainer');
+  if (!headerContainer) return;
+
+  const response = await fetch('/components/header.html');
+  if (!response.ok) {
+    console.error('Failed to load header');
+    return;
+  }
+
+  headerContainer.innerHTML = await response.text();
+  initBackButton();
+}
+
+/**
+ * 뒤로가기 버튼 초기화
+ */
+function initBackButton() {
+  const backBtn = document.getElementById('headerBackBtn');
+  if (!backBtn) return;
+
+  backBtn.removeAttribute('hidden');
+
+  backBtn.addEventListener('click', () => {
+    // 히스토리가 있고 referrer가 있으면 뒤로가기
+    if (window.history.length > 1 && document.referrer) {
+      navigation.goBack();
+    } else {
+      // 없으면 커뮤니티 목록으로
+      navigation.goTo('/community/posts');
+    }
+  });
+}
+
+/**
  * 페이지 초기화
  */
 async function init() {
-  // 헤더 초기화
-  await initHeader(PAGE_ID);
+  // 헤더 로드
+  await loadHeader();
 
-  // 푸터 초기화
-  await initFooter();
+  // 헤더 인증 상태 초기화
+  await initHeaderAuth();
 
   // 인증 필요 (서버에서 사용자 정보 가져옴)
   const user = await auth.requireAuth();
@@ -60,7 +95,7 @@ async function init() {
 
   // 이벤트 리스너 설정
   setupEventListeners();
-  
+
   // 폼 유효성 검사 설정
   setupValidation();
 }
@@ -100,7 +135,7 @@ function setupEventListeners() {
   formController = createFormController(elements.form, {
     submitButton: elements.submitBtn,
     additionalElements: [elements.uploadBtn],
-    loadingHTML: '<span class="spinner-border spinner-border-sm me-1"></span>작성 중...'
+    loadingHTML: '<i class="bi bi-arrow-repeat spinner"></i><span>작성 중...</span>'
   });
 
   // 폼 제출
@@ -111,6 +146,8 @@ function setupEventListeners() {
 
   // 커스텀 업로드 버튼 클릭 시 파일 입력 트리거
   events.on(elements.uploadBtn, "click", () => {
+    console.log('Upload button clicked');
+    console.log('Image input element:', elements.imageInput);
     elements.imageInput.click();
   }, { pageId: PAGE_ID });
 
@@ -201,10 +238,10 @@ async function handleFormSubmit(event) {
       // 성공 - 바로 상세 페이지로 이동
       const postId = response.data?.postId || response.data?.id;
       if (postId) {
-        navigation.goTo(`/posts/${postId}`);
+        navigation.goTo(`/community/posts/${postId}`);
       } else {
         // postId가 없으면 목록으로 이동
-        navigation.goTo("/posts");
+        navigation.goTo("/community/posts");
       }
     } else {
       // 실패
@@ -224,24 +261,14 @@ async function handleFormSubmit(event) {
 /**
  * 취소 버튼 클릭 핸들러
  */
-async function handleCancelClick() {
-  const hasContent = 
-    elements.titleInput.value.trim() || 
-    elements.contentInput.value.trim() ||
-    state.uploadedImages.length > 0;
-
-  if (hasContent) {
-    const confirmed = await Modal.confirm(
-      "작성 취소",
-      "작성 중인 내용이 있습니다. 정말 취소하시겠습니까?"
-    );
-
-    if (!confirmed) {
-      return;
-    }
+function handleCancelClick() {
+  // 히스토리가 있고 referrer가 있으면 뒤로가기
+  if (window.history.length > 1 && document.referrer) {
+    navigation.goBack();
+  } else {
+    // 없으면 커뮤니티 목록으로
+    navigation.goTo('/community/posts');
   }
-
-  navigation.goBack();
 }
 
 /**
@@ -249,18 +276,24 @@ async function handleCancelClick() {
  * @param {Event} event - 변경 이벤트
  */
 async function handleImageSelect(event) {
+  console.log('handleImageSelect called');
   const files = event.target.files;
-  
-  // 파일 입력 초기화 (같은 파일 재선택 가능하도록)
-  elements.imageInput.value = "";
+  console.log('Selected files:', files);
 
   if (!files || files.length === 0) {
+    console.log('No files selected');
     return;
   }
 
+  // 파일을 Array로 복사 (파일 입력 초기화 전에)
+  const fileArray = Array.from(files);
+
+  // 파일 입력 초기화 (같은 파일 재선택 가능하도록)
+  elements.imageInput.value = "";
+
   // 파일 검증 및 필터링
   const validFiles = [];
-  for (const file of files) {
+  for (const file of fileArray) {
     const validation = validateImageFile(file);
     if (!validation.valid) {
       showMessage(validation.error, 'warning');
@@ -356,32 +389,23 @@ function displayImagePreviews() {
   updateImageCount();
 
   if (state.uploadedImages.length === 0) {
-    elements.imagePreviewContainer.classList.add("d-none");
+    elements.imagePreviewContainer.classList.add("hidden");
     return;
   }
 
-  elements.imagePreviewContainer.classList.remove("d-none");
+  elements.imagePreviewContainer.classList.remove("hidden");
 
   state.uploadedImages.forEach((imageData, index) => {
     const previewItem = document.createElement("div");
-    previewItem.className = "position-relative";
-    previewItem.style.width = "100px";
-    previewItem.style.height = "100px";
-    previewItem.style.borderRadius = "8px";
-    previewItem.style.overflow = "hidden";
-    previewItem.style.cursor = imageData.isUploading ? "default" : "move";
-    previewItem.style.touchAction = imageData.isUploading ? "auto" : "none";
+    previewItem.className = "image-item";
     previewItem.setAttribute("draggable", imageData.isUploading ? "false" : "true");
     previewItem.setAttribute("data-index", index);
+    previewItem.style.cursor = imageData.isUploading ? "default" : "move";
+    previewItem.style.touchAction = imageData.isUploading ? "auto" : "none";
 
     const img = document.createElement("img");
+    img.className = "preview-image";
     img.src = imageData.previewUrl;
-    img.className = "img-thumbnail";
-    img.style.width = "100%";
-    img.style.height = "100%";
-    img.style.objectFit = "cover";
-    img.style.border = "none";
-    img.style.pointerEvents = "none";
     img.alt = imageData.file.name;
 
     previewItem.appendChild(img);
@@ -389,28 +413,15 @@ function displayImagePreviews() {
     // 업로드 중이면 로딩 오버레이 표시
     if (imageData.isUploading) {
       const loadingOverlay = document.createElement("div");
-      loadingOverlay.className = "position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center";
-      loadingOverlay.style.backgroundColor = "rgba(0, 0, 0, 0.6)";
-      loadingOverlay.style.borderRadius = "8px";
-      loadingOverlay.innerHTML = '<div class="spinner-border spinner-border-sm text-light" role="status"><span class="visually-hidden">업로드 중...</span></div>';
+      loadingOverlay.className = "loading-overlay";
+      loadingOverlay.innerHTML = '<div class="spinner"></div>';
       previewItem.appendChild(loadingOverlay);
     }
 
     // 삭제 버튼
     const removeBtn = document.createElement("button");
     removeBtn.type = "button";
-    removeBtn.className = "btn btn-danger position-absolute";
-    removeBtn.style.top = "2px";
-    removeBtn.style.right = "2px";
-    removeBtn.style.width = "24px";
-    removeBtn.style.height = "24px";
-    removeBtn.style.padding = "0";
-    removeBtn.style.borderRadius = "50%";
-    removeBtn.style.display = "flex";
-    removeBtn.style.alignItems = "center";
-    removeBtn.style.justifyContent = "center";
-    removeBtn.style.fontSize = "12px";
-    removeBtn.style.lineHeight = "1";
+    removeBtn.className = "remove-btn";
     removeBtn.innerHTML = '<i class="bi bi-x"></i>';
     removeBtn.setAttribute("data-index", index);
     removeBtn.disabled = imageData.isUploading;
@@ -434,8 +445,8 @@ function displayImagePreviews() {
 function updateImageCount() {
   const count = state.uploadedImages.length;
   if (elements.imageCountText) {
-    elements.imageCountText.textContent = `${count} / 5개 선택됨`;
-    
+    elements.imageCountText.textContent = `${count} / 5개`;
+
     // 5개 선택되면 버튼 비활성화
     if (elements.uploadBtn) {
       if (count >= 5) {
