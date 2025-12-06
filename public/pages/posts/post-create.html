@@ -14,6 +14,7 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="/css/custom.css" />
     <link rel="stylesheet" href="/css/components/header.css" />
+    <link rel="stylesheet" href="/css/components/footer.css" />
     <link rel="stylesheet" href="/css/pages/community-edit.css" />
   </head>
   <body data-page="posts-create" data-active-nav="community">
@@ -120,17 +121,18 @@
             <!-- Form Actions -->
             <div class="form-actions">
               <button type="button" class="btn btn-secondary" id="cancel-btn">
-                <i class="bi bi-x-circle"></i>
                 <span>취소</span>
               </button>
               <button type="submit" class="btn btn-primary" id="submit-btn">
-                <i class="bi bi-check-circle"></i>
                 <span>작성 완료</span>
               </button>
             </div>
           </form>
       </div>
     </main>
+
+    <!-- Global Footer (will be loaded dynamically) -->
+    <footer></footer>
 
     <!-- Page Script -->
     <script type="module" src="/js/pages/posts/create.js"></script>

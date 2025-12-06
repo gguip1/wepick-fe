@@ -977,8 +977,9 @@ function updateCharCount(textarea, countElement) {
  * 페이지 초기화
  */
 async function init() {
-  // Load header HTML
+  // Load header and footer HTML
   await loadHeader();
+  await loadFooter();
 
   // Initialize header auth state
   await initHeaderAuth();
@@ -1020,6 +1021,22 @@ async function loadHeader() {
     initBackButton();
   } catch (error) {
     console.error('Failed to load header:', error);
+  }
+}
+
+/**
+ * Footer HTML 로드
+ */
+async function loadFooter() {
+  const footerContainer = document.querySelector('footer');
+  if (!footerContainer) return;
+
+  try {
+    const response = await fetch('/components/footer.html');
+    const html = await response.text();
+    footerContainer.innerHTML = html;
+  } catch (error) {
+    console.error('Failed to load footer:', error);
   }
 }
 

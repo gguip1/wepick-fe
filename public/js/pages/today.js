@@ -22,8 +22,9 @@ let voteCardsContainer, voteCards, voteButton, resultStats, shareButton;
  */
 async function init() {
   try {
-    // Load header HTML
+    // Load header and footer HTML
     await loadHeader();
+    await loadFooter();
 
     // Initialize DOM elements
     initializeDOMElements();
@@ -298,6 +299,22 @@ async function loadHeader() {
     headerContainer.innerHTML = html;
   } catch (error) {
     console.error('Failed to load header:', error);
+  }
+}
+
+/**
+ * Load footer HTML
+ */
+async function loadFooter() {
+  const footerContainer = document.querySelector('footer');
+  if (!footerContainer) return;
+
+  try {
+    const response = await fetch('/components/footer.html');
+    const html = await response.text();
+    footerContainer.innerHTML = html;
+  } catch (error) {
+    console.error('Failed to load footer:', error);
   }
 }
 

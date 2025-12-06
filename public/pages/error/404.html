@@ -11,6 +11,7 @@
     <link rel="icon" type="image/png" href="/assets/imgs/wepick-logo.png" />
 
     <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/components/footer.css" />
     <link rel="stylesheet" href="/css/pages/error.css" />
   </head>
   <body data-page="error-404">
@@ -92,8 +93,25 @@
       </p>
     </div>
 
+    <!-- Global Footer (will be loaded dynamically) -->
+    <footer></footer>
+
     <!-- JavaScript -->
     <script type="module">
+      // Load footer
+      async function loadFooter() {
+        const footerContainer = document.querySelector('footer');
+        if (!footerContainer) return;
+
+        try {
+          const response = await fetch('/components/footer.html');
+          const html = await response.text();
+          footerContainer.innerHTML = html;
+        } catch (error) {
+          console.error('Failed to load footer:', error);
+        }
+      }
+
       // Smart back button navigation
       const backBtn = document.getElementById('backBtn');
 
@@ -108,6 +126,9 @@
           }
         });
       }
+
+      // Initialize
+      loadFooter();
     </script>
   </body>
 </html>

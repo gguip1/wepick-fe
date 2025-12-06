@@ -62,6 +62,22 @@ async function loadHeader() {
 }
 
 /**
+ * Footer HTML 로드
+ */
+async function loadFooter() {
+  const footerContainer = document.querySelector('footer');
+  if (!footerContainer) return;
+
+  try {
+    const response = await fetch('/components/footer.html');
+    const html = await response.text();
+    footerContainer.innerHTML = html;
+  } catch (error) {
+    console.error('Failed to load footer:', error);
+  }
+}
+
+/**
  * 뒤로가기 버튼 초기화
  */
 function initBackButton() {
@@ -93,8 +109,9 @@ function initBackButton() {
  * 페이지 초기화
  */
 async function init() {
-  // 헤더 HTML 로드
+  // 헤더 및 푸터 HTML 로드
   await loadHeader();
+  await loadFooter();
 
   // 헤더 인증 상태 초기화 (로그인 상태 반영)
   await initHeaderAuth();
