@@ -226,7 +226,7 @@ export function createCommentCard(comment, isOptimistic = false) {
     actions.className = 'comment-actions';
 
     const editBtn = document.createElement('button');
-    editBtn.className = 'comment-action-btn';
+    editBtn.className = 'comment-action-btn edit-btn';
     editBtn.textContent = '수정';
     editBtn.dataset.action = 'edit';
 
