@@ -209,7 +209,7 @@ export async function initHeaderAuth() {
     const navMap = {
       'today': '/today',
       'topics': '/topics',
-      'community': '/community'
+      'community': '/community/posts'
     };
 
     const targetHref = navMap[activeNav];
@@ -235,7 +235,7 @@ export async function initHeaderAuth() {
     const navMap = {
       'today': '/today',
       'topics': '/topics',
-      'community': '/community'
+      'community': '/community/posts'
     };
 
     const targetHref = navMap[activeNav];
