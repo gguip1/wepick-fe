@@ -34,16 +34,30 @@ if (!root) {
 async function init() {
   // 헤더 초기화
   await initHeader(PAGE_ID);
-  
+
   // 푸터 초기화
   await initFooter();
-  
+
   // 인증 필수 (서버에서 사용자 정보 가져옴)
   const user = await auth.requireAuth();
   if (!user) return;
 
+  setupBackButton();
   setupEventListeners();
   setupValidation();
+}
+
+/**
+ * 뒤로가기 버튼 설정
+ */
+function setupBackButton() {
+  const backBtn = dom.qs("#auth-back-btn");
+  if (!backBtn) return;
+
+  backBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    navigation.goTo('/users/mypage');
+  });
 }
 
 /**
@@ -63,11 +77,19 @@ function setupEventListeners() {
   const form = dom.qs("#user-edit-password-form");
   const newPasswordInput = dom.qs("#newPassword");
   const newPassword2Input = dom.qs("#newPassword2");
-  
+  const cancelBtn = dom.qs("#cancel-btn");
+
   if (form) {
     events.on(form, "submit", handlePasswordUpdate, { pageId: PAGE_ID });
   }
-  
+
+  // 새 비밀번호 입력 시 칩 상태 업데이트
+  if (newPasswordInput) {
+    events.on(newPasswordInput, "input", () => {
+      updatePasswordChips(newPasswordInput.value);
+    }, { pageId: PAGE_ID });
+  }
+
   // 비밀번호 확인 필드에 대한 추가 검증
   if (newPassword2Input) {
     events.on(newPassword2Input, "blur", () => {
@@ -75,6 +97,38 @@ function setupEventListeners() {
       validatePasswordMatch(newPasswordInput, newPassword2Input);
     }, { pageId: PAGE_ID });
   }
+
+  // 취소 버튼
+  if (cancelBtn) {
+    events.on(cancelBtn, "click", () => {
+      navigation.goTo('/users/mypage');
+    }, { pageId: PAGE_ID });
+  }
+}
+
+/**
+ * 비밀번호 유효성 검사 칩 상태 업데이트
+ * @param {string} password - 비밀번호 값
+ */
+function updatePasswordChips(password) {
+  const rules = {
+    length: password.length >= 8 && password.length <= 20,
+    uppercase: /[A-Z]/.test(password),
+    lowercase: /[a-z]/.test(password),
+    number: /[0-9]/.test(password),
+    symbol: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+  };
+
+  Object.keys(rules).forEach(rule => {
+    const chip = dom.qs(`.password-chip[data-rule="${rule}"]`);
+    if (chip) {
+      if (rules[rule]) {
+        chip.classList.add('valid');
+      } else {
+        chip.classList.remove('valid');
+      }
+    }
+  });
 }
 
 /**

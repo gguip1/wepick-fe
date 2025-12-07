@@ -29,9 +29,23 @@ async function init() {
   const user = await auth.requireAuth();
   if (!user) return;
 
+  setupBackButton();
   await loadCurrentUserData(user);
   setupEventListeners();
   setupValidation();
+}
+
+/**
+ * 뒤로가기 버튼 설정
+ */
+function setupBackButton() {
+  const backBtn = dom.qs("#auth-back-btn");
+  if (!backBtn) return;
+
+  backBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    navigation.goTo('/users/mypage');
+  });
 }
 
 /**
@@ -111,9 +125,27 @@ async function handleNicknameChange(e) {
 
   const originalBtnText = submitBtn.textContent;
   submitBtn.disabled = true;
-  submitBtn.textContent = '변경 중...';
+  submitBtn.innerHTML = '<div class="spinner"></div>확인 중...';
 
   try {
+    // 닉네임 중복 체크
+    const nicknameCheck = await UsersAPI.checkNicknameExists(nickname);
+
+    if (nicknameCheck.status === 200 && nicknameCheck.data?.isExisted) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalBtnText;
+      showMessage("이미 사용 중인 닉네임입니다.", 'error');
+      return;
+    } else if (nicknameCheck.status !== 200) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalBtnText;
+      showMessage("닉네임 확인에 실패했습니다. 다시 시도해주세요.", 'error');
+      return;
+    }
+
+    // 닉네임 사용 가능 - 변경 진행
+    submitBtn.innerHTML = '<div class="spinner"></div>변경 중...';
+
     const response = await UsersAPI.updateNickname({ nickname });
 
     if (response.status >= 200 && response.status < 300) {

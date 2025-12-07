@@ -14,23 +14,18 @@
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="/shared/styles/custom.css" />
+    <link rel="stylesheet" href="/shared/styles/header.css" />
     <link rel="stylesheet" href="/features/users/styles/auth.css" />
     <link rel="stylesheet" href="/features/users/styles/user-edit-profile.css" />
   </head>
   <body data-page="users-edit-profile-img">
     <div class="auth-wrapper">
-      <div class="auth-container">
-        <!-- Logo Section with Back Button -->
-        <div class="auth-logo">
-          <a href="/users/mypage" class="auth-back-btn">
-            <img src="/assets/imgs/back_button.svg" alt="뒤로가기" />
-          </a>
-          <a href="/today" class="auth-logo-link">
-            <img src="/assets/imgs/wepick-logo-64.png" alt="WePick Logo" />
-            <span class="auth-logo-text">WePick</span>
-          </a>
-        </div>
+      <!-- Back Button (outside card) -->
+      <button class="auth-back-btn-floating" id="auth-back-btn">
+        <img src="/assets/imgs/back_button.svg" alt="뒤로가기" />
+      </button>
 
+      <div class="auth-container">
         <!-- Auth Header -->
         <div class="auth-header">
           <h1 class="auth-title">프로필 사진 변경</h1>

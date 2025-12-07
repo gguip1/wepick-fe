@@ -37,8 +37,22 @@ async function init() {
   const user = await auth.requireAuth();
   if (!user) return;
 
+  setupBackButton();
   await loadCurrentUserData(user);
   setupEventListeners();
+}
+
+/**
+ * 뒤로가기 버튼 설정
+ */
+function setupBackButton() {
+  const backBtn = dom.qs("#auth-back-btn");
+  if (!backBtn) return;
+
+  backBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    navigation.goTo('/users/mypage');
+  });
 }
 
 /**

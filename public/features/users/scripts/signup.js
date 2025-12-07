@@ -32,9 +32,24 @@ const totalSteps = 3;
  * 페이지 초기화
  */
 async function init() {
+  setupBackButton();
   setupEventListeners();
   setupValidation();
   updateStepUI();
+}
+
+/**
+ * 뒤로가기 버튼 설정
+ */
+function setupBackButton() {
+  const backBtn = dom.qs("#auth-back-btn");
+  if (!backBtn) return;
+
+  backBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    // 회원가입 페이지에서는 로그인 페이지로 이동 (순환 방지)
+    navigation.goTo('/users/signin');
+  });
 }
 
 /**
@@ -49,6 +64,18 @@ function setupValidation() {
     const passwordInput = dom.qs("#password");
     const password2Input = dom.qs("#password2");
 
+    if (passwordInput) {
+      // 비밀번호 입력 시 칩 상태 업데이트
+      events.on(passwordInput, "input", () => {
+        updatePasswordChips(passwordInput.value);
+
+        // 비밀번호 확인 필드 재검증
+        if (password2Input?.value && password2Input.classList.contains('is-invalid')) {
+          validatePasswordMatch(passwordInput, password2Input);
+        }
+      }, { pageId: PAGE_ID });
+    }
+
     if (password2Input && passwordInput) {
       // blur 이벤트: 비밀번호 확인 필드에서 벗어날 때 일치 검증
       events.on(password2Input, "blur", () => {
@@ -61,15 +88,33 @@ function setupValidation() {
           validatePasswordMatch(passwordInput, password2Input);
         }
       }, { pageId: PAGE_ID });
-
-      // 비밀번호 필드 변경 시에도 확인 필드 재검증
-      events.on(passwordInput, "input", () => {
-        if (password2Input.value && password2Input.classList.contains('is-invalid')) {
-          validatePasswordMatch(passwordInput, password2Input);
-        }
-      }, { pageId: PAGE_ID });
     }
   }
+}
+
+/**
+ * 비밀번호 유효성 검사 칩 상태 업데이트
+ * @param {string} password - 비밀번호 값
+ */
+function updatePasswordChips(password) {
+  const rules = {
+    length: password.length >= 8 && password.length <= 20,
+    uppercase: /[A-Z]/.test(password),
+    lowercase: /[a-z]/.test(password),
+    number: /[0-9]/.test(password),
+    symbol: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+  };
+
+  Object.keys(rules).forEach(rule => {
+    const chip = dom.qs(`.password-chip[data-rule="${rule}"]`);
+    if (chip) {
+      if (rules[rule]) {
+        chip.classList.add('valid');
+      } else {
+        chip.classList.remove('valid');
+      }
+    }
+  });
 }
 
 /**
@@ -83,6 +128,18 @@ function setupEventListeners() {
 
   if (form) {
     events.on(form, "submit", handleSignUp, { pageId: PAGE_ID });
+
+    // 엔터 키 처리: Step 1, 2에서는 다음 버튼 클릭, Step 3에서만 폼 제출
+    events.on(form, "keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        if (currentStep < totalSteps) {
+          handleNextStep();
+        } else {
+          handleSignUp(e);
+        }
+      }
+    }, { pageId: PAGE_ID });
   }
 
   if (nextBtn) {
@@ -102,16 +159,57 @@ function setupEventListeners() {
 /**
  * 다음 스텝으로 이동
  */
-function handleNextStep() {
+async function handleNextStep() {
+  const nextBtn = dom.qs("#next-btn");
+
   // 현재 스텝 검증
   if (!validateCurrentStep()) {
     return;
+  }
+
+  // Step 1: 이메일 중복 체크
+  if (currentStep === 1) {
+    const emailInput = dom.qs("#email");
+    const email = emailInput?.value.trim();
+
+    // 로딩 상태
+    const originalText = nextBtn.textContent;
+    nextBtn.disabled = true;
+    nextBtn.innerHTML = '<div class="spinner"></div>확인 중...';
+
+    try {
+      const response = await UsersAPI.checkEmailExists(email);
+
+      if (response.status === 200 && response.data?.isExisted) {
+        // 이메일 중복
+        nextBtn.disabled = false;
+        nextBtn.textContent = originalText;
+        showMessage("이미 사용 중인 이메일입니다.", 'error');
+        return;
+      } else if (response.status === 200 && !response.data?.isExisted) {
+        // 사용 가능한 이메일
+        nextBtn.disabled = false;
+        nextBtn.textContent = originalText;
+      } else {
+        // API 오류
+        nextBtn.disabled = false;
+        nextBtn.textContent = originalText;
+        showMessage("이메일 확인에 실패했습니다. 다시 시도해주세요.", 'error');
+        return;
+      }
+    } catch (error) {
+      nextBtn.disabled = false;
+      nextBtn.textContent = originalText;
+      showMessage("서버 연결에 실패했습니다.", 'error');
+      return;
+    }
   }
 
   // 다음 스텝으로 이동
   if (currentStep < totalSteps) {
     currentStep++;
     updateStepUI();
+    hideMessage();
   }
 }
 
@@ -129,7 +227,7 @@ function handlePrevStep() {
  * 스텝 인디케이터 클릭 처리
  * @param {number} targetStep - 이동할 스텝 번호
  */
-function handleStepClick(targetStep) {
+async function handleStepClick(targetStep) {
   // 같은 스텝이면 무시
   if (targetStep === currentStep) {
     return;
@@ -147,12 +245,35 @@ function handleStepClick(targetStep) {
       return;
     }
 
+    // Step 1에서 이동 시 이메일 중복 체크
+    if (currentStep === 1) {
+      const emailInput = dom.qs("#email");
+      const email = emailInput?.value.trim();
+
+      try {
+        const response = await UsersAPI.checkEmailExists(email);
+
+        if (response.status === 200 && response.data?.isExisted) {
+          showMessage("이미 사용 중인 이메일입니다.", 'error');
+          return;
+        } else if (response.status !== 200) {
+          showMessage("이메일 확인에 실패했습니다.", 'error');
+          return;
+        }
+      } catch (error) {
+        showMessage("서버 연결에 실패했습니다.", 'error');
+        return;
+      }
+    }
+
     currentStep = targetStep;
     updateStepUI();
+    hideMessage();
   } else {
     // 뒤로 가는 경우 (이전 스텝으로) - 자유롭게 이동 가능
     currentStep = targetStep;
     updateStepUI();
+    hideMessage();
   }
 }
 
@@ -275,9 +396,27 @@ async function handleSignUp(e) {
   // 로딩 상태 시작
   const originalBtnText = submitBtn.textContent;
   submitBtn.disabled = true;
-  submitBtn.innerHTML = '<div class="spinner"></div>회원가입 중...';
+  submitBtn.innerHTML = '<div class="spinner"></div>확인 중...';
 
   try {
+    // 닉네임 중복 체크
+    const nicknameCheck = await UsersAPI.checkNicknameExists(nickname);
+
+    if (nicknameCheck.status === 200 && nicknameCheck.data?.isExisted) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalBtnText;
+      showMessage("이미 사용 중인 닉네임입니다.", 'error');
+      return;
+    } else if (nicknameCheck.status !== 200) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalBtnText;
+      showMessage("닉네임 확인에 실패했습니다. 다시 시도해주세요.", 'error');
+      return;
+    }
+
+    // 닉네임 사용 가능 - 회원가입 진행
+    submitBtn.innerHTML = '<div class="spinner"></div>회원가입 중...';
+
     // 회원가입 API 호출
     const response = await UsersAPI.signUp({
       email,
@@ -293,14 +432,14 @@ async function handleSignUp(e) {
       // 로딩 상태 종료
       submitBtn.disabled = false;
       submitBtn.textContent = originalBtnText;
-      
+
       // 네트워크 에러
       showMessage("서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.", 'error');
     } else {
       // 로딩 상태 종료
       submitBtn.disabled = false;
       submitBtn.textContent = originalBtnText;
-      
+
       // 회원가입 실패 (400, 409 등)
       const errorMessage = response.error?.message || "회원가입에 실패했습니다.";
       showMessage(errorMessage, 'error');
@@ -309,7 +448,7 @@ async function handleSignUp(e) {
     // 로딩 상태 종료
     submitBtn.disabled = false;
     submitBtn.textContent = originalBtnText;
-    
+
     console.error("Sign up error:", error);
     showMessage("일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요.", 'error');
   }
