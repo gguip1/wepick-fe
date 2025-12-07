@@ -173,9 +173,10 @@ async function handleImageSelect(e) {
     return;
   }
 
-  const maxSize = 10 * 1024 * 1024;
+  const maxSize = 5 * 1024 * 1024; // 5MB
   if (file.size > maxSize) {
-    showMessage("이미지 크기는 10MB 이하여야 합니다.", 'warning');
+    const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+    showMessage(`파일 크기가 너무 큽니다. (${sizeMB}MB / 최대 5MB)`, 'warning');
     input.value = '';
 
     if (currentImageFile) {
@@ -191,7 +192,7 @@ async function handleImageSelect(e) {
 }
 
 /**
- * 프로필 이미지 업로드
+ * 프로필 이미지 업로드 (Presigned URL 방식)
  */
 async function uploadProfileImage(file) {
   const profileImageWrapper = dom.qs("#profileImageWrapper");
@@ -201,17 +202,17 @@ async function uploadProfileImage(file) {
       profileImageWrapper.classList.add('loading');
     }
 
-    const response = await ImagesAPI.uploadProfile(file);
+    // Presigned URL 방식으로 업로드
+    const result = await ImagesAPI.uploadProfileImage(file);
 
-    if (response.status >= 200 && response.status < 300) {
-      uploadedImageId = response.data?.imageId;
-      currentImageFile = file;
-
-      console.log('Image uploaded successfully, imageId:', uploadedImageId);
-    } else {
-      console.error('Image upload failed:', response.error);
-      showMessage("이미지 업로드에 실패했습니다. 다시 시도해주세요.", 'error');
+    if (result.error) {
+      console.error('Image upload failed:', result.error);
+      showMessage(result.error, 'error');
       handleImageRemove({ preventDefault: () => {}, stopPropagation: () => {} });
+    } else {
+      uploadedImageId = result.imageId;
+      currentImageFile = file;
+      console.log('Image uploaded successfully, imageId:', uploadedImageId);
     }
   } catch (error) {
     console.error('Image upload error:', error);
@@ -323,7 +324,7 @@ async function handleUpdateProfileImage(e) {
       updateData.profileImageId = null;
     }
 
-    const response = await UsersAPI.updateCurrent(updateData);
+    const response = await UsersAPI.updateProfileImage(updateData);
 
     if (response.status >= 200 && response.status < 300) {
       navigation.goTo('/users/edit');

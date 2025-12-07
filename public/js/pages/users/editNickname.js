@@ -114,7 +114,7 @@ async function handleNicknameChange(e) {
   submitBtn.textContent = '변경 중...';
 
   try {
-    const response = await UsersAPI.updateCurrent({ nickname });
+    const response = await UsersAPI.updateNickname({ nickname });
 
     if (response.status >= 200 && response.status < 300) {
       navigation.goTo('/users/edit');

@@ -339,9 +339,88 @@ async function handleImageSelect(event) {
     showMessage(`최대 ${maxImages}개까지만 업로드할 수 있어 ${availableSlots}개만 선택됩니다.`, 'warning');
   }
 
-  // 각 파일을 즉시 업로드
-  for (const file of filesToUpload) {
-    await uploadSingleImage(file);
+  // 다중 이미지 업로드
+  await uploadMultipleImages(filesToUpload);
+}
+
+/**
+ * 다중 이미지 업로드 및 미리보기 추가
+ * @param {File[]} files - 업로드할 파일 배열
+ */
+async function uploadMultipleImages(files) {
+  if (!files || files.length === 0) return;
+
+  // 모든 파일에 대해 미리보기 생성 및 임시 이미지 객체 추가
+  const tempImages = files.map(file => {
+    const previewUrl = createImagePreview(file);
+    return {
+      file,
+      imageId: null,
+      previewUrl,
+      isUploading: true,
+    };
+  });
+
+  // 상태에 추가
+  const startIndex = state.uploadedImages.length;
+  state.uploadedImages.push(...tempImages);
+
+  // UI 업데이트 (로딩 상태 표시)
+  displayImagePreviews();
+
+  try {
+    // 다중 이미지 업로드 API 호출
+    const result = await ImagesAPI.uploadMultiplePostImages(files);
+
+    console.log('Multiple upload result:', result);
+
+    // 성공한 이미지들 업데이트
+    if (result.imageIds && result.imageIds.length > 0) {
+      result.imageIds.forEach((imageId, index) => {
+        if (imageId !== null) {
+          const stateIndex = startIndex + index;
+          if (state.uploadedImages[stateIndex]) {
+            state.uploadedImages[stateIndex].imageId = imageId;
+            state.uploadedImages[stateIndex].isUploading = false;
+          }
+        }
+      });
+    }
+
+    // 실패한 이미지들 처리
+    if (result.errors && result.errors.length > 0) {
+      result.errors.forEach(errorInfo => {
+        showMessage(`${errorInfo.file}: ${errorInfo.error}`, 'error');
+      });
+
+      // 실패한 이미지들 제거
+      state.uploadedImages = state.uploadedImages.filter((img, index) => {
+        if (index >= startIndex && img.imageId === null && !img.isUploading) {
+          revokeImagePreview(img.previewUrl);
+          return false;
+        }
+        return true;
+      });
+    }
+
+    // UI 업데이트 (로딩 표시 제거)
+    displayImagePreviews();
+
+  } catch (error) {
+    console.error("Failed to upload images:", error);
+
+    // 모든 임시 이미지 제거
+    for (let i = startIndex; i < state.uploadedImages.length; i++) {
+      if (state.uploadedImages[i].previewUrl) {
+        revokeImagePreview(state.uploadedImages[i].previewUrl);
+      }
+    }
+    state.uploadedImages.splice(startIndex, tempImages.length);
+
+    showMessage('이미지 업로드에 실패했습니다.', 'error');
+
+    // UI 업데이트
+    displayImagePreviews();
   }
 }
 
@@ -383,13 +462,13 @@ async function uploadSingleImage(file) {
     }
   } catch (error) {
     console.error("Failed to upload image:", error);
-    
+
     // 실패한 이미지 제거
     state.uploadedImages.splice(imageIndex, 1);
     revokeImagePreview(previewUrl);
-    
+
     showMessage(`${file.name} 업로드에 실패했습니다.`, 'error');
-    
+
     // UI 업데이트
     displayImagePreviews();
   }

@@ -145,8 +145,8 @@ async function handlePasswordChange(e) {
   submitBtn.textContent = '변경 중...';
 
   try {
-    const response = await UsersAPI.changePassword({
-      currentPassword,
+    const response = await UsersAPI.updatePassword({
+      oldPassword: currentPassword,
       newPassword,
       newPassword2: newPassword
     });
