@@ -9,6 +9,8 @@ import { GaugeBar } from '../components/gauge-bar.js';
 import { initHeaderAuth } from '../utils/header-init.js';
 import { loadHeader, loadFooter } from '../utils/component-loader.js';
 
+const PAGE_ID = "wepick-today";
+
 // Page state
 let currentTopic = null;
 let selectedChoice = null;

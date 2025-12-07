@@ -15,7 +15,7 @@ import { setupRealtimeValidation, validateForm } from "../../utils/validation.js
 import { createDraggableList } from "../../utils/drag-drop.js";
 import { validateImageFile, uploadImage, createImagePreview, revokeImagePreview } from "../../utils/image-upload.js";
 import { createCharCounter, createFormController } from "../../utils/form-helpers.js";
-import { loadHeader as loadHeaderComponent } from "../../utils/component-loader.js";
+import { loadHeader as loadHeaderComponent, loadFooter as loadFooterComponent } from "../../utils/component-loader.js";
 
 const PAGE_ID = "posts-create";
 
@@ -52,16 +52,7 @@ async function loadHeader() {
  * Footer 로드
  */
 async function loadFooter() {
-  const footerContainer = document.querySelector('footer');
-  if (!footerContainer) return;
-
-  try {
-    const response = await fetch('/components/footer.html');
-    const html = await response.text();
-    footerContainer.innerHTML = html;
-  } catch (error) {
-    console.error('Failed to load footer:', error);
-  }
+  await loadFooterComponent();
 }
 
 /**

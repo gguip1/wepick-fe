@@ -8,6 +8,8 @@ import { navigation } from "../../utils/navigation.js";
 import { initHeaderAuth } from "../../utils/header-init.js";
 import { loadHeader } from "../../utils/component-loader.js";
 
+const PAGE_ID = "posts-list";
+
 // 페이지 식별자 확인 (다른 페이지에서 실행 방지)
 const root = document.querySelector('[data-page="posts-list"]');
 if (!root) {

@@ -4,6 +4,7 @@
  */
 
 import { UsersAPI } from '../api/users.js';
+import { config } from '../config.js';
 
 /**
  * Initialize header authentication state
@@ -212,14 +213,9 @@ export async function initHeaderAuth() {
     const activeNav = document.body.dataset.activeNav;
     if (!activeNav) return;
 
-    // Map activeNav values to header nav hrefs
-    const navMap = {
-      'today': '/today',
-      'topics': '/topics',
-      'community': '/community/posts'
-    };
-
-    const targetHref = navMap[activeNav];
+    // Get route from centralized config
+    const navKey = activeNav.toUpperCase();
+    const targetHref = config.ROUTES.NAV[navKey];
     if (!targetHref) return;
 
     // Add active class to matching header nav item
@@ -238,14 +234,9 @@ export async function initHeaderAuth() {
     const activeNav = document.body.dataset.activeNav;
     if (!activeNav) return;
 
-    // Map activeNav values to bottom nav hrefs
-    const navMap = {
-      'today': '/today',
-      'topics': '/topics',
-      'community': '/community/posts'
-    };
-
-    const targetHref = navMap[activeNav];
+    // Get route from centralized config
+    const navKey = activeNav.toUpperCase();
+    const targetHref = config.ROUTES.NAV[navKey];
     if (!targetHref) return;
 
     // Add active class to matching bottom nav item

@@ -5,11 +5,7 @@
  */
 
 import { apiRequest } from "./base.js";
-
-/**
- * 이미지 파일 최대 크기 (5MB)
- */
-export const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
+import { config } from "../config.js";
 
 /**
  * 이미지 파일 유효성 검사
@@ -22,15 +18,16 @@ export function validateImageFile(file) {
         return { valid: false, error: '파일을 선택해주세요.' };
     }
 
-    // 파일 타입 검사 (이미지만 허용)
-    if (!file.type.startsWith('image/')) {
-        return { valid: false, error: '이미지 파일만 업로드 가능합니다.' };
+    // 파일 타입 검사 (허용된 타입만)
+    if (!config.IMAGE_UPLOAD.ALLOWED_TYPES.includes(file.type)) {
+        return { valid: false, error: '지원하지 않는 파일 형식입니다. (JPG, PNG, GIF만 가능)' };
     }
 
-    // 파일 크기 검사 (5MB 제한)
-    if (file.size > MAX_IMAGE_SIZE) {
+    // 파일 크기 검사
+    if (file.size > config.IMAGE_UPLOAD.MAX_SIZE) {
         const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
-        return { valid: false, error: `파일 크기가 너무 큽니다. (${sizeMB}MB / 최대 5MB)` };
+        const maxSizeMB = (config.IMAGE_UPLOAD.MAX_SIZE / (1024 * 1024)).toFixed(0);
+        return { valid: false, error: `파일 크기가 너무 큽니다. (${sizeMB}MB / 최대 ${maxSizeMB}MB)` };
     }
 
     return { valid: true, error: null };

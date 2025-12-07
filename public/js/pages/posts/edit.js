@@ -12,7 +12,7 @@ import { auth } from "../../utils/auth.js";
 import { initHeaderAuth } from "../../utils/header-init.js";
 import { showMessage, hideMessage } from "../../utils/message.js";
 import { setupRealtimeValidation, validateForm } from "../../utils/validation.js";
-import { loadHeader as loadHeaderComponent } from "../../utils/component-loader.js";
+import { loadHeader as loadHeaderComponent, loadFooter as loadFooterComponent } from "../../utils/component-loader.js";
 
 const PAGE_ID = "posts-edit";
 
@@ -57,16 +57,7 @@ async function loadHeader() {
  * Footer HTML 로드
  */
 async function loadFooter() {
-  const footerContainer = document.querySelector('footer');
-  if (!footerContainer) return;
-
-  try {
-    const response = await fetch('/components/footer.html');
-    const html = await response.text();
-    footerContainer.innerHTML = html;
-  } catch (error) {
-    console.error('Failed to load footer:', error);
-  }
+  await loadFooterComponent();
 }
 
 /**

@@ -7,6 +7,8 @@ import { UsersAPI } from '../../api/users.js';
 import { initHeaderAuth } from '../../utils/header-init.js';
 import { loadHeader, loadFooter } from '../../utils/component-loader.js';
 
+const PAGE_ID = "users-mypage";
+
 // 페이지 식별자 확인
 const root = document.querySelector('[data-page="mypage"]');
 if (!root) {

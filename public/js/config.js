@@ -9,6 +9,7 @@
 export const config = Object.freeze({
   // API 설정
   API_BASE_URL: "https://api.wepick.cloud/api",
+  // API_BASE_URL: "http://localhost:8080/api",
   TIMEOUT: 6000,
 
   // 애플리케이션 설정
@@ -27,5 +28,19 @@ export const config = Object.freeze({
     SIGNIN: "/users/signin",
     SIGNUP: "/users/signup",
     NOT_FOUND: "/pages/error/404.html",
+
+    // Navigation routes
+    NAV: Object.freeze({
+      TODAY: '/today',
+      TOPICS: '/topics',
+      COMMUNITY: '/community/posts',
+    }),
+  }),
+
+  // 이미지 업로드 설정
+  IMAGE_UPLOAD: Object.freeze({
+    MAX_SIZE: 5 * 1024 * 1024, // 5MB
+    ALLOWED_TYPES: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'],
+    ALLOWED_EXTENSIONS: ['.jpg', '.jpeg', '.png', '.gif'],
   }),
 });
