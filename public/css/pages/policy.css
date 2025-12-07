@@ -1,0 +1,315 @@
+/* ========================================
+   Policy Pages Styles (Terms & Privacy)
+   ======================================== */
+
+/* Global Reset */
+body[data-page="policy-terms"],
+body[data-page="policy-privacy"] {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #02051c 0%, #0a0f2c 100%);
+  color: white;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  box-sizing: border-box;
+  padding: 2rem 1rem;
+  overflow-x: hidden;
+}
+
+body[data-page="policy-terms"] *,
+body[data-page="policy-privacy"] * {
+  box-sizing: border-box;
+}
+
+/* Container */
+.policy-container {
+  max-width: 900px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Logo */
+.policy-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+  text-decoration: none;
+  transition: opacity 0.3s ease;
+}
+
+.policy-logo:hover {
+  opacity: 0.8;
+}
+
+.policy-logo-image {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+.policy-logo-text {
+  color: white;
+  font-size: 1.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* Policy Card */
+.policy-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 3rem 2.5rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 2rem;
+}
+
+/* Header */
+.policy-header {
+  margin-bottom: 3rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.policy-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin: 0 0 1rem 0;
+  color: rgba(255, 255, 255, 0.95);
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.policy-description {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0 0 1rem 0;
+}
+
+.policy-date {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+  font-style: italic;
+}
+
+/* Sections */
+.policy-sections {
+  margin-bottom: 3rem;
+}
+
+.policy-section {
+  margin-bottom: 2.5rem;
+}
+
+.policy-section:last-child {
+  margin-bottom: 0;
+}
+
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 1rem 0;
+  color: rgba(255, 255, 255, 0.95);
+  padding-left: 1rem;
+  border-left: 3px solid #3b82f6;
+}
+
+.section-content {
+  color: rgba(255, 255, 255, 0.75);
+  line-height: 1.8;
+}
+
+.section-content p {
+  margin: 0 0 0.75rem 0;
+}
+
+.section-content p:last-child {
+  margin-bottom: 0;
+}
+
+.section-content ul {
+  margin: 0;
+  padding-left: 1.5rem;
+  list-style: none;
+}
+
+.section-content ul li {
+  position: relative;
+  margin-bottom: 0.75rem;
+  padding-left: 1rem;
+}
+
+.section-content ul li:last-child {
+  margin-bottom: 0;
+}
+
+.section-content ul li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: #60a5fa;
+  font-weight: bold;
+}
+
+/* Contact Info */
+.policy-contact {
+  padding-top: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.contact-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem 0;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.contact-info {
+  font-size: 0.9375rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+}
+
+.contact-link {
+  color: #60a5fa;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.contact-link:hover {
+  color: #3b82f6;
+  text-decoration: underline;
+}
+
+/* Back Button */
+.policy-back {
+  text-align: center;
+}
+
+.btn {
+  padding: 0.875rem 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+  min-width: 140px;
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+/* ========================================
+   Responsive Design
+   ======================================== */
+
+/* Tablet */
+@media (max-width: 768px) {
+  body[data-page="policy-terms"],
+  body[data-page="policy-privacy"] {
+    padding: 1.5rem 1rem;
+  }
+
+  .policy-logo {
+    margin-bottom: 1.5rem;
+  }
+
+  .policy-logo-image {
+    width: 40px;
+    height: 40px;
+  }
+
+  .policy-logo-text {
+    font-size: 1.5rem;
+  }
+
+  .policy-card {
+    padding: 2rem 1.5rem;
+  }
+
+  .policy-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+  }
+
+  .policy-title {
+    font-size: 2rem;
+  }
+
+  .policy-description {
+    font-size: 0.9375rem;
+  }
+
+  .section-title {
+    font-size: 1.125rem;
+  }
+
+  .section-content {
+    font-size: 0.9375rem;
+  }
+
+  .policy-section {
+    margin-bottom: 2rem;
+  }
+}
+
+/* Mobile */
+@media (max-width: 360px) {
+  body[data-page="policy-terms"],
+  body[data-page="policy-privacy"] {
+    padding: 1rem 0.75rem;
+  }
+
+  .policy-card {
+    padding: 1.5rem 1rem;
+  }
+
+  .policy-title {
+    font-size: 1.75rem;
+  }
+
+  .policy-description {
+    font-size: 0.875rem;
+  }
+
+  .section-title {
+    font-size: 1rem;
+    padding-left: 0.75rem;
+  }
+
+  .section-content {
+    font-size: 0.875rem;
+  }
+
+  .section-content ul {
+    padding-left: 1rem;
+  }
+
+  .section-content ul li {
+    padding-left: 0.75rem;
+  }
+
+  .btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9375rem;
+    min-width: 120px;
+  }
+}

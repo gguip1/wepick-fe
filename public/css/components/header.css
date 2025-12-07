@@ -1,182 +1,582 @@
-/* ===== 헤더 컴포넌트 ===== */
-header {
+/* ===== Global Header Component ===== */
+
+/* Body padding to prevent content from being hidden by fixed header */
+body {
+    padding-top: 72px; /* Header height (40px logo + 2rem padding = ~72px) */
+}
+
+.global-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(2, 5, 28, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 1000;
+    padding: 1rem 0;
+}
+
+.header-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 var(--spacing-lg);
-    height: 60px;
-    background-color: var(--color-bg-primary);
-    border-bottom: 1px solid var(--color-border-light);
-    box-shadow: var(--shadow-sm);
-    position: relative;
-    z-index: var(--z-sticky);
+    gap: 2rem;
 }
 
-/* ===== 헤더 제목 ===== */
-header .title {
-    font-size: var(--font-size-xl);
-    font-weight: var(--font-weight-bold);
-    color: var(--color-text-primary);
-    margin: 0;
-    line-height: var(--line-height-tight);
-}
-
-/* ===== 헤더 버튼들 ===== */
-header .back-btn, 
-header .profile-btn {
-    background: none;
-    border: none;
-    display: flex;
+/* Back Button (Mobile Only) */
+.header-back-btn {
+    display: none;
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
-    border-radius: var(--border-radius-md);
+    background: transparent;
+    border: none;
+    padding: 0.5rem;
     cursor: pointer;
-    transition: background-color var(--transition-fast);
+    transition: all 0.3s ease;
+    z-index: 10;
 }
 
-header .back-btn:hover,
-header .profile-btn:hover {
-    background-color: var(--color-bg-hover);
+.header-back-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
 }
 
-header .back-btn:focus,
-header .profile-btn:focus {
-    outline: 2px solid var(--color-primary);
-    outline-offset: 2px;
+.header-back-btn[hidden] {
+    display: none;
 }
 
-/* ===== 헤더 아이콘 ===== */
-header .back-btn img, 
-header .profile-btn img {
-    width: 30px;
-    height: 30px;
-    display: block;
-    transition: transform var(--transition-fast);
-    border-radius: var(--border-radius-full);
+.header-back-icon {
+    width: 24px;
+    height: 24px;
+    filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%);
+}
+
+/* Logo */
+.header-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    flex-shrink: 0;
+}
+
+.header-logo-image {
+    height: 40px;
+    width: 40px;
+    object-fit: contain;
+}
+
+.header-logo-text {
+    color: white;
+    font-weight: 700;
+    font-size: 1.5rem;
+    white-space: nowrap;
+}
+
+/* Desktop Navigation */
+.header-nav {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.header-nav-link {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 500;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.header-nav-link:hover {
+    color: white;
+    background: rgba(59, 130, 246, 0.1);
+}
+
+.header-nav-link.active {
+    color: #3b82f6;
+    background: rgba(59, 130, 246, 0.2);
+}
+
+/* User Menu */
+.header-user-menu {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Auth Links (Not Logged In) */
+.header-auth-links {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.header-auth-links[hidden] {
+    display: none;
+}
+
+.header-auth-link {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 500;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.header-auth-link:hover {
+    color: white;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.header-auth-link.header-signup {
+    background: #3b82f6;
+    color: white;
+}
+
+.header-auth-link.header-signup:hover {
+    background: #2563eb;
+}
+
+/* User Dropdown (Logged In) */
+.header-user-dropdown {
+    position: relative;
+}
+
+.header-user-dropdown[hidden] {
+    display: none;
+}
+
+.header-user-button {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 0.375rem 0.75rem 0.375rem 0.375rem;
+    border-radius: 24px;
+    cursor: pointer;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.header-user-button:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.header-user-image {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
     object-fit: cover;
 }
 
-header .back-btn:hover img,
-header .profile-btn:hover img {
-    transform: scale(1.1);
+.header-dropdown-arrow {
+    font-size: 0.75rem;
+    transition: transform 0.3s ease;
 }
 
-/* ===== 프로필 드롭다운 ===== */
-header .profile-dropdown {
+.header-dropdown-menu {
     position: absolute;
-    top: 100%;
-    right: var(--spacing-lg);
-    background-color: var(--color-bg-primary);
-    border: 1px solid var(--color-border-light);
-    border-radius: var(--border-radius-lg);
-    box-shadow: var(--shadow-lg);
-    list-style: none;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    width: 280px;
+    background: rgba(2, 5, 28, 0.98);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 1.25rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(10px);
+}
+
+.header-dropdown-menu[hidden] {
+    display: none;
+}
+
+.header-dropdown-user-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.header-dropdown-image {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.header-dropdown-user-details {
     display: flex;
     flex-direction: column;
-    min-width: 200px;
-    padding: var(--spacing-xs) 0;
-    margin: 0;
-    opacity: 0;
-    transform: translateY(-8px) scale(0.95);
-    pointer-events: none;
-    transition: opacity var(--transition-base), 
-                transform var(--transition-base);
-    z-index: var(--z-dropdown);
+    gap: 0.25rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.header-dropdown-username {
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
     overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
-header .profile-dropdown.show {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-    pointer-events: auto;
+.header-dropdown-useremail {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.8125rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
-/* ===== 드롭다운 아이템 ===== */
-header .profile-dropdown-item {
-    margin: 0;
-    padding: 0;
+.header-dropdown-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 1rem 0;
 }
 
-header .profile-dropdown-item a, 
-header .profile-dropdown-item button {
-    all: unset;
+.header-dropdown-items {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.header-dropdown-item {
     display: flex;
     align-items: center;
     width: 100%;
-    padding: var(--spacing-md) var(--spacing-lg);
-    color: var(--color-text-primary);
-    font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-medium);
+    padding: 0.875rem 1rem;
+    color: rgba(255, 255, 255, 0.9);
     text-decoration: none;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    border: none;
+    background: none;
+    text-align: left;
     cursor: pointer;
-    transition: background-color var(--transition-fast), 
-                color var(--transition-fast);
-    border-radius: 0;
-    margin: 0;
-    box-sizing: border-box;
+    border-radius: 8px;
+    transition: all 0.2s ease;
 }
 
-header .profile-dropdown-item:first-child a,
-header .profile-dropdown-item:first-child button {
-    border-top-left-radius: var(--border-radius-md);
-    border-top-right-radius: var(--border-radius-md);
+.header-dropdown-item:hover {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
 }
 
-header .profile-dropdown-item:last-child a,
-header .profile-dropdown-item:last-child button {
-    border-bottom-left-radius: var(--border-radius-md);
-    border-bottom-right-radius: var(--border-radius-md);
+.header-dropdown-item.logout-item {
+    color: #ef4444;
+    margin-top: 0.5rem;
 }
 
-/* ===== 드롭다운 호버 효과 ===== */
-header .profile-dropdown-item a:hover,
-header .profile-dropdown-item a:focus-visible,
-header .profile-dropdown-item button:hover,
-header .profile-dropdown-item button:focus-visible {
-    background-color: var(--color-primary-bg);
-    color: var(--color-primary);
-    outline: none;
+.header-dropdown-item.logout-item:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
 }
 
-/* ===== 로그아웃 버튼 특별 스타일 ===== */
-header .profile-dropdown-item .logout-btn {
-    color: var(--color-danger);
+/* Mobile User Section */
+.header-mobile-user-section {
+    display: none;
 }
 
-header .profile-dropdown-item .logout-btn:hover,
-header .profile-dropdown-item .logout-btn:focus-visible {
-    background-color: var(--color-danger-bg);
-    color: var(--color-danger);
-    outline: none;
+.header-mobile-auth-buttons {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
-/* ===== 반응형 디자인 ===== */
-@media (max-width: 768px) {
-    header {
-        padding: 0 var(--spacing-md);
-        height: 56px;
+.header-mobile-signin-btn {
+    color: white;
+    text-decoration: none;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+}
+
+.header-mobile-signin-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.header-mobile-auth-buttons[hidden] {
+    display: none;
+}
+
+/* Mobile Menu Toggle */
+.header-mobile-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    padding: 0.25rem;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 44px;
+    height: 44px;
+}
+
+.header-mobile-toggle:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.header-mobile-toggle[hidden] {
+    display: none;
+}
+
+.header-mobile-toggle-image {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* Mobile Menu */
+.header-mobile-menu {
+    display: none;
+    position: fixed;
+    top: 70px;
+    right: 1rem;
+    width: 280px;
+    background: rgba(2, 5, 28, 0.98);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 1.25rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(10px);
+}
+
+.header-mobile-menu[hidden] {
+    display: none;
+}
+
+.header-mobile-user-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.header-mobile-menu-image {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.header-mobile-user-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.header-mobile-username {
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.header-mobile-useremail {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.8125rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.header-mobile-menu-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 1rem 0;
+}
+
+.header-mobile-menu-items {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.header-mobile-menu-item {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 0.875rem 1rem;
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: none;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    border: none;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.header-mobile-menu-item:hover {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+}
+
+.header-mobile-menu-item.logout-item {
+    color: #ef4444;
+    margin-top: 0.5rem;
+}
+
+.header-mobile-menu-item.logout-item:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+
+/* Bottom Navigation */
+.bottom-nav {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(2, 5, 28, 0.98);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 0.5rem 0;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+}
+
+.bottom-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    flex: 1;
+    padding: 0.5rem;
+    text-decoration: none;
+    color: rgba(255, 255, 255, 0.6);
+    transition: all 0.3s ease;
+}
+
+.bottom-nav-item:hover,
+.bottom-nav-item.active {
+    color: #3b82f6;
+}
+
+.bottom-nav-icon {
+    font-size: 1.5rem;
+    filter: grayscale(1);
+    transition: filter 0.3s ease;
+}
+
+.bottom-nav-item:hover .bottom-nav-icon,
+.bottom-nav-item.active .bottom-nav-icon {
+    filter: grayscale(0);
+}
+
+.bottom-nav-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    /* Show bottom navigation on mobile */
+    .bottom-nav {
+        display: flex;
     }
-    
-    header .title {
-        font-size: var(--font-size-lg);
+
+    /* Hide desktop navigation */
+    .header-nav {
+        display: none;
     }
-    
-    header .back-btn,
-    header .profile-btn {
-        width: 36px;
-        height: 36px;
+
+    /* Show mobile user section */
+    .header-mobile-user-section {
+        display: flex;
     }
-    
-    header .back-btn img,
-    header .profile-btn img {
-        width: 20px;
-        height: 20px;
+
+    /* Hide desktop user menu */
+    .header-user-menu {
+        display: none;
     }
-    
-    header .profile-dropdown {
-        right: var(--spacing-md);
-        min-width: 180px;
+
+    .header-container {
+        padding: 0 1rem;
+        position: relative;
+        justify-content: center;
+    }
+
+    /* Show back button on mobile for specific pages */
+    .header-back-btn:not([hidden]) {
+        display: flex;
+    }
+
+    /* Center logo on mobile - always centered regardless of other elements */
+    .header-logo {
+        position: static;
+        transform: none;
+        margin: 0;
+    }
+
+    /* Mobile user section on right side */
+    .header-mobile-user-section {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    /* Add padding to body to prevent content from being hidden by bottom nav */
+    body {
+        padding-bottom: 70px;
+    }
+}
+
+@media (min-width: 1025px) {
+    /* Ensure bottom nav is hidden on desktop */
+    .bottom-nav {
+        display: none !important;
+    }
+
+    /* Ensure desktop navigation is visible */
+    .header-nav {
+        display: flex;
+    }
+
+    /* Ensure mobile toggle is hidden */
+    .header-mobile-toggle {
+        display: none;
+    }
+
+    /* Ensure desktop user menu is visible */
+    .header-user-menu {
+        display: flex;
     }
 }

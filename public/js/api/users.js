@@ -74,39 +74,47 @@ export const UsersAPI = {
             method: 'GET' 
         }),
     /**
-     * 현재 사용자 정보 수정
-     * @param {Object} data - 수정할 데이터
-     * @param {string} [data.nickname] - 닉네임
-     * @param {number|null} [data.profileImageId] - 프로필 이미지 ID
+     * 프로필 이미지 변경
+     * @param {Object} data - 프로필 이미지 데이터
+     * @param {number|null} data.profileImageId - 프로필 이미지 ID (null이면 이미지 제거)
      * @returns {Promise<{data: any, error: any, status: number}>}
      */
-    updateCurrent: (data) => {
-        const body = {};
-        if (data.nickname !== undefined && data.nickname !== null) {
-            body.nickname = data.nickname;
-        }
-        if (data.profileImageId !== undefined) {
-            body.profileImageId = data.profileImageId;
-        }
-
-        return apiRequest('/users/me', {
+    updateProfileImage: (data) =>
+        apiRequest('/users/me/profile-image', {
             method: 'PATCH',
-            body: JSON.stringify(body),
-        });
-    },
+            body: JSON.stringify({
+                profileImageId: data.profileImageId
+            }),
+        }),
+
+    /**
+     * 닉네임 변경
+     * @param {Object} data - 닉네임 데이터
+     * @param {string} data.nickname - 새 닉네임
+     * @returns {Promise<{data: any, error: any, status: number}>}
+     */
+    updateNickname: (data) =>
+        apiRequest('/users/me/nickname', {
+            method: 'PATCH',
+            body: JSON.stringify({
+                nickname: data.nickname
+            }),
+        }),
     /**
      * 비밀번호 변경
      * @param {Object} data - 비밀번호 데이터
+     * @param {string} data.oldPassword - 현재 비밀번호
      * @param {string} data.newPassword - 새 비밀번호
      * @param {string} data.newPassword2 - 새 비밀번호 확인
      * @returns {Promise<{data: any, error: any, status: number}>}
      */
-    updatePassword: (data) => 
+    updatePassword: (data) =>
         apiRequest('/users/me/password', {
             method: 'PATCH',
-            body: JSON.stringify({ 
-                newPassword: data.newPassword, 
-                newPassword2: data.newPassword2 
+            body: JSON.stringify({
+                oldPassword: data.oldPassword,
+                newPassword: data.newPassword,
+                newPassword2: data.newPassword2
             }),
         }),
     /**

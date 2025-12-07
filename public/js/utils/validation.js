@@ -310,6 +310,7 @@ function setFieldValid(field) {
   const feedback = field.parentElement.querySelector('.invalid-feedback');
   if (feedback) {
     feedback.textContent = '';
+    feedback.classList.remove('show');
   }
 }
 
@@ -330,6 +331,7 @@ function setFieldInvalid(field, message) {
     field.parentElement.appendChild(feedback);
   }
   feedback.textContent = message;
+  feedback.classList.add('show');
 }
 
 /**
@@ -397,6 +399,7 @@ export function resetValidation(form) {
   const feedbacks = form.querySelectorAll('.invalid-feedback');
   feedbacks.forEach((feedback) => {
     feedback.textContent = '';
+    feedback.classList.remove('show');
   });
 }
 
@@ -424,13 +427,14 @@ export function showValidationFeedback(input, validationResult) {
  */
 export function clearValidationFeedback(input) {
   if (!input) return;
-  
+
   input.classList.remove('is-valid', 'is-invalid');
-  
+
   // 기존 피드백 메시지 제거
   const existingFeedback = input.parentElement.querySelector('.invalid-feedback');
   if (existingFeedback) {
     existingFeedback.textContent = '';
+    existingFeedback.classList.remove('show');
   }
 }
 

@@ -9,11 +9,10 @@ import { events } from "../../utils/events.js";
 import { dom } from "../../utils/dom.js";
 import { navigation } from "../../utils/navigation.js";
 import { auth } from "../../utils/auth.js";
-import { initHeader } from "../../components/header.js";
-import { initFooter } from "../../components/footer.js";
-import { Modal } from "../../components/modal.js";
+import { initHeaderAuth } from "../../utils/header-init.js";
 import { showMessage, hideMessage } from "../../utils/message.js";
 import { setupRealtimeValidation, validateForm } from "../../utils/validation.js";
+import { loadHeader as loadHeaderComponent } from "../../utils/component-loader.js";
 
 const PAGE_ID = "posts-edit";
 
@@ -45,14 +44,69 @@ function getPostIdFromUrl() {
 }
 
 /**
+ * 헤더 HTML 로드
+ */
+async function loadHeader() {
+  await loadHeaderComponent();
+
+  // 뒤로가기 버튼 초기화
+  initBackButton();
+}
+
+/**
+ * Footer HTML 로드
+ */
+async function loadFooter() {
+  const footerContainer = document.querySelector('footer');
+  if (!footerContainer) return;
+
+  try {
+    const response = await fetch('/components/footer.html');
+    const html = await response.text();
+    footerContainer.innerHTML = html;
+  } catch (error) {
+    console.error('Failed to load footer:', error);
+  }
+}
+
+/**
+ * 뒤로가기 버튼 초기화
+ */
+function initBackButton() {
+  const backBtn = document.getElementById('headerBackBtn');
+  if (!backBtn) return;
+
+  // 버튼 표시
+  backBtn.removeAttribute('hidden');
+
+  // 클릭 이벤트 추가
+  backBtn.addEventListener('click', () => {
+    // 뒤로 갈 곳이 있는지 확인
+    if (window.history.length > 1 && document.referrer) {
+      // 이전 페이지가 있으면 뒤로가기
+      navigation.goBack();
+    } else {
+      // 없으면 해당 게시글 상세 페이지로 이동
+      if (state.postId) {
+        navigation.goTo(`/community/posts/${state.postId}`);
+      } else {
+        // postId도 없으면 커뮤니티 목록으로
+        navigation.goTo('/community/posts');
+      }
+    }
+  });
+}
+
+/**
  * 페이지 초기화
  */
 async function init() {
-  // 헤더 초기화
-  await initHeader(PAGE_ID);
+  // 헤더 및 푸터 HTML 로드
+  await loadHeader();
+  await loadFooter();
 
-  // 푸터 초기화
-  await initFooter();
+  // 헤더 인증 상태 초기화 (로그인 상태 반영)
+  await initHeaderAuth();
 
   // 인증 필요 (서버에서 사용자 정보 가져옴)
   const user = await auth.requireAuth();
@@ -182,6 +236,9 @@ async function loadPostData() {
       if (elements.form) {
         elements.form.style.display = "block";
       }
+
+      // 초기 버튼 상태 설정 (변경사항 없으므로 비활성화)
+      checkFormChanges();
     } else {
       console.error("Failed to load post");
       navigation.goBack();
@@ -202,19 +259,17 @@ function displayAllImages() {
   updateImageCount();
 
   if (state.allImages.length === 0) {
-    elements.imagePreviewContainer.classList.add("d-none");
+    elements.imagePreviewContainer.classList.add("hidden");
+    // 이미지 변경 확인
+    checkFormChanges();
     return;
   }
 
-  elements.imagePreviewContainer.classList.remove("d-none");
+  elements.imagePreviewContainer.classList.remove("hidden");
 
   state.allImages.forEach((imageData, index) => {
     const imageItem = document.createElement("div");
-    imageItem.className = "position-relative";
-    imageItem.style.width = "100px";
-    imageItem.style.height = "100px";
-    imageItem.style.borderRadius = "8px";
-    imageItem.style.overflow = "hidden";
+    imageItem.className = "image-item";
     imageItem.style.cursor = imageData.isUploading ? "default" : "move";
     imageItem.style.touchAction = "none"; // 터치 스크롤 방지
     imageItem.setAttribute("draggable", imageData.isUploading ? "false" : "true");
@@ -222,12 +277,7 @@ function displayAllImages() {
 
     const img = document.createElement("img");
     img.src = imageData.previewUrl;
-    img.className = "img-thumbnail";
-    img.style.width = "100%";
-    img.style.height = "100%";
-    img.style.objectFit = "cover";
-    img.style.border = "none";
-    img.style.pointerEvents = "none";
+    img.className = "preview-image";
     img.alt = imageData.isExisting ? `이미지 ${index + 1}` : imageData.file.name;
 
     imageItem.appendChild(img);
@@ -235,28 +285,15 @@ function displayAllImages() {
     // 업로드 중이면 로딩 오버레이 표시
     if (imageData.isUploading) {
       const loadingOverlay = document.createElement("div");
-      loadingOverlay.className = "position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center";
-      loadingOverlay.style.backgroundColor = "rgba(0, 0, 0, 0.6)";
-      loadingOverlay.style.borderRadius = "8px";
-      loadingOverlay.innerHTML = '<div class="spinner-border spinner-border-sm text-light" role="status"><span class="visually-hidden">업로드 중...</span></div>';
+      loadingOverlay.className = "loading-overlay";
+      loadingOverlay.innerHTML = '<div class="spinner"></div>';
       imageItem.appendChild(loadingOverlay);
     }
 
     // 삭제 버튼
     const removeBtn = document.createElement("button");
     removeBtn.type = "button";
-    removeBtn.className = "btn btn-danger position-absolute";
-    removeBtn.style.top = "2px";
-    removeBtn.style.right = "2px";
-    removeBtn.style.width = "24px";
-    removeBtn.style.height = "24px";
-    removeBtn.style.padding = "0";
-    removeBtn.style.borderRadius = "50%";
-    removeBtn.style.display = "flex";
-    removeBtn.style.alignItems = "center";
-    removeBtn.style.justifyContent = "center";
-    removeBtn.style.fontSize = "12px";
-    removeBtn.style.lineHeight = "1";
+    removeBtn.className = "remove-btn";
     removeBtn.innerHTML = '<i class="bi bi-x"></i>';
     removeBtn.setAttribute("data-index", index);
     removeBtn.disabled = imageData.isUploading;
@@ -280,6 +317,9 @@ function displayAllImages() {
     imageItem.appendChild(removeBtn);
     elements.imagePreviewList.appendChild(imageItem);
   });
+
+  // 이미지 변경 확인
+  checkFormChanges();
 }
 
 // 드래그 상태 저장
@@ -486,6 +526,38 @@ function handleRemoveImage(event) {
 }
 
 /**
+ * 폼 변경사항 확인 및 버튼 상태 업데이트
+ */
+function checkFormChanges() {
+  if (!state.originalPost) return;
+
+  const titleChanged = elements.titleInput.value.trim() !== (state.originalPost.title || "");
+  const contentChanged = elements.contentInput.value.trim() !== (state.originalPost.content || "");
+
+  // 이미지 변경 확인
+  const originalImageCount = state.originalPost.images?.length || state.originalPost.imageUrls?.length || 0;
+  const currentImageCount = state.allImages.length;
+  const imageCountChanged = currentImageCount !== originalImageCount;
+
+  // 이미지 순서나 내용 변경 확인
+  let imageContentChanged = false;
+  if (!imageCountChanged && currentImageCount > 0) {
+    const originalImageIds = (state.originalPost.images || []).map(img => img.imageId);
+    const currentImageIds = state.allImages.map(img => img.imageId);
+    imageContentChanged = JSON.stringify(originalImageIds) !== JSON.stringify(currentImageIds);
+  }
+
+  const hasChanges = titleChanged || contentChanged || imageCountChanged || imageContentChanged;
+
+  // 제출 버튼 활성화/비활성화
+  if (elements.submitBtn) {
+    elements.submitBtn.disabled = !hasChanges;
+  }
+
+  return hasChanges;
+}
+
+/**
  * 이벤트 리스너 설정
  */
 function setupEventListeners() {
@@ -503,19 +575,21 @@ function setupEventListeners() {
   // 이미지 파일 선택
   events.on(elements.imageInput, "change", handleImageSelect, { pageId: PAGE_ID });
 
-  // 제목 글자 수 카운터
+  // 제목 입력 시
   const titleCharCount = dom.qs("#title-char-count");
   if (elements.titleInput && titleCharCount) {
     events.on(elements.titleInput, "input", () => {
       updateCharCount(elements.titleInput, titleCharCount, 26);
+      checkFormChanges();
     }, { pageId: PAGE_ID });
   }
 
-  // 내용 글자 수 카운터
+  // 내용 입력 시
   const contentCharCount = dom.qs("#content-char-count");
   if (elements.contentInput && contentCharCount) {
     events.on(elements.contentInput, "input", () => {
       updateCharCount(elements.contentInput, contentCharCount, 5000);
+      checkFormChanges();
     }, { pageId: PAGE_ID });
   }
 }
@@ -595,26 +669,20 @@ async function handleFormSubmit(event) {
 /**
  * 취소 버튼 클릭 핸들러
  */
-async function handleCancelClick() {
-  const originalImageCount = state.originalPost?.images?.length || state.originalPost?.imageUrls?.length || 0;
-  const hasChanges = 
-    elements.titleInput.value.trim() !== (state.originalPost?.title || "") ||
-    elements.contentInput.value.trim() !== (state.originalPost?.content || "") ||
-    state.allImages.length !== originalImageCount ||
-    state.allImages.some(img => !img.isExisting);
-
-  if (hasChanges) {
-    const confirmed = await Modal.confirm(
-      "수정 취소",
-      "수정 중인 내용이 있습니다. 정말 취소하시겠습니까?"
-    );
-
-    if (!confirmed) {
-      return;
+function handleCancelClick() {
+  // 뒤로 갈 곳이 있는지 확인
+  if (window.history.length > 1 && document.referrer) {
+    // 이전 페이지가 있으면 뒤로가기
+    navigation.goBack();
+  } else {
+    // 없으면 해당 게시글 상세 페이지로 이동
+    if (state.postId) {
+      navigation.goTo(`/community/posts/${state.postId}`);
+    } else {
+      // postId도 없으면 커뮤니티 목록으로
+      navigation.goTo('/community/posts');
     }
   }
-
-  navigation.goBack();
 }
 
 /**
@@ -755,7 +823,7 @@ function disableForm() {
   elements.uploadBtn.disabled = true;
   elements.cancelBtn.disabled = true;
   elements.submitBtn.disabled = true;
-  elements.submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>수정 중...';
+  elements.submitBtn.innerHTML = '<div class="spinner"></div><span>수정 중...</span>';
 }
 
 /**
@@ -767,8 +835,8 @@ function enableForm() {
   elements.imageInput.disabled = false;
   elements.cancelBtn.disabled = false;
   elements.submitBtn.disabled = false;
-  elements.submitBtn.innerHTML = '<i class="bi bi-check-circle me-1"></i>수정 완료';
-  
+  elements.submitBtn.innerHTML = '<i class="bi bi-check-circle"></i><span>수정 완료</span>';
+
   // 이미지 개수에 따라 업로드 버튼 상태 업데이트
   updateImageCount();
 }
@@ -781,16 +849,16 @@ function enableForm() {
  */
 function updateCharCount(input, countElement, maxLength) {
   const currentLength = input.value.length;
-  
+
   countElement.textContent = currentLength;
-  
+
   // 글자 수에 따라 색상 변경
   if (currentLength >= maxLength) {
-    countElement.className = "text-danger fw-bold";
+    countElement.className = "count danger";
   } else if (currentLength >= maxLength * 0.9) {
-    countElement.className = "text-warning fw-bold";
+    countElement.className = "count warning";
   } else {
-    countElement.className = "text-muted";
+    countElement.className = "count";
   }
 }
 

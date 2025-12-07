@@ -11,9 +11,6 @@ import { UsersAPI } from "../../api/users.js";
 import { events } from "../../utils/events.js";
 import { dom } from "../../utils/dom.js";
 import { navigation } from "../../utils/navigation.js";
-import { auth } from "../../utils/auth.js";
-import { config } from "../../config.js";
-import { initFooter } from "../../components/footer.js";
 import { showMessage, hideMessage } from "../../utils/message.js";
 import { setupRealtimeValidation, validateForm } from "../../utils/validation.js";
 
@@ -29,11 +26,22 @@ if (!root) {
  * 페이지 초기화
  */
 async function init() {
-  // 푸터 초기화
-  await initFooter();
-  
+  setupBackButton();
   setupEventListeners();
   setupValidation();
+}
+
+/**
+ * 뒤로가기 버튼 설정
+ */
+function setupBackButton() {
+  const backBtn = dom.qs("#auth-back-btn");
+  if (!backBtn) return;
+
+  backBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    navigation.goBack();
+  });
 }
 
 /**
@@ -95,15 +103,15 @@ async function handleSignIn(e) {
   // 로딩 상태 시작
   const originalBtnText = submitBtn.textContent;
   submitBtn.disabled = true;
-  submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>로그인 중...';
+  submitBtn.innerHTML = '<div class="spinner"></div>로그인 중...';
 
   try {
     // 로그인 API 호출
     const response = await UsersAPI.signIn({ email, password });
 
     if (response.status >= 200 && response.status < 300) {
-      // 로그인 성공 - 바로 이동
-      navigation.goTo(config.ROUTES.HOME);
+      // 로그인 성공 - /today로 이동
+      navigation.goTo('/today');
     } else if (response.status === null) {
       // 로딩 상태 종료
       submitBtn.disabled = false;

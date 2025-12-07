@@ -1,4 +1,5 @@
 import { initDropdown } from '/js/ui/dropdown.js';
+import { loadHeader as loadHeaderComponent } from '/js/utils/component-loader.js';
 
 async function loadHeader() {
     const placeholder = document.querySelector('[data-component="app-header"]');
@@ -7,10 +8,7 @@ async function loadHeader() {
     const pageTitle = placeholder.getAttribute('data-page-title') ?? null;
 
     try {
-        const response = await fetch('./components/header.html', { cache: 'no-cache' });
-        if (!response.ok) throw new Error('Failed to load header component');
-        const markup = await response.text();
-        placeholder.outerHTML = markup;
+        await loadHeaderComponent();
     } catch (error) {
         console.error('Header load error:', error);
         return { pageTitle };

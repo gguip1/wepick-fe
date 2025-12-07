@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>오늘의 선택 - WePick</title>
+    <meta
+      name="description"
+      content="오늘의 질문에 투표하고 실시간 결과를 확인하세요!"
+    />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/assets/imgs/wepick-logo-50.png" />
+
+    <!-- Styles -->
+    <!-- <link rel="stylesheet" href="/css/custom.css" /> -->
+    <link rel="stylesheet" href="/css/components/header.css" />
+    <link rel="stylesheet" href="/css/components/footer.css" />
+    <link rel="stylesheet" href="/css/components/gauge-bar.css" />
+    <link rel="stylesheet" href="/css/pages/today.css" />
+  </head>
+  <body data-active-nav="today">
+    <div class="today-page">
+      <!-- Global Header (will be loaded dynamically) -->
+      <div id="headerContainer"></div>
+
+      <!-- Main Content -->
+      <main class="today-content">
+        <!-- Vote Section (투표 전) -->
+        <section class="vote-section" id="voteSection">
+          <!-- Loading Skeleton (initially shown) -->
+          <div class="loading-skeleton" id="loadingSkeleton">
+            <div class="skeleton-question"></div>
+            <div class="skeleton-gauge"></div>
+            <div class="skeleton-cards">
+              <div class="skeleton-card"></div>
+              <div class="skeleton-card"></div>
+            </div>
+          </div>
+
+          <!-- Actual Content (initially hidden) -->
+          <div class="vote-content" id="voteContent" hidden>
+            <h1 class="topic-question" id="topicQuestion">
+              질문을 불러오는 중...
+            </h1>
+
+            <!-- Gauge Bar (unified for both before and after voting) -->
+            <div class="gauge-bar-component gauge-large before-vote" id="mainGaugeBar">
+            <div class="gauge-percentages">
+              <div class="gauge-percentage-item gauge-percentage-a">
+                <div class="gauge-option-label" id="gaugeOptionALabel">
+                  Option A
+                </div>
+                <div class="gauge-option-percentage" data-option="a">?%</div>
+              </div>
+              <div class="gauge-percentage-item gauge-percentage-b">
+                <div class="gauge-option-percentage" data-option="b">?%</div>
+                <div class="gauge-option-label" id="gaugeOptionBLabel">
+                  Option B
+                </div>
+              </div>
+            </div>
+            <div class="gauge-progress-bar" id="gaugeProgressBar">
+              <div class="gauge-bar-fill" data-fill="a"></div>
+            </div>
+          </div>
+
+          <div class="vote-cards" id="voteCards">
+            <!-- Vote Card A -->
+            <div class="vote-card" data-choice="A" role="button" tabindex="0">
+              <div class="vote-card-content">
+                <h2 class="vote-card-title" id="optionATitle">옵션 A</h2>
+                <p class="vote-card-description" id="optionADescription">
+                  설명을 불러오는 중...
+                </p>
+              </div>
+              <div class="vote-card-overlay">
+                <span class="vote-card-check" data-choice="A">✓</span>
+              </div>
+            </div>
+
+            <!-- Vote Card B -->
+            <div class="vote-card" data-choice="B" role="button" tabindex="0">
+              <div class="vote-card-content">
+                <h2 class="vote-card-title" id="optionBTitle">옵션 B</h2>
+                <p class="vote-card-description" id="optionBDescription">
+                  설명을 불러오는 중...
+                </p>
+              </div>
+              <div class="vote-card-overlay">
+                <span class="vote-card-check" data-choice="B">✓</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Statistics (after voting, initially hidden) -->
+          <div class="result-stats" id="resultStats" hidden>
+            <p class="result-total-votes">
+              총 <span id="totalVotes">0</span>명이 투표했습니다
+            </p>
+            <p class="result-user-choice">
+              당신은 <span id="userChoice">-</span>을(를) 선택했습니다
+            </p>
+          </div>
+
+          <button class="vote-button" id="voteButton" disabled>
+            선택지를 골라주세요
+          </button>
+
+          <!-- Share Button (after voting, initially hidden) -->
+          <button class="share-button" id="shareButton" hidden>
+            💬 의견 공유하기
+          </button>
+          </div>
+          <!-- End of vote-content -->
+        </section>
+      </main>
+
+      <!-- Global Footer (will be loaded dynamically) -->
+      <footer></footer>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="/js/components/gauge-bar.js"></script>
+    <script type="module" src="/js/pages/today.js"></script>
+  </body>
+</html>

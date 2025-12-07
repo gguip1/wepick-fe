@@ -186,58 +186,52 @@ export function createPostCard(post) {
  */
 export function createCommentCard(comment, isOptimistic = false) {
   const card = document.createElement('div');
-  card.className = 'card mb-2';
+  card.className = isOptimistic ? 'comment-card temp-comment' : 'comment-card';
   card.dataset.commentId = comment.commentId || 'temp';
-  
-  // 낙관적 업데이트인 경우 투명도 적용
-  if (isOptimistic) {
-    card.style.opacity = '0.6';
-  }
-
-  const cardBody = document.createElement('div');
-  cardBody.className = 'card-body';
 
   // 댓글 헤더
   const header = document.createElement('div');
-  header.className = 'd-flex justify-content-between align-items-center mb-2';
+  header.className = 'comment-header';
 
-  const authorInfo = document.createElement('div');
-  authorInfo.className = 'd-flex align-items-center';
+  // 작성자 섹션
+  const authorSection = document.createElement('div');
+  authorSection.className = 'comment-author-section';
 
   const authorImage = document.createElement('img');
   authorImage.src = comment.author.profileImageUrl || '/assets/imgs/profile_icon.svg';
   authorImage.alt = 'Profile';
-  authorImage.className = 'rounded-circle me-2';
-  authorImage.style.width = '24px';
-  authorImage.style.height = '24px';
-  authorImage.style.objectFit = 'cover';
+  authorImage.className = 'comment-author-image';
+
+  const authorInfo = document.createElement('div');
+  authorInfo.className = 'comment-author-info';
 
   const authorName = document.createElement('span');
-  authorName.className = 'fw-bold small';
+  authorName.className = 'comment-author-name';
   authorName.textContent = comment.author.nickname;
 
-  const commentDate = document.createElement('small');
-  commentDate.className = 'text-muted ms-2';
-  commentDate.textContent = formatFullDateTime(comment.createdAt);
+  const commentDate = document.createElement('span');
+  commentDate.className = 'comment-date';
+  commentDate.textContent = formatRelativeTime(comment.createdAt);
 
-  authorInfo.appendChild(authorImage);
   authorInfo.appendChild(authorName);
   authorInfo.appendChild(commentDate);
+  authorSection.appendChild(authorImage);
+  authorSection.appendChild(authorInfo);
 
-  header.appendChild(authorInfo);
+  header.appendChild(authorSection);
 
   // 작성자인 경우 수정/삭제 버튼
   if (comment.isAuthor) {
     const actions = document.createElement('div');
-    actions.className = 'd-flex gap-2';
+    actions.className = 'comment-actions';
 
     const editBtn = document.createElement('button');
-    editBtn.className = 'btn btn-sm btn-link text-primary p-0';
+    editBtn.className = 'comment-action-btn edit-btn';
     editBtn.textContent = '수정';
     editBtn.dataset.action = 'edit';
 
     const deleteBtn = document.createElement('button');
-    deleteBtn.className = 'btn btn-sm btn-link text-danger p-0';
+    deleteBtn.className = 'comment-action-btn delete-btn';
     deleteBtn.textContent = '삭제';
     deleteBtn.dataset.action = 'delete';
 
@@ -247,13 +241,12 @@ export function createCommentCard(comment, isOptimistic = false) {
   }
 
   // 댓글 내용
-  const content = document.createElement('p');
-  content.className = 'card-text mb-0 comment-content';
+  const content = document.createElement('div');
+  content.className = 'comment-content';
   content.textContent = comment.content;
 
-  cardBody.appendChild(header);
-  cardBody.appendChild(content);
-  card.appendChild(cardBody);
+  card.appendChild(header);
+  card.appendChild(content);
 
   return card;
 }

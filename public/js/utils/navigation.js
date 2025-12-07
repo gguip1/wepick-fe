@@ -27,19 +27,19 @@ function isInternalUrl(url) {
 
 /**
  * 안전한 뒤로가기
- * document.referrer를 확인하여 외부 사이트로 이동하는 것을 방지
+ * 히스토리 스택을 확인하여 안전하게 뒤로가기
  */
 function goBack() {
-  const referrer = document.referrer;
-
-  // referrer가 없거나 외부 URL인 경우 홈으로 이동
-  if (!referrer || !isInternalUrl(referrer)) {
+  // 히스토리 스택이 있는지 확인
+  // history.length > 1: 현재 페이지 외에 히스토리가 있음
+  // history.length === 1: 현재 페이지만 있음 (새 탭/창으로 열림)
+  if (window.history.length > 1) {
+    // 히스토리가 있으면 뒤로가기
+    window.history.back();
+  } else {
+    // 히스토리가 없으면 (새 탭/창으로 열린 경우) 홈으로 이동
     goTo(config.ROUTES.HOME);
-    return;
   }
-
-  // 내부 URL인 경우 뒤로가기
-  window.history.back();
 }
 
 /**

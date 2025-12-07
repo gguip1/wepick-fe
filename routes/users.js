@@ -6,12 +6,21 @@ router.get('/signin', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'pages', 'users', 'user-signin.html'));
 });
 
-router.get('/signup', (req, res) => {   
+router.get('/signup', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'pages', 'users', 'user-signup.html'));
 });
 
-router.get('/edit', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'public', 'pages', 'users', 'user-edit.html'));
+router.get('/mypage', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'public', 'pages', 'users', 'mypage.html'));
+});
+
+// 더 구체적인 라우트를 먼저 정의 (Express 라우트 매칭 순서)
+router.get('/edit/profile-img', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'public', 'pages', 'users', 'user-edit-profile-img.html'));
+});
+
+router.get('/edit/nickname', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'public', 'pages', 'users', 'user-edit-nickname.html'));
 });
 
 router.get('/edit/password', (req, res) => {

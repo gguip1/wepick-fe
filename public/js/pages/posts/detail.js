@@ -12,8 +12,8 @@ import { config } from "../../config.js";
 import { createCommentCard } from "../../components/card.js";
 import { Modal } from "../../components/modal.js";
 import { Toast } from "../../components/toast.js";
-import { initHeader } from "../../components/header.js";
-import { initFooter } from "../../components/footer.js";
+import { initHeaderAuth } from "../../utils/header-init.js";
+import { loadHeader as loadHeaderComponent } from "../../utils/component-loader.js";
 
 const PAGE_ID = "posts-detail";
 
@@ -93,16 +93,108 @@ function formatRelativeTime(dateString) {
 }
 
 /**
- * 현재 사용자 정보 가져오기 (서버에서)
+ * 로그아웃 처리
  */
-async function getCurrentUser() {
-  try {
-    const user = await auth.requireAuth();
-    if (user) {
-      state.currentUser = user;
+function handleLogout() {
+  // 현재 사용자 상태 초기화
+  state.currentUser = null;
+
+  // UI 업데이트
+  updateAuthUI();
+
+  // 좋아요 상태 초기화 (필요 시)
+  if (state.post) {
+    state.post.isLiked = false;
+  }
+
+  // 수정/삭제 버튼 숨기기
+  const actions = dom.qs('.post-actions');
+  if (actions) {
+    actions.remove();
+  }
+}
+
+/**
+ * 인증 상태에 따른 UI 업데이트
+ */
+function updateAuthUI() {
+  const commentsSection = dom.qs("#comments-section");
+  if (!commentsSection) return;
+
+  const commentForm = dom.qs("#comment-form");
+  const likeBtn = dom.qs("#like-btn");
+
+  if (!state.currentUser) {
+    // 비로그인 상태: 댓글 폼과 좋아요 버튼 숨기고 로그인 버튼 표시
+    if (commentForm) {
+      commentForm.style.display = 'none';
     }
-  } catch (error) {
-    console.error("Failed to get current user:", error);
+    if (likeBtn) {
+      likeBtn.style.display = 'none';
+    }
+
+    // "로그인하고 댓글 쓰기" 버튼 생성 및 삽입
+    createLoginPrompt(commentsSection, commentForm);
+  } else {
+    // 로그인 상태: 댓글 폼과 좋아요 버튼 표시
+    if (commentForm) {
+      commentForm.style.display = 'block';
+    }
+    if (likeBtn) {
+      likeBtn.style.display = 'inline-flex';
+    }
+
+    // 로그인 프롬프트 제거 (있다면)
+    const loginPrompt = dom.qs("#login-prompt");
+    if (loginPrompt) {
+      loginPrompt.remove();
+    }
+  }
+}
+
+/**
+ * 로그인 프롬프트 생성
+ */
+function createLoginPrompt(commentsSection, commentForm) {
+  // 이미 존재하면 생성하지 않음
+  if (dom.qs("#login-prompt")) return;
+
+  const loginPrompt = document.createElement('div');
+  loginPrompt.id = 'login-prompt';
+  loginPrompt.className = 'login-prompt';
+  loginPrompt.innerHTML = `
+    <div class="login-prompt-content">
+      <p class="login-prompt-text">댓글을 작성하려면 로그인이 필요합니다</p>
+      <button class="login-prompt-btn" id="login-prompt-btn">
+        로그인하고 댓글 쓰기
+      </button>
+    </div>
+  `;
+
+  // 댓글 폼 다음에 삽입
+  if (commentForm && commentForm.nextSibling) {
+    commentsSection.insertBefore(loginPrompt, commentForm.nextSibling);
+  } else if (commentForm) {
+    commentForm.parentNode.insertBefore(loginPrompt, commentForm.nextSibling);
+  } else {
+    // 댓글 폼이 없으면 댓글 섹션 상단에 삽입
+    const commentsHeader = dom.qs(".comments-header", commentsSection);
+    if (commentsHeader && commentsHeader.nextSibling) {
+      commentsSection.insertBefore(loginPrompt, commentsHeader.nextSibling);
+    } else {
+      commentsSection.insertBefore(loginPrompt, commentsSection.firstChild);
+    }
+  }
+
+  // 로그인 버튼 클릭 이벤트
+  const loginBtn = dom.qs("#login-prompt-btn");
+  if (loginBtn) {
+    events.on(loginBtn, "click", async () => {
+      const { storage } = await import("../../utils/storage.js");
+      const currentPath = window.location.pathname;
+      storage.set("redirect_after_signin", currentPath);
+      navigation.goTo("/users/signin");
+    }, { pageId: PAGE_ID });
   }
 }
 
@@ -111,114 +203,140 @@ async function getCurrentUser() {
  */
 function renderPostDetail(post) {
   const section = dom.qs("#post-detail-section");
-  
+
   // 스켈레톤 로더 제거
   const skeletonLoader = dom.qs(".skeleton-loader", section);
   if (skeletonLoader) {
     skeletonLoader.remove();
   }
 
+  // 기존 게시물 컨테이너 제거 (중복 방지)
+  const existingArticle = dom.qs(".post-detail-content", section);
+  if (existingArticle) {
+    existingArticle.remove();
+  }
+
   // 게시물 컨테이너 생성
   const article = document.createElement("article");
-  article.className = "post-detail-content mt-3";
+  article.className = "post-detail-content";
   article.dataset.postId = post.postId;
+
+  // Topic badge if linked
+  if (post.topicId) {
+    const badge = document.createElement("div");
+    badge.className = "topic-badge";
+    badge.textContent = "🎯 WePick Today와 연동된 게시물";
+    article.appendChild(badge);
+  }
 
   // 1. 제목
   const title = document.createElement("h1");
-  title.className = "post-title fw-bold mb-3";
+  title.className = "post-title";
   title.textContent = post.title;
   article.appendChild(title);
 
   // 2. 작성자 정보 + 통계 + 수정/삭제 버튼
   const metaBar = document.createElement("div");
-  metaBar.className = "meta-bar d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom";
+  metaBar.className = "meta-bar";
 
   const leftSection = document.createElement("div");
-  leftSection.className = "d-flex align-items-center gap-3";
+  leftSection.className = "meta-bar-left";
 
   // 작성자 정보
   const authorSection = document.createElement("div");
-  authorSection.className = "d-flex align-items-center gap-2";
+  authorSection.className = "author-section";
 
   const authorImage = document.createElement("img");
   authorImage.src = post.author.profileImageUrl || "/assets/imgs/profile_icon.svg";
   authorImage.alt = post.author.nickname;
-  authorImage.className = "rounded-circle";
-  authorImage.style.width = "32px";
-  authorImage.style.height = "32px";
-  authorImage.style.objectFit = "cover";
+  authorImage.className = "author-image";
 
   const authorInfo = document.createElement("div");
-  authorInfo.className = "d-flex align-items-center gap-2 flex-wrap";
+  authorInfo.className = "author-info";
 
   const authorName = document.createElement("span");
-  authorName.className = "fw-semibold small";
+  authorName.className = "author-name";
   authorName.textContent = post.author.nickname;
 
-  const separator1 = document.createElement("span");
-  separator1.className = "text-muted small";
-  separator1.textContent = "·";
-
   const postDate = document.createElement("span");
-  postDate.className = "text-muted small";
+  postDate.className = "post-date";
   postDate.textContent = formatRelativeTime(post.createdAt);
 
-  const separator2 = document.createElement("span");
-  separator2.className = "text-muted small";
-  separator2.textContent = "·";
-
-  // 통계 (조회수, 좋아요, 댓글)
-  const viewStat = document.createElement("span");
-  viewStat.className = "text-muted small d-flex align-items-center gap-1";
-  viewStat.innerHTML = `<i class="bi bi-eye"></i>${post.viewCount || 0}`;
-
-  const separator3 = document.createElement("span");
-  separator3.className = "text-muted small";
-  separator3.textContent = "·";
-
-  const likeStat = document.createElement("span");
-  likeStat.className = `small d-flex align-items-center gap-1 ${post.isLiked ? "text-danger" : "text-muted"}`;
-  likeStat.id = "like-stat";
-  likeStat.innerHTML = `<i class="bi bi-heart${post.isLiked ? "-fill" : ""}"></i>${post.likeCount || 0}`;
-
-  const separator4 = document.createElement("span");
-  separator4.className = "text-muted small";
-  separator4.textContent = "·";
-
-  const commentStat = document.createElement("span");
-  commentStat.className = "text-muted small d-flex align-items-center gap-1";
-  commentStat.innerHTML = `<i class="bi bi-chat"></i>${post.commentCount || 0}`;
-
   authorInfo.appendChild(authorName);
-  authorInfo.appendChild(separator1);
   authorInfo.appendChild(postDate);
-  authorInfo.appendChild(separator2);
-  authorInfo.appendChild(viewStat);
-  authorInfo.appendChild(separator3);
-  authorInfo.appendChild(likeStat);
-  authorInfo.appendChild(separator4);
-  authorInfo.appendChild(commentStat);
 
   authorSection.appendChild(authorImage);
   authorSection.appendChild(authorInfo);
   leftSection.appendChild(authorSection);
+
+  // 통계 (조회수, 좋아요, 댓글)
+  const metaStats = document.createElement("div");
+  metaStats.className = "post-meta-stats";
+
+  const viewStat = document.createElement("span");
+  viewStat.className = "post-stat";
+  const viewIcon = document.createElement("img");
+  viewIcon.className = "post-stat-icon";
+  viewIcon.src = "/assets/imgs/view_icon.svg";
+  viewIcon.alt = "조회수";
+  const viewCount = document.createElement("span");
+  viewCount.textContent = post.viewCount || 0;
+  viewStat.appendChild(viewIcon);
+  viewStat.appendChild(viewCount);
+
+  const separator1 = document.createElement("span");
+  separator1.className = "meta-separator";
+  separator1.textContent = "·";
+
+  const likeStat = document.createElement("span");
+  likeStat.className = `post-stat ${post.isLiked ? "liked" : ""}`;
+  likeStat.id = "like-stat";
+  const likeIcon = document.createElement("img");
+  likeIcon.className = "post-stat-icon";
+  likeIcon.src = "/assets/imgs/like_icon.svg";
+  likeIcon.alt = "좋아요";
+  const likeCount = document.createElement("span");
+  likeCount.textContent = post.likeCount || 0;
+  likeStat.appendChild(likeIcon);
+  likeStat.appendChild(likeCount);
+
+  const separator2 = document.createElement("span");
+  separator2.className = "meta-separator";
+  separator2.textContent = "·";
+
+  const commentStat = document.createElement("span");
+  commentStat.className = "post-stat";
+  const commentIcon = document.createElement("img");
+  commentIcon.className = "post-stat-icon";
+  commentIcon.src = "/assets/imgs/comment_icon.svg";
+  commentIcon.alt = "댓글";
+  const commentCount = document.createElement("span");
+  commentCount.textContent = post.commentCount || 0;
+  commentStat.appendChild(commentIcon);
+  commentStat.appendChild(commentCount);
+
+  metaStats.appendChild(viewStat);
+  metaStats.appendChild(separator1);
+  metaStats.appendChild(likeStat);
+  metaStats.appendChild(separator2);
+  metaStats.appendChild(commentStat);
+
   metaBar.appendChild(leftSection);
+  metaBar.appendChild(metaStats);
 
   // 작성자인 경우 수정/삭제 버튼
   if (post.isAuthor) {
     const actions = document.createElement("div");
-    actions.className = "d-flex gap-2";
+    actions.className = "post-actions";
 
     const editBtn = document.createElement("button");
-    editBtn.className = "btn btn-sm btn-outline-secondary";
-    editBtn.innerHTML = '<i class="bi bi-pencil"></i>';
-    editBtn.title = "수정";
+    editBtn.className = "action-btn";
+    editBtn.textContent = "수정";
     editBtn.dataset.action = "edit";
 
     const deleteBtn = document.createElement("button");
-    deleteBtn.className = "btn btn-sm btn-outline-danger";
-    deleteBtn.innerHTML = '<i class="bi bi-trash"></i>';
-    deleteBtn.title = "삭제";
+    deleteBtn.className = "action-btn delete-btn";
+    deleteBtn.textContent = "삭제";
     deleteBtn.dataset.action = "delete";
 
     actions.appendChild(editBtn);
@@ -230,17 +348,16 @@ function renderPostDetail(post) {
 
   // 4. 이미지
   const images = post.images || (post.imageUrls ? post.imageUrls.map(url => ({ imageUrl: url })) : []);
-  
+
   if (images.length > 0) {
     const imageContainer = document.createElement("div");
-    imageContainer.className = "post-images mb-4";
+    imageContainer.className = "post-images";
 
     images.forEach((image, index) => {
       const img = document.createElement("img");
       img.src = image.imageUrl || image;
       img.alt = `Post image ${index + 1}`;
-      img.className = "img-fluid rounded mb-3";
-      img.style.maxWidth = "100%";
+      img.className = "post-image";
       img.loading = "lazy";
       imageContainer.appendChild(img);
     });
@@ -250,23 +367,35 @@ function renderPostDetail(post) {
 
   // 5. 내용
   const content = document.createElement("div");
-  content.className = "post-content mb-5";
-  content.style.whiteSpace = "pre-wrap";
-  content.style.wordBreak = "break-word";
-  content.style.overflowWrap = "break-word";
-  content.style.lineHeight = "1.8";
-  content.style.fontSize = "1.05rem";
+  content.className = "post-content";
   content.textContent = post.content;
   article.appendChild(content);
 
-  // 6. 좋아요 버튼 (심플하게)
+  // 6. 좋아요 버튼
   const likeSection = document.createElement("div");
-  likeSection.className = "text-center py-4 my-4";
+  likeSection.className = "like-section";
 
   const likeBtn = document.createElement("button");
-  likeBtn.className = `btn ${post.isLiked ? "btn-danger" : "btn-outline-danger"}`;
+  likeBtn.className = `like-btn ${post.isLiked ? "liked" : ""}`;
   likeBtn.id = "like-btn";
-  likeBtn.innerHTML = `<i class="bi bi-heart${post.isLiked ? "-fill" : ""} me-2"></i>좋아요 ${post.likeCount}`;
+
+  const likeBtnIcon = document.createElement("img");
+  likeBtnIcon.className = "like-icon heart-icon";
+  likeBtnIcon.src = "/assets/imgs/like_icon.svg";
+  likeBtnIcon.alt = "좋아요";
+
+  const likeText = document.createElement("span");
+  likeText.className = "like-text";
+  likeText.textContent = "좋아요";
+
+  const likeBtnCount = document.createElement("span");
+  likeBtnCount.className = "like-count";
+  likeBtnCount.id = "like-btn-count";
+  likeBtnCount.textContent = post.likeCount;
+
+  likeBtn.appendChild(likeBtnIcon);
+  likeBtn.appendChild(likeText);
+  likeBtn.appendChild(likeBtnCount);
 
   likeSection.appendChild(likeBtn);
   article.appendChild(likeSection);
@@ -309,33 +438,26 @@ function setupPostEventListeners() {
  * 게시물 수정 핸들러
  */
 function handleEditPost() {
-  navigation.goTo(`/posts/edit/${state.postId}`);
+  navigation.goTo(`/community/posts/edit/${state.postId}`);
 }
 
 /**
  * 게시물 삭제 핸들러
  */
 async function handleDeletePost() {
-  const confirmed = await Modal.confirm(
-    "게시물 삭제",
-    "정말로 이 게시물을 삭제하시겠습니까?"
+  const confirmed = confirm(
+    "정말로 이 게시물을 삭제하시겠습니까?\n삭제된 게시물은 영구적으로 삭제되며 복구할 수 없습니다."
   );
 
   if (!confirmed) return;
 
   try {
-    const response = await PostsAPI.delete(state.postId);
-
-    if (response.status >= 200 && response.status < 300) {
-      // 성공 시: 바로 목록으로 이동
-      navigation.goTo(config.ROUTES.HOME);
-    } else {
-      // 실패 시: Toast 표시
-      Toast.error(response.error?.message || "게시물 삭제에 실패했습니다.");
-    }
+    await PostsAPI.delete(state.postId);
+    // 삭제 성공 시 바로 목록으로 이동
+    navigation.goTo("/community/posts");
   } catch (error) {
     console.error("Failed to delete post:", error);
-    Toast.error("게시물 삭제 중 오류가 발생했습니다.");
+    alert("게시물 삭제 중 오류가 발생했습니다.");
   }
 }
 
@@ -344,6 +466,14 @@ async function handleDeletePost() {
  */
 async function handleLikeToggle() {
   if (!state.post) return;
+
+  // 로그인 확인
+  if (!state.currentUser) {
+    const { storage } = await import('../../utils/storage.js');
+    storage.set("redirect_after_signin", window.location.pathname);
+    navigation.goTo("/users/signin");
+    return;
+  }
 
   const isLiked = state.post.isLiked;
 
@@ -360,15 +490,21 @@ async function handleLikeToggle() {
       // 좋아요 버튼 UI 업데이트
       const likeBtn = dom.qs("#like-btn");
       if (likeBtn) {
-        likeBtn.className = `btn ${state.post.isLiked ? "btn-danger" : "btn-outline-danger"}`;
-        likeBtn.innerHTML = `<i class="bi bi-heart${state.post.isLiked ? "-fill" : ""} me-2"></i>좋아요 ${state.post.likeCount}`;
+        likeBtn.className = `like-btn ${state.post.isLiked ? "liked" : ""}`;
+        const likeBtnCount = dom.qs("#like-btn-count", likeBtn);
+        if (likeBtnCount) {
+          likeBtnCount.textContent = state.post.likeCount;
+        }
       }
 
       // 통계 영역의 좋아요 수 업데이트
       const likeStat = dom.qs("#like-stat");
       if (likeStat) {
-        likeStat.className = `small d-flex align-items-center gap-1 ${state.post.isLiked ? "text-danger" : "text-muted"}`;
-        likeStat.innerHTML = `<i class="bi bi-heart${state.post.isLiked ? "-fill" : ""}"></i>${state.post.likeCount}`;
+        likeStat.className = `post-stat ${state.post.isLiked ? "liked" : ""}`;
+        const likeStatCount = likeStat.querySelector("span:last-child");
+        if (likeStatCount) {
+          likeStatCount.textContent = state.post.likeCount;
+        }
       }
     } else {
       Toast.error(response.error?.message || "좋아요 처리에 실패했습니다.");
@@ -425,7 +561,7 @@ async function loadMoreComments() {
   const loadMoreBtn = dom.qs("#load-more-btn");
   if (loadMoreBtn) {
     loadMoreBtn.disabled = true;
-    loadMoreBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>로딩 중...';
+    loadMoreBtn.textContent = '로딩 중...';
   }
 
   // 스크롤 위치 보정을 위해 첫 번째 댓글을 기준점으로 저장
@@ -472,10 +608,11 @@ async function loadMoreComments() {
     console.error("Failed to load more comments:", error);
   } finally {
     state.isLoadingComments = false;
-    
+
+
     if (loadMoreBtn) {
       loadMoreBtn.disabled = false;
-      loadMoreBtn.innerHTML = '<i class="bi bi-arrow-up-circle me-1"></i>이전 댓글 보기';
+      loadMoreBtn.textContent = '↑ 이전 댓글 보기';
     }
   }
 }
@@ -529,7 +666,11 @@ function renderComments(comments, prepend = false) {
 function updateLoadMoreButton() {
   const loadMoreContainer = dom.qs("#load-more-container");
   if (loadMoreContainer) {
-    loadMoreContainer.style.display = state.hasNext ? "block" : "none";
+    if (state.hasNext) {
+      loadMoreContainer.removeAttribute('hidden');
+    } else {
+      loadMoreContainer.setAttribute('hidden', '');
+    }
   }
 }
 
@@ -557,19 +698,19 @@ async function handleCommentSubmit(e) {
 
   // 유효성 검사
   if (!content) {
-    await Modal.alert("알림", "댓글 내용을 입력해주세요.");
+    alert("댓글 내용을 입력해주세요.");
     return;
   }
 
   if (content.length > 300) {
-    await Modal.alert("알림", "댓글은 최대 300자까지 입력 가능합니다.");
+    alert("댓글은 최대 300자까지 입력 가능합니다.");
     return;
   }
 
   // 버튼 비활성화 (중복 제출 방지)
   if (submitBtn) {
     submitBtn.disabled = true;
-    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>등록 중...';
+    submitBtn.textContent = '등록 중...';
   }
 
   // 낙관적 업데이트: 임시 댓글 생성
@@ -591,12 +732,15 @@ async function handleCommentSubmit(e) {
 
   // 폼 초기화
   form.reset();
-  
+
   // 글자 수 카운터 초기화
-  const charCount = dom.qs("#char-count");
-  if (charCount) {
-    charCount.textContent = "0";
-    charCount.className = "text-muted";
+  const charCounter = dom.qs(".char-counter");
+  if (charCounter) {
+    const charCount = dom.qs("#char-count", charCounter);
+    if (charCount) {
+      charCount.textContent = "0";
+    }
+    charCounter.className = "char-counter";
   }
 
   // 게시물의 댓글 수 업데이트 (낙관적)
@@ -607,7 +751,7 @@ async function handleCommentSubmit(e) {
 
   // 새 댓글로 스크롤
   setTimeout(() => {
-    tempCard.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    tempCard.scrollIntoView({ behavior: "smooth", block: "center" });
   }, 100);
 
   try {
@@ -646,15 +790,14 @@ async function handleCommentSubmit(e) {
       }
 
       // 하이라이트 효과
-      realCard.style.transition = "background-color 0.5s ease";
-      realCard.style.backgroundColor = "#d1e7dd";
+      realCard.classList.add("new-comment-highlight");
       setTimeout(() => {
-        realCard.style.backgroundColor = "";
-      }, 2000);
+        realCard.classList.remove("new-comment-highlight");
+      }, 3000);
 
       // 실제 댓글로 스크롤
       setTimeout(() => {
-        realCard.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        realCard.scrollIntoView({ behavior: "smooth", block: "center" });
       }, 100);
     } else {
       // 실패: 임시 댓글 제거 및 댓글 수 복구
@@ -663,7 +806,7 @@ async function handleCommentSubmit(e) {
         state.post.commentCount = Math.max(0, (state.post.commentCount || 0) - 1);
         updateCommentCount();
       }
-      await Modal.alert("오류", response.error?.message || "댓글 작성에 실패했습니다.");
+      alert(response.error?.message || "댓글 작성에 실패했습니다.");
     }
   } catch (error) {
     console.error("Failed to create comment:", error);
@@ -673,12 +816,12 @@ async function handleCommentSubmit(e) {
       state.post.commentCount = Math.max(0, (state.post.commentCount || 0) - 1);
       updateCommentCount();
     }
-    await Modal.alert("오류", "댓글 작성 중 오류가 발생했습니다.");
+    alert("댓글 작성 중 오류가 발생했습니다.");
   } finally {
     // 버튼 활성화
     if (submitBtn) {
       submitBtn.disabled = false;
-      submitBtn.innerHTML = '<i class="bi bi-send me-1"></i>댓글 등록';
+      submitBtn.textContent = '댓글 등록';
     }
   }
 }
@@ -687,13 +830,17 @@ async function handleCommentSubmit(e) {
  * 댓글 수정 핸들러 (인라인 편집)
  */
 function handleEditComment(commentId) {
+  // 댓글 수정은 현재 인라인 편집으로 구현되어 있습니다.
+  // 향후 별도 수정 페이지가 필요하면 아래와 같이 구현할 수 있습니다:
+  // navigation.goTo(`/community/posts/${state.postId}/comments/${commentId}/edit`);
+
   const comment = state.comments.find((c) => c.commentId === commentId);
   if (!comment) return;
 
   const commentCard = dom.qs(`[data-comment-id="${commentId}"]`);
   if (!commentCard) return;
 
-  const cardBody = dom.qs(".card-body", commentCard);
+  const cardBody = dom.qs(".comment-content", commentCard)?.parentElement;
   if (!cardBody) return;
 
   // 이미 편집 모드인지 확인
@@ -710,27 +857,27 @@ function handleEditComment(commentId) {
   editForm.className = "comment-edit-form";
 
   const textarea = document.createElement("textarea");
-  textarea.className = "form-control mb-2";
+  textarea.className = "comment-textarea";
   textarea.rows = 3;
   textarea.maxLength = 300;
   textarea.value = originalContent;
 
   const controlsDiv = document.createElement("div");
-  controlsDiv.className = "d-flex justify-content-between align-items-center";
+  controlsDiv.className = "comment-edit-controls";
 
   const charCountSmall = document.createElement("small");
-  charCountSmall.className = "text-muted";
+  charCountSmall.className = "char-counter";
   charCountSmall.innerHTML = `<span class="edit-char-count">${originalContent.length}</span> / 300자`;
 
   const buttonsDiv = document.createElement("div");
-  buttonsDiv.className = "d-flex gap-2";
+  buttonsDiv.className = "comment-edit-buttons";
 
   const saveBtn = document.createElement("button");
-  saveBtn.className = "btn btn-sm btn-primary";
+  saveBtn.className = "comment-edit-btn save-btn";
   saveBtn.textContent = "댓글 수정하기";
 
   const cancelBtn = document.createElement("button");
-  cancelBtn.className = "btn btn-sm btn-secondary";
+  cancelBtn.className = "comment-edit-btn";
   cancelBtn.textContent = "취소";
 
   buttonsDiv.appendChild(saveBtn);
@@ -755,13 +902,13 @@ function handleEditComment(commentId) {
     const charCountSpan = editForm.querySelector(".edit-char-count");
     if (charCountSpan) {
       charCountSpan.textContent = currentLength;
-      
+
       if (currentLength >= 300) {
-        charCountSpan.parentElement.className = "text-danger fw-bold";
+        charCountSpan.parentElement.className = "char-counter danger";
       } else if (currentLength >= 270) {
-        charCountSpan.parentElement.className = "text-warning fw-bold";
+        charCountSpan.parentElement.className = "char-counter warning";
       } else {
-        charCountSpan.parentElement.className = "text-muted";
+        charCountSpan.parentElement.className = "char-counter";
       }
     }
   };
@@ -781,12 +928,12 @@ function handleEditComment(commentId) {
     const newContent = textarea.value.trim();
 
     if (!newContent) {
-      await Modal.alert("알림", "댓글 내용을 입력해주세요.");
+      alert("댓글 내용을 입력해주세요.");
       return;
     }
 
     if (newContent.length > 300) {
-      await Modal.alert("알림", "댓글은 최대 300자까지 입력 가능합니다.");
+      alert("댓글은 최대 300자까지 입력 가능합니다.");
       return;
     }
 
@@ -800,7 +947,7 @@ function handleEditComment(commentId) {
 
     // 버튼 비활성화
     saveBtn.disabled = true;
-    saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>수정 중...';
+    saveBtn.textContent = '수정 중...';
 
     try {
       const response = await PostsAPI.updateComment(
@@ -825,19 +972,18 @@ function handleEditComment(commentId) {
         if (actionsElement) actionsElement.style.display = "";
 
         // 하이라이트 효과
-        commentCard.style.transition = "background-color 0.5s ease";
-        commentCard.style.backgroundColor = "#fff3cd";
+        commentCard.classList.add("new-comment-highlight");
         setTimeout(() => {
-          commentCard.style.backgroundColor = "";
-        }, 2000);
+          commentCard.classList.remove("new-comment-highlight");
+        }, 3000);
       } else {
-        await Modal.alert("오류", response.error?.message || "댓글 수정에 실패했습니다.");
+        alert(response.error?.message || "댓글 수정에 실패했습니다.");
         saveBtn.disabled = false;
         saveBtn.textContent = "댓글 수정하기";
       }
     } catch (error) {
       console.error("Failed to update comment:", error);
-      await Modal.alert("오류", "댓글 수정 중 오류가 발생했습니다.");
+      alert("댓글 수정 중 오류가 발생했습니다.");
       saveBtn.disabled = false;
       saveBtn.textContent = "댓글 수정하기";
     }
@@ -848,39 +994,32 @@ function handleEditComment(commentId) {
  * 댓글 삭제 핸들러
  */
 async function handleDeleteComment(commentId) {
-  const confirmed = await Modal.confirm(
-    "댓글 삭제",
-    "정말로 이 댓글을 삭제하시겠습니까?"
-  );
+  const confirmed = confirm("정말로 이 댓글을 삭제하시겠습니까?");
 
   if (!confirmed) return;
 
   try {
-    const response = await PostsAPI.deleteComment(state.postId, commentId);
+    await PostsAPI.deleteComment(state.postId, commentId);
 
-    if (response.status >= 200 && response.status < 300) {
-      // 상태에서 제거
-      state.comments = state.comments.filter((c) => c.commentId !== commentId);
+    // 상태에서 제거
+    state.comments = state.comments.filter((c) => c.commentId !== commentId);
 
-      // UI에서 제거
-      const commentCard = dom.qs(`[data-comment-id="${commentId}"]`);
-      if (commentCard) {
-        commentCard.remove();
-      }
+    // UI에서 제거
+    const commentCard = dom.qs(`[data-comment-id="${commentId}"]`);
+    if (commentCard) {
+      commentCard.remove();
+    }
 
-      // 댓글 수 업데이트
-      updateCommentCount();
+    // 댓글 수 업데이트
+    updateCommentCount();
 
-      // 게시물의 댓글 수도 업데이트
-      if (state.post) {
-        state.post.commentCount = Math.max(0, (state.post.commentCount || 0) - 1);
-      }
-    } else {
-      await Modal.alert("오류", response.error?.message || "댓글 삭제에 실패했습니다.");
+    // 게시물의 댓글 수도 업데이트
+    if (state.post) {
+      state.post.commentCount = Math.max(0, (state.post.commentCount || 0) - 1);
     }
   } catch (error) {
     console.error("Failed to delete comment:", error);
-    await Modal.alert("오류", "댓글 삭제 중 오류가 발생했습니다.");
+    alert("댓글 삭제 중 오류가 발생했습니다.");
   }
 }
 
@@ -921,16 +1060,17 @@ function setupEventListeners() {
 function updateCharCount(textarea, countElement) {
   const currentLength = textarea.value.length;
   const maxLength = 300;
-  
+
   countElement.textContent = currentLength;
-  
+
   // 글자 수에 따라 색상 변경
+  const parentElement = countElement.parentElement;
   if (currentLength >= maxLength) {
-    countElement.className = "text-danger fw-bold";
+    parentElement.className = "char-counter danger";
   } else if (currentLength >= maxLength * 0.9) {
-    countElement.className = "text-warning fw-bold";
+    parentElement.className = "char-counter warning";
   } else {
-    countElement.className = "text-muted";
+    parentElement.className = "char-counter";
   }
 }
 
@@ -938,14 +1078,15 @@ function updateCharCount(textarea, countElement) {
  * 페이지 초기화
  */
 async function init() {
-  // 헤더 초기화
-  await initHeader(PAGE_ID);
+  // Load header and footer HTML
+  await loadHeader();
+  await loadFooter();
 
-  // 푸터 초기화
-  await initFooter();
-
-  // 인증 필요 및 현재 사용자 정보 가져오기
-  await getCurrentUser();
+  // Initialize header auth state and get current user (한 번만 호출)
+  const user = await initHeaderAuth();
+  if (user) {
+    state.currentUser = user;
+  }
 
   // postId 추출
   state.postId = getPostIdFromUrl();
@@ -961,8 +1102,57 @@ async function init() {
   // 초기 댓글 로드
   await loadInitialComments();
 
+  // 인증 상태에 따른 UI 업데이트
+  updateAuthUI();
+
   // 이벤트 리스너 설정
   setupEventListeners();
+
+  // 로그아웃 이벤트 리스너
+  window.addEventListener('userLoggedOut', handleLogout);
+}
+
+/**
+ * 헤더 HTML 로드
+ */
+async function loadHeader() {
+  await loadHeaderComponent();
+
+  // 뒤로가기 버튼 활성화 및 이벤트 추가
+  initBackButton();
+}
+
+/**
+ * Footer HTML 로드
+ */
+async function loadFooter() {
+  const footerContainer = document.querySelector('footer');
+  if (!footerContainer) return;
+
+  try {
+    const response = await fetch('/components/footer.html');
+    const html = await response.text();
+    footerContainer.innerHTML = html;
+  } catch (error) {
+    console.error('Failed to load footer:', error);
+  }
+}
+
+/**
+ * 뒤로가기 버튼 초기화
+ */
+function initBackButton() {
+  const backBtn = document.getElementById('headerBackBtn');
+  if (!backBtn) return;
+
+  // 버튼 표시
+  backBtn.removeAttribute('hidden');
+
+  // 클릭 이벤트 추가
+  backBtn.addEventListener('click', () => {
+    // 커뮤니티 목록 페이지로 이동
+    navigation.goTo('/community/posts');
+  });
 }
 
 /**

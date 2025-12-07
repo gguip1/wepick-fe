@@ -8,7 +8,6 @@ import { events } from '../utils/events.js';
 import { navigation } from '../utils/navigation.js';
 import { auth } from '../utils/auth.js';
 import { UsersAPI } from '../api/users.js';
-import { Modal } from './modal.js';
 
 /**
  * 헤더 초기화

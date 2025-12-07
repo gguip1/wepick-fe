@@ -1,0 +1,162 @@
+/* ===================================================================
+   Gauge Bar Component - Reusable VS Progress Bar
+   =================================================================== */
+
+/* Gauge Bar Container */
+.gauge-bar-component {
+  width: 100%;
+  max-width: 1000px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg, 1.5rem);
+}
+
+/* Gauge Percentages */
+.gauge-percentages {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.gauge-percentage-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs, 0.5rem);
+}
+
+.gauge-option-label {
+  font-size: var(--font-size-base, 1rem);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.gauge-option-percentage {
+  font-size: var(--font-size-4xl, 3rem);
+  font-weight: 700;
+  line-height: 1;
+  transition: all var(--transition-fast, 0.3s) ease;
+}
+
+/* Option A Styling */
+.gauge-percentage-a .gauge-option-label {
+  color: #93c5fd;
+}
+
+.gauge-percentage-a .gauge-option-percentage {
+  color: #60a5fa;
+}
+
+/* Option B Styling */
+.gauge-percentage-b .gauge-option-label {
+  color: #fca5a5;
+}
+
+.gauge-percentage-b .gauge-option-percentage {
+  color: #f87171;
+}
+
+/* Progress Bar */
+.gauge-progress-bar {
+  width: 100%;
+  height: 80px;
+  background: linear-gradient(
+    90deg,
+    #f87171 0%,
+    #fb923c 25%,
+    #fb923c 75%,
+    #f87171 100%
+  );
+  border-radius: var(--bs-border-radius-lg, 50px);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* Bar Fill (Option A) */
+.gauge-bar-fill {
+  height: 100%;
+  width: 50%;
+  background: linear-gradient(
+    90deg,
+    #3b82f6 0%,
+    #60a5fa 90%,
+    rgba(96, 165, 250, 0.7) 95%,
+    rgba(96, 165, 250, 0.3) 98%,
+    transparent 100%
+  );
+  transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+/* Pulse Animation for Percentages */
+@keyframes gauge-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.gauge-option-percentage.animate {
+  animation: gauge-pulse 0.5s ease;
+}
+
+/* Size Variants */
+.gauge-bar-component.gauge-small .gauge-progress-bar {
+  height: 50px;
+}
+
+.gauge-bar-component.gauge-small .gauge-option-percentage {
+  font-size: var(--font-size-2xl, 1.5rem);
+}
+
+.gauge-bar-component.gauge-small .gauge-option-label {
+  font-size: var(--font-size-sm, 0.9375rem);
+}
+
+.gauge-bar-component.gauge-medium .gauge-progress-bar {
+  height: 60px;
+}
+
+.gauge-bar-component.gauge-medium .gauge-option-percentage {
+  font-size: var(--font-size-3xl, 1.875rem);
+}
+
+.gauge-bar-component.gauge-large .gauge-progress-bar {
+  height: 80px;
+}
+
+.gauge-bar-component.gauge-large .gauge-option-percentage {
+  font-size: var(--font-size-4xl, 3rem);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .gauge-option-percentage {
+    font-size: var(--font-size-3xl, 1.875rem);
+  }
+
+  .gauge-option-label {
+    font-size: var(--font-size-sm, 0.9375rem);
+  }
+
+  .gauge-progress-bar {
+    height: 60px;
+  }
+}
+
+@media (max-width: 480px) {
+  .gauge-option-percentage {
+    font-size: var(--font-size-2xl, 1.5rem);
+  }
+
+  .gauge-progress-bar {
+    height: 50px;
+  }
+}

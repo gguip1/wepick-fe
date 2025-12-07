@@ -1,9 +1,14 @@
 services:
   community-fe:
-    image: public.ecr.aws/a3y4e2t5/ktb-community/fe-registry:latest
+    image: public.ecr.aws/a3y4e2t5/ktb-community/dev/fe-registry:latest
     container_name: community-fe
     restart: unless-stopped
     networks:
       - community-network
     ports:
       - "3000:3000"
+
+networks:
+  community-network:
+    external: true
+    name: community-network

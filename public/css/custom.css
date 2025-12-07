@@ -1,7 +1,7 @@
 /* ===================================================================
-   커뮤니티 프론트엔드 - 커스텀 CSS
-   Bootstrap 5.3.8 기반 - 필수 커스텀 스타일만 포함
-   =================================================================== */
+  커뮤니티 프론트엔드 - 커스텀 CSS
+  Bootstrap 5.3.8 기반 - 필수 커스텀 스타일만 포함
+  =================================================================== */
 
 /* ===== Bootstrap 테마 변수 정의 ===== */
 :root {
@@ -51,6 +51,19 @@
 }
 
 /* ===== 전역 스타일 ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden;
+}
+
 body {
   font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
