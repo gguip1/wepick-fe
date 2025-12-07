@@ -12,6 +12,7 @@ import { auth } from "../../utils/auth.js";
 import { initHeaderAuth } from "../../utils/header-init.js";
 import { showMessage, hideMessage } from "../../utils/message.js";
 import { setupRealtimeValidation, validateForm } from "../../utils/validation.js";
+import { loadHeader as loadHeaderComponent } from "../../utils/component-loader.js";
 
 const PAGE_ID = "posts-edit";
 
@@ -46,19 +47,10 @@ function getPostIdFromUrl() {
  * 헤더 HTML 로드
  */
 async function loadHeader() {
-  const headerContainer = document.getElementById('headerContainer');
-  if (!headerContainer) return;
+  await loadHeaderComponent();
 
-  try {
-    const response = await fetch('/components/header.html');
-    const html = await response.text();
-    headerContainer.innerHTML = html;
-
-    // 뒤로가기 버튼 초기화
-    initBackButton();
-  } catch (error) {
-    console.error('Failed to load header:', error);
-  }
+  // 뒤로가기 버튼 초기화
+  initBackButton();
 }
 
 /**

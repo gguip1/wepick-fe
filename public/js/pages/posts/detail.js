@@ -13,6 +13,7 @@ import { createCommentCard } from "../../components/card.js";
 import { Modal } from "../../components/modal.js";
 import { Toast } from "../../components/toast.js";
 import { initHeaderAuth } from "../../utils/header-init.js";
+import { loadHeader as loadHeaderComponent } from "../../utils/component-loader.js";
 
 const PAGE_ID = "posts-detail";
 
@@ -1115,19 +1116,10 @@ async function init() {
  * 헤더 HTML 로드
  */
 async function loadHeader() {
-  const headerContainer = document.getElementById('headerContainer');
-  if (!headerContainer) return;
+  await loadHeaderComponent();
 
-  try {
-    const response = await fetch('/components/header.html');
-    const html = await response.text();
-    headerContainer.innerHTML = html;
-
-    // 뒤로가기 버튼 활성화 및 이벤트 추가
-    initBackButton();
-  } catch (error) {
-    console.error('Failed to load header:', error);
-  }
+  // 뒤로가기 버튼 활성화 및 이벤트 추가
+  initBackButton();
 }
 
 /**

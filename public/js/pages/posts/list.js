@@ -6,6 +6,7 @@
 import { PostsAPI } from "../../api/posts.js";
 import { navigation } from "../../utils/navigation.js";
 import { initHeaderAuth } from "../../utils/header-init.js";
+import { loadHeader } from "../../utils/component-loader.js";
 
 // 페이지 식별자 확인 (다른 페이지에서 실행 방지)
 const root = document.querySelector('[data-page="posts-list"]');
@@ -54,22 +55,6 @@ async function init() {
 
   // 로그아웃 이벤트 리스너
   window.addEventListener('userLoggedOut', handleLogout);
-}
-
-/**
- * 헤더 HTML 로드
- */
-async function loadHeader() {
-  const headerContainer = document.getElementById('headerContainer');
-  if (!headerContainer) return;
-
-  try {
-    const response = await fetch('/components/header.html');
-    const html = await response.text();
-    headerContainer.innerHTML = html;
-  } catch (error) {
-    console.error('Failed to load header:', error);
-  }
 }
 
 /**

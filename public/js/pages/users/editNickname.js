@@ -82,7 +82,7 @@ function setupEventListeners() {
  * 취소 버튼 클릭 처리
  */
 function handleCancel() {
-  navigation.goTo('/users/edit');
+  navigation.goTo('/users/mypage');
 }
 
 /**
@@ -117,7 +117,7 @@ async function handleNicknameChange(e) {
     const response = await UsersAPI.updateNickname({ nickname });
 
     if (response.status >= 200 && response.status < 300) {
-      navigation.goTo('/users/edit');
+      navigation.goTo('/users/mypage');
     } else if (response.status === null) {
       submitBtn.disabled = false;
       submitBtn.textContent = originalBtnText;

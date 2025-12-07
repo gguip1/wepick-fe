@@ -1,4 +1,10 @@
 /* ===== Global Header Component ===== */
+
+/* Body padding to prevent content from being hidden by fixed header */
+body {
+    padding-top: 72px; /* Header height (40px logo + 2rem padding = ~72px) */
+}
+
 .global-header {
     position: fixed;
     top: 0;

@@ -7,6 +7,7 @@ import { TopicsAPI } from '../api/topics.js';
 import { auth } from '../utils/auth.js';
 import { GaugeBar } from '../components/gauge-bar.js';
 import { initHeaderAuth } from '../utils/header-init.js';
+import { loadHeader, loadFooter } from '../utils/component-loader.js';
 
 // Page state
 let currentTopic = null;
@@ -300,38 +301,6 @@ function showResultUI(results) {
 function showError(message) {
   // TODO: Use toast notification system when available
   alert(message);
-}
-
-/**
- * Load header HTML
- */
-async function loadHeader() {
-  const headerContainer = document.getElementById('headerContainer');
-  if (!headerContainer) return;
-
-  try {
-    const response = await fetch('/components/header.html');
-    const html = await response.text();
-    headerContainer.innerHTML = html;
-  } catch (error) {
-    console.error('Failed to load header:', error);
-  }
-}
-
-/**
- * Load footer HTML
- */
-async function loadFooter() {
-  const footerContainer = document.querySelector('footer');
-  if (!footerContainer) return;
-
-  try {
-    const response = await fetch('/components/footer.html');
-    const html = await response.text();
-    footerContainer.innerHTML = html;
-  } catch (error) {
-    console.error('Failed to load footer:', error);
-  }
 }
 
 /**

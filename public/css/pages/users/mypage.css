@@ -1,0 +1,373 @@
+/* ═══════════════════════════════════════════════════════════
+   Mypage - Vertical Menu List Layout
+   ═══════════════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════
+   BASE LAYOUT
+   ═══════════════════════════════════ */
+body[data-page="mypage"] {
+  background: linear-gradient(135deg, #02051c 0%, #0a0f2c 100%);
+  min-height: 100vh;
+  overflow-x: hidden;
+  max-width: 100vw;
+  position: relative;
+}
+
+/* Page Container */
+.mypage-container {
+  min-height: 100vh;
+  padding-top: 80px;
+  padding-bottom: 3rem;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+.mypage-content {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 0 clamp(1rem, 4vw, 2rem);
+  width: 100%;
+}
+
+/* ═══════════════════════════════════
+   PAGE HEADER
+   ═══════════════════════════════════ */
+.mypage-header {
+  margin-bottom: 2rem;
+}
+
+.mypage-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: white;
+  margin: 0;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* ═══════════════════════════════════
+   LOADING SKELETON
+   ═══════════════════════════════════ */
+.loading-skeleton {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.skeleton-profile-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.skeleton-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite;
+}
+
+.skeleton-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.skeleton-line {
+  height: 20px;
+  border-radius: 8px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite;
+}
+
+.skeleton-nickname {
+  width: 150px;
+  height: 24px;
+}
+
+.skeleton-email {
+  width: 200px;
+  height: 18px;
+}
+
+.skeleton-section {
+  margin-bottom: 2rem;
+}
+
+.skeleton-title {
+  width: 80px;
+  height: 18px;
+  margin-bottom: 1rem;
+}
+
+.skeleton-menu-item {
+  height: 60px;
+  border-radius: 12px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* ═══════════════════════════════════
+   USER PROFILE CARD
+   ═══════════════════════════════════ */
+.user-profile-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.user-profile-card:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.12);
+  /* transform: translateY(-2px); */
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.profile-image-section {
+  flex-shrink: 0;
+}
+
+.profile-image {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid rgba(59, 130, 246, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.profile-info-section {
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-nickname {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: white;
+  margin: 0 0 0.5rem 0;
+  word-break: break-word;
+}
+
+.profile-email {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+  word-break: break-all;
+}
+
+/* ═══════════════════════════════════
+   MENU SECTIONS
+   ═══════════════════════════════════ */
+.menu-section {
+  margin-bottom: 2rem;
+}
+
+.section-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: white;
+  margin: 0 0 1rem 0;
+  padding-left: 0.25rem;
+}
+
+/* ═══════════════════════════════════
+   MENU LIST (Vertical)
+   ═══════════════════════════════════ */
+.menu-list {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+}
+
+.menu-list.danger {
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.menu-item:last-child {
+  border-bottom: none;
+}
+
+.menu-item:hover {
+  background: rgba(59, 130, 246, 0.1);
+  padding-left: 1.75rem;
+}
+
+.menu-item:active {
+  background: rgba(59, 130, 246, 0.15);
+}
+
+.menu-list.danger .menu-item:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.menu-list.danger .menu-item:active {
+  background: rgba(239, 68, 68, 0.15);
+}
+
+.menu-item-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.menu-icon {
+  width: 20px;
+  height: 20px;
+  color: rgba(255, 255, 255, 0.7);
+  flex-shrink: 0;
+  transition: color 0.3s ease;
+}
+
+.menu-list.danger .menu-icon {
+  color: #ef4444;
+}
+
+.menu-label {
+  font-size: 1rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.menu-list.danger .menu-label {
+  color: #ef4444;
+}
+
+.menu-arrow {
+  font-size: 1.25rem;
+  color: rgba(255, 255, 255, 0.5);
+  flex-shrink: 0;
+}
+
+.menu-list.danger .menu-arrow {
+  color: rgba(239, 68, 68, 0.5);
+}
+
+/* ═══════════════════════════════════
+   RESPONSIVE DESIGN
+   ═══════════════════════════════════ */
+@media (max-width: 768px) {
+  .mypage-container {
+    padding-top: 72px;
+    padding-bottom: 80px;
+  }
+
+  .mypage-title {
+    font-size: 1.5rem;
+  }
+
+  .user-profile-card {
+    padding: 1.5rem;
+    gap: 1rem;
+  }
+
+  .profile-image {
+    width: 64px;
+    height: 64px;
+  }
+
+  .profile-nickname {
+    font-size: 1.25rem;
+  }
+
+  .profile-email {
+    font-size: 0.875rem;
+  }
+
+  .menu-item {
+    padding: 1rem 1.25rem;
+  }
+
+  .menu-item:hover {
+    padding-left: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .mypage-container {
+    padding-top: 68px;
+  }
+
+  .user-profile-card {
+    padding: 1.25rem;
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .profile-image {
+    width: 72px;
+    height: 72px;
+  }
+
+  .menu-item {
+    padding: 0.875rem 1rem;
+  }
+
+  .menu-item:hover {
+    padding-left: 1.25rem;
+  }
+
+  .menu-label {
+    font-size: 0.95rem;
+  }
+}

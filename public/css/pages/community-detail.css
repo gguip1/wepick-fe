@@ -386,6 +386,17 @@ body[data-page="posts-detail"] {
   75% { transform: scale(1.15); }
 }
 
+/* Shake Animation for Error Feedback */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-8px); }
+  20%, 40%, 60%, 80% { transform: translateX(8px); }
+}
+
+.like-btn.shake {
+  animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
 /* ═══════════════════════════════════
    5. Comments Section
    ═══════════════════════════════════ */
@@ -938,5 +949,72 @@ body[data-page="posts-detail"] {
 
   .comment-edit-btn {
     flex: 1;
+  }
+}
+
+/* ═══════════════════════════════════
+   Login Prompt (비로그인 상태)
+   ═══════════════════════════════════ */
+
+.login-prompt {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  border-radius: 16px;
+  padding: 32px 24px;
+  margin: 24px 0;
+  text-align: center;
+}
+
+.login-prompt-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.login-prompt-text {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+.login-prompt-btn {
+  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 32px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.login-prompt-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+}
+
+.login-prompt-btn:active {
+  transform: translateY(0);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .login-prompt {
+    padding: 24px 16px;
+    margin: 16px 0;
+  }
+
+  .login-prompt-text {
+    font-size: 0.9375rem;
+  }
+
+  .login-prompt-btn {
+    width: 100%;
+    padding: 12px 24px;
+    font-size: 0.9375rem;
   }
 }

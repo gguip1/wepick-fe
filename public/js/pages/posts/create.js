@@ -15,6 +15,7 @@ import { setupRealtimeValidation, validateForm } from "../../utils/validation.js
 import { createDraggableList } from "../../utils/drag-drop.js";
 import { validateImageFile, uploadImage, createImagePreview, revokeImagePreview } from "../../utils/image-upload.js";
 import { createCharCounter, createFormController } from "../../utils/form-helpers.js";
+import { loadHeader as loadHeaderComponent } from "../../utils/component-loader.js";
 
 const PAGE_ID = "posts-create";
 
@@ -43,16 +44,7 @@ let contentCounter = null;
  * 헤더 로드
  */
 async function loadHeader() {
-  const headerContainer = document.getElementById('headerContainer');
-  if (!headerContainer) return;
-
-  const response = await fetch('/components/header.html');
-  if (!response.ok) {
-    console.error('Failed to load header');
-    return;
-  }
-
-  headerContainer.innerHTML = await response.text();
+  await loadHeaderComponent();
   initBackButton();
 }
 

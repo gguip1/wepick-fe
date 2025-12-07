@@ -8,7 +8,8 @@
 
 export const config = Object.freeze({
   // API 설정
-  API_BASE_URL: "https://api.wepick.cloud/api",
+  // API_BASE_URL: "https://api.wepick.cloud/api",
+  API_BASE_URL: "http://localhost:8080/api",
   TIMEOUT: 6000,
 
   // 애플리케이션 설정

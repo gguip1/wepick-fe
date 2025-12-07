@@ -62,7 +62,7 @@ function setupEventListeners() {
  * 취소 버튼 클릭 처리
  */
 function handleCancel() {
-  navigation.goTo('/users/edit');
+  navigation.goTo('/users/mypage');
 }
 
 /**
@@ -153,7 +153,7 @@ async function handlePasswordChange(e) {
 
     if (response.status >= 200 && response.status < 300) {
       // 비밀번호 변경 성공 - 개인정보 수정 메인 페이지로 이동
-      navigation.goTo('/users/edit');
+      navigation.goTo('/users/mypage');
     } else if (response.status === null) {
       submitBtn.disabled = false;
       submitBtn.textContent = originalBtnText;
