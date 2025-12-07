@@ -26,8 +26,8 @@ class GaugeBar {
     }
 
     this.options = {
-      percentageA: options.percentageA || 50,
-      percentageB: options.percentageB || 50,
+      percentageA: options.percentageA ?? 50,
+      percentageB: options.percentageB ?? 50,
       animate: options.animate !== false,
       autoUpdate: options.autoUpdate || false,
       autoUpdateInterval: options.autoUpdateInterval || 4000,

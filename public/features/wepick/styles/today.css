@@ -10,7 +10,6 @@ body[data-active-nav="today"] {
 /* Page Container */
 .today-page {
   min-height: 100vh;
-  padding-top: 80px; /* Space for fixed header */
 }
 
 /* Main Content */
@@ -201,7 +200,7 @@ body[data-active-nav="today"] {
 }
 
 .gauge-bar-component.before-vote .gauge-bar-fill {
-  width: 50%;
+  /* width는 JavaScript에서 동적으로 설정 - CSS에서 강제하지 않음 */
   background: linear-gradient(
     90deg,
     rgba(59, 130, 246, 0.2) 0%,
@@ -409,22 +408,10 @@ body[data-active-nav="today"] {
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .today-page {
-    padding-top: 80px;
-  }
-
   .today-header {
     top: var(--spacing-lg, 1.5rem);
     left: var(--spacing-lg, 1.5rem);
   }
-
-  /* .logo-image {
-    height: 40px;
-  }
-
-  .logo-text {
-    font-size: var(--font-size-xl, 1.25rem);
-  } */
 
   .today-content {
     padding: var(--spacing-2xl, 3rem) var(--spacing-md, 1rem);
@@ -506,5 +493,86 @@ body[data-active-nav="today"] {
 
   .vote-card-emoji {
     font-size: 2.5rem;
+  }
+}
+
+/* ===================================================================
+   No Topic UI - 오늘의 토픽이 없을 때
+   =================================================================== */
+
+.no-topic-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+.no-topic-content {
+  text-align: center;
+  padding: var(--spacing-2xl, 3rem);
+  max-width: 500px;
+}
+
+.no-topic-icon {
+  font-size: 4rem;
+  margin-bottom: var(--spacing-xl, 2rem);
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.no-topic-title {
+  font-size: var(--font-size-2xl, 1.5rem);
+  font-weight: 700;
+  color: white;
+  margin-bottom: var(--spacing-md, 1rem);
+}
+
+.no-topic-description {
+  font-size: var(--font-size-base, 1rem);
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.6;
+  margin-bottom: var(--spacing-xl, 2rem);
+}
+
+.no-topic-button {
+  display: inline-block;
+  padding: var(--spacing-md, 1rem) var(--spacing-xl, 2rem);
+  font-size: var(--font-size-base, 1rem);
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%);
+  border: none;
+  border-radius: var(--bs-border-radius-lg, 50px);
+  text-decoration: none;
+  transition: all var(--transition-fast, 0.3s) ease;
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+}
+
+.no-topic-button:hover {
+  box-shadow: 0 6px 30px rgba(59, 130, 246, 0.6);
+  transform: translateY(-2px);
+  color: white;
+}
+
+@media (max-width: 480px) {
+  .no-topic-icon {
+    font-size: 3rem;
+  }
+
+  .no-topic-title {
+    font-size: var(--font-size-xl, 1.25rem);
+  }
+
+  .no-topic-description {
+    font-size: var(--font-size-sm, 0.9375rem);
   }
 }

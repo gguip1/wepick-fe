@@ -1,6 +1,21 @@
 /**
  * WePick Today Choice Page
  * 오늘의 선택/결과 페이지 로직
+ *
+ * API 응답 형식 (GET /api/topics/today):
+ * {
+ *   topicId: number,
+ *   title: string,
+ *   description: string,
+ *   targetDate: "YYYY-MM-DD",
+ *   status: "OPEN" | "CLOSED",
+ *   options: [
+ *     { optionId, label: "A", text, description, voteCount, percent },
+ *     { optionId, label: "B", text, description, voteCount, percent }
+ *   ],
+ *   totalVotes: number,
+ *   votedOptionId: number | null
+ * }
  */
 
 import { TopicsAPI } from '/shared/api/topics.js';
@@ -8,32 +23,34 @@ import { auth } from '/shared/utils/auth.js';
 import { GaugeBar } from '/shared/components/gauge-bar.js';
 import { initHeaderAuth } from '/shared/utils/header-init.js';
 import { loadHeader, loadFooter } from '/shared/utils/component-loader.js';
+import { showMessage } from '/shared/utils/message.js';
 
 const PAGE_ID = "wepick-today";
 
 // Page state
 let currentTopic = null;
-let selectedChoice = null;
+let selectedOptionId = null;
 let gaugeBar = null;
-let currentUser = null; // 현재 사용자 정보
+let currentUser = null;
 
-// DOM Elements (initialized after DOM is ready)
-let loadingSkeleton, voteContent, voteSection, topicQuestion, mainGaugeBar;
-let voteCardsContainer, voteCards, voteButton, resultStats, shareButton;
+// DOM Elements
+let loadingSkeleton, voteContent, voteSection, topicQuestion;
+let mainGaugeBar, voteCardsContainer, voteCards, voteButton;
+let resultStats, shareButton;
 
 /**
  * Initialize page
  */
 async function init() {
   try {
-    // Load header and footer HTML
+    // Load header and footer
     await loadHeader();
     await loadFooter();
 
     // Initialize DOM elements
     initializeDOMElements();
 
-    // Initialize header auth state and get current user (한 번만 호출)
+    // Initialize header auth state
     const user = await initHeaderAuth();
     if (user) {
       currentUser = user;
@@ -42,27 +59,37 @@ async function init() {
     // Fetch today's topic
     const response = await TopicsAPI.getTodayTopic();
 
-    if (!response.data) {
+    // Hide loading skeleton
+    loadingSkeleton.style.display = 'none';
+
+    // 404: 오늘의 토픽이 없는 경우
+    if (response.status === 404 || (!response.data && !response.error)) {
+      showNoTopicUI();
+      return;
+    }
+
+    // 기타 에러
+    if (response.error) {
       showError('오늘의 토픽을 불러오는데 실패했습니다.');
+      voteContent.removeAttribute('hidden');
       return;
     }
 
     currentTopic = response.data;
 
-    // Hide loading skeleton and show actual content
-    loadingSkeleton.style.display = 'none';
+    // Show content
     voteContent.removeAttribute('hidden');
 
     // Update UI with topic data
     updateTopicUI(currentTopic);
 
-    // Check if user has already voted
-    await checkVoteStatus();
+    // Check vote status from API response
+    checkVoteStatus(currentTopic);
 
     // Setup event listeners
     setupEventListeners();
 
-    // 로그아웃 이벤트 리스너
+    // Listen for logout event
     window.addEventListener('userLoggedOut', handleLogout);
 
   } catch (error) {
@@ -74,66 +101,82 @@ async function init() {
 }
 
 /**
- * 로그아웃 처리
+ * Handle logout
  */
 function handleLogout() {
-  // 현재 사용자 상태 초기화
   currentUser = null;
-
-  // 투표 상태 초기화 및 UI 업데이트
+  // 로그아웃 시 투표 UI로 전환 (퍼센트 숨김)
   showVoteUI();
+}
+
+/**
+ * Get option by label (A or B)
+ */
+function getOptionByLabel(topic, label) {
+  return topic.options.find(opt => opt.label === label);
+}
+
+/**
+ * Get option by ID
+ */
+function getOptionById(topic, optionId) {
+  return topic.options.find(opt => opt.optionId === optionId);
 }
 
 /**
  * Update UI with topic data
  */
 function updateTopicUI(topic) {
-  // Update question
-  topicQuestion.textContent = topic.question;
+  // Update question (title)
+  topicQuestion.textContent = topic.title;
 
-  const optionAText = topic.optionA.text;
-  const optionBText = topic.optionB.text;
+  const optionA = getOptionByLabel(topic, 'A');
+  const optionB = getOptionByLabel(topic, 'B');
 
   // Update Option A
-  document.getElementById('optionATitle').textContent = optionAText;
-  document.getElementById('optionADescription').textContent = topic.optionA.description;
+  document.getElementById('optionATitle').textContent = optionA.text;
+  document.getElementById('optionADescription').textContent = optionA.description;
 
   // Update Option B
-  document.getElementById('optionBTitle').textContent = optionBText;
-  document.getElementById('optionBDescription').textContent = topic.optionB.description;
+  document.getElementById('optionBTitle').textContent = optionB.text;
+  document.getElementById('optionBDescription').textContent = optionB.description;
 
   // Update gauge labels
-  document.getElementById('gaugeOptionALabel').textContent = optionAText;
-  document.getElementById('gaugeOptionBLabel').textContent = optionBText;
+  document.getElementById('gaugeOptionALabel').textContent = optionA.text;
+  document.getElementById('gaugeOptionBLabel').textContent = optionB.text;
+
+  // Store optionId in data attributes for voting
+  const cardA = document.querySelector('.vote-card[data-choice="A"]');
+  const cardB = document.querySelector('.vote-card[data-choice="B"]');
+  if (cardA) cardA.dataset.optionId = optionA.optionId;
+  if (cardB) cardB.dataset.optionId = optionB.optionId;
 }
 
 /**
- * Check if user has already voted
+ * Check vote status from API response
+ * votedOptionId가 있으면 이미 투표한 것
  */
-async function checkVoteStatus() {
-  // Check login status first
-  if (!currentUser) {
-    // Not logged in, show vote UI
-    showVoteUI();
-    return;
-  }
+function checkVoteStatus(topic) {
+  const optionA = getOptionByLabel(topic, 'A');
+  const optionB = getOptionByLabel(topic, 'B');
 
-  // Check if user voted
-  const voteResponse = await TopicsAPI.checkUserVote(currentTopic.id);
+  // 퍼센트 값 추출 (숫자로 변환)
+  const percentA = optionA ? Number(optionA.percent) : 0;
+  const percentB = optionB ? Number(optionB.percent) : 0;
 
-  if (voteResponse.data && voteResponse.data.hasVoted) {
-    // User has voted, show results
-    const percentageA = Math.round((currentTopic.votesA / currentTopic.totalVotes) * 100);
-    const percentageB = Math.round((currentTopic.votesB / currentTopic.totalVotes) * 100);
+  if (topic.votedOptionId !== null && topic.votedOptionId !== undefined) {
+    // User has voted - show results
+    const votedOption = getOptionById(topic, topic.votedOptionId);
 
     showResultUI({
-      percentageA,
-      percentageB,
-      totalVotes: currentTopic.totalVotes,
-      userChoice: voteResponse.data.choice
+      percentageA: percentA,
+      percentageB: percentB,
+      totalVotes: topic.totalVotes,
+      userChoice: votedOption ? votedOption.label : null,
+      userChoiceText: votedOption ? votedOption.text : null
     });
   } else {
-    // User hasn't voted, show vote UI
+    // Not voted - show vote UI (퍼센트 숨김)
     showVoteUI();
   }
 }
@@ -165,6 +208,7 @@ function setupEventListeners() {
 function handleCardClick(e) {
   const card = e.currentTarget;
   const choice = card.dataset.choice;
+  const optionId = parseInt(card.dataset.optionId, 10);
 
   // Remove selection from all cards
   voteCards.forEach(c => c.classList.remove('selected'));
@@ -172,8 +216,8 @@ function handleCardClick(e) {
   // Add selection to clicked card
   card.classList.add('selected');
 
-  // Update selected choice
-  selectedChoice = choice;
+  // Update selected option
+  selectedOptionId = optionId;
 
   // Highlight corresponding gauge bar option
   mainGaugeBar.classList.remove('highlight-a', 'highlight-b');
@@ -188,36 +232,54 @@ function handleCardClick(e) {
  * Handle vote submit
  */
 async function handleVoteSubmit() {
-  if (!selectedChoice) {
+  if (!selectedOptionId) {
     return;
   }
 
-  // TODO: 인증 연동 완료 후 주석 해제
   // Check login status
-  // const user = await auth.getAuthUser();
+  const user = await auth.getAuthUser();
 
-  // if (!user) {
-  //   // Redirect to login with return URL
-  //   const currentPath = window.location.pathname + window.location.search;
-  //   window.location.href = `/users/signin?redirect=${encodeURIComponent(currentPath)}&action=vote`;
-  //   return;
-  // }
+  if (!user) {
+    // Redirect to login with return URL
+    const currentPath = window.location.pathname + window.location.search;
+    window.location.href = `/users/signin?redirect=${encodeURIComponent(currentPath)}&action=vote`;
+    return;
+  }
 
   // Disable button during submission
   voteButton.disabled = true;
   voteButton.textContent = '투표 중...';
 
   try {
-    // Submit vote
-    const response = await TopicsAPI.submitVote(currentTopic.id, selectedChoice);
+    // Submit vote with optionId
+    const response = await TopicsAPI.submitVote(currentTopic.topicId, selectedOptionId);
 
-    if (response.data && response.data.success) {
-      // Show results
-      showResultUI(response.data.results);
-    } else {
-      showError('투표에 실패했습니다. 다시 시도해주세요.');
+    if (response.error) {
+      // Handle specific errors
+      if (response.status === 409) {
+        showError('이미 투표하셨습니다.');
+        // Refresh to show results
+        const refreshResponse = await TopicsAPI.getTodayTopic();
+        if (refreshResponse.data) {
+          currentTopic = refreshResponse.data;
+          checkVoteStatus(currentTopic);
+        }
+      } else if (response.status === 404) {
+        showError('투표 기간이 만료되었습니다.');
+      } else {
+        showError(response.error.message || '투표에 실패했습니다.');
+      }
       voteButton.disabled = false;
       voteButton.textContent = '투표하기';
+      return;
+    }
+
+    // Vote successful - refresh topic data to get updated results
+    const refreshResponse = await TopicsAPI.getTodayTopic();
+    if (refreshResponse.data) {
+      currentTopic = refreshResponse.data;
+      checkVoteStatus(currentTopic);
+      showMessage('투표가 완료되었습니다!', 'success');
     }
 
   } catch (error) {
@@ -232,23 +294,41 @@ async function handleVoteSubmit() {
  * Handle share button click
  */
 function handleShareClick() {
-  if (currentTopic && currentTopic.id) {
-    window.location.href = `/topics/${currentTopic.id}/chat`;
+  if (currentTopic && currentTopic.topicId) {
+    window.location.href = `/topics/${currentTopic.topicId}/chat`;
   }
 }
 
 /**
  * Show vote UI (before voting)
+ * 투표 전에는 퍼센트를 숨기고 ??%로 표시
  */
 function showVoteUI() {
-  // Add 'before-vote' class to gauge bar for styling
+  // Add 'before-vote' class to gauge bar
   mainGaugeBar.classList.add('before-vote');
 
-  // Show vote elements (reset display in case it was hidden with display:none)
+  // 투표 전에는 퍼센트 숨김 (??% 표시)
+  const percentageAEl = mainGaugeBar.querySelector('[data-option="a"]');
+  const percentageBEl = mainGaugeBar.querySelector('[data-option="b"]');
+  const barFill = mainGaugeBar.querySelector('[data-fill="a"]');
+
+  if (percentageAEl) percentageAEl.textContent = '??%';
+  if (percentageBEl) percentageBEl.textContent = '??%';
+  if (barFill) barFill.style.width = '50%';
+
+  // Show vote elements
   voteCardsContainer.style.display = 'grid';
   voteCardsContainer.removeAttribute('hidden');
   voteButton.style.display = 'block';
   voteButton.removeAttribute('hidden');
+
+  // Reset vote button state
+  voteButton.disabled = true;
+  voteButton.textContent = '선택지를 골라주세요';
+
+  // Reset card selection
+  voteCards.forEach(c => c.classList.remove('selected'));
+  selectedOptionId = null;
 
   // Hide result elements
   resultStats.setAttribute('hidden', '');
@@ -259,10 +339,10 @@ function showVoteUI() {
  * Show result UI (after voting)
  */
 function showResultUI(results) {
-  // Remove 'before-vote' class to trigger transition
+  // Remove 'before-vote' class
   mainGaugeBar.classList.remove('before-vote');
 
-  // Hide vote elements completely (use display:none for complete removal)
+  // Hide vote elements
   voteCardsContainer.style.display = 'none';
   voteButton.style.display = 'none';
 
@@ -273,36 +353,79 @@ function showResultUI(results) {
   // Update statistics
   document.getElementById('totalVotes').textContent = results.totalVotes.toLocaleString();
 
-  const choiceText = results.userChoice === 'A'
-    ? currentTopic.optionA.text
-    : currentTopic.optionB.text;
+  // Get choice text
+  let choiceText = results.userChoiceText;
+  if (!choiceText && results.userChoice) {
+    const option = getOptionByLabel(currentTopic, results.userChoice);
+    choiceText = option ? option.text : results.userChoice;
+  }
+
   const userChoiceElement = document.getElementById('userChoice');
-  userChoiceElement.textContent = choiceText;
+  userChoiceElement.textContent = choiceText || '-';
 
   // Add color class based on user's choice
   userChoiceElement.className = results.userChoice === 'A' ? 'choice-a' : 'choice-b';
+
+  // 퍼센트 값 보장 (숫자로 변환, 0은 유지)
+  const percentA = Number(results.percentageA) ?? 0;
+  const percentB = Number(results.percentageB) ?? 0;
+
+  // 즉시 DOM 요소 업데이트 (GaugeBar 생성 전에도 값 표시)
+  const percentageAEl = mainGaugeBar.querySelector('[data-option="a"]');
+  const percentageBEl = mainGaugeBar.querySelector('[data-option="b"]');
+  const barFill = mainGaugeBar.querySelector('[data-fill="a"]');
+
+  if (percentageAEl) percentageAEl.textContent = `${percentA}%`;
+  if (percentageBEl) percentageBEl.textContent = `${percentB}%`;
+  if (barFill) barFill.style.width = `${percentA}%`;
 
   // Initialize/Update Gauge Bar with animation
   setTimeout(() => {
     if (!gaugeBar) {
       gaugeBar = new GaugeBar('#mainGaugeBar', {
-        percentageA: results.percentageA,
-        percentageB: results.percentageB,
+        percentageA: percentA,
+        percentageB: percentB,
         animate: true,
         autoUpdate: false
       });
     } else {
-      gaugeBar.update(results.percentageA, results.percentageB);
+      gaugeBar.update(percentA, percentB);
     }
   }, 100);
+}
+
+/**
+ * Show "no topic" UI when there's no topic for today
+ */
+function showNoTopicUI() {
+  // Hide vote content
+  voteContent.setAttribute('hidden', '');
+
+  // Create and show "no topic" message
+  const noTopicContainer = document.createElement('div');
+  noTopicContainer.className = 'no-topic-container';
+  noTopicContainer.innerHTML = `
+    <div class="no-topic-content">
+      <div class="no-topic-icon">📭</div>
+      <h2 class="no-topic-title">오늘의 토픽이 없습니다</h2>
+      <p class="no-topic-description">
+        아직 오늘의 투표 주제가 준비되지 않았어요.<br>
+        잠시 후 다시 확인해주세요!
+      </p>
+      <a href="/" class="no-topic-button">홈으로 돌아가기</a>
+    </div>
+  `;
+
+  // Insert after loading skeleton
+  const voteSection = document.getElementById('voteSection');
+  voteSection.appendChild(noTopicContainer);
 }
 
 /**
  * Show error message
  */
 function showError(message) {
-  // TODO: Use toast notification system when available
-  alert(message);
+  showMessage(message, 'error');
 }
 
 /**

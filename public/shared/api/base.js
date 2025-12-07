@@ -22,6 +22,7 @@ import { Loading } from '/shared/components/loading.js';
  * @param {string} endpoint - API 엔드포인트 (예: '/posts', '/users/me')
  * @param {Object} options - fetch 옵션
  * @param {boolean} options.skipAuthRedirect - 401 응답 시 자동 리다이렉트 건너뛰기 (로그인/회원가입 페이지용)
+ * @param {boolean} options.skip404Redirect - 404 응답 시 자동 리다이렉트 건너뛰기 (토픽 없음 등)
  * @param {boolean} options.showLoading - 로딩 인디케이터 표시 여부 (기본값: true)
  * @returns {Promise<{data: any, error: {message: string, reason: string}|null, status: number}>}
  */
@@ -40,8 +41,8 @@ export async function apiRequest(endpoint, options = {}) {
         ...(options.headers || {}),
     };
 
-    // skipAuthRedirect, showLoading 옵션 추출 (fetch에 전달하지 않음)
-    const { skipAuthRedirect = false, showLoading = true, ...fetchOptions } = options;
+    // skipAuthRedirect, skip404Redirect, showLoading 옵션 추출 (fetch에 전달하지 않음)
+    const { skipAuthRedirect = false, skip404Redirect = false, showLoading = true, ...fetchOptions } = options;
 
     // 로딩 인디케이터 표시
     if (showLoading) {
@@ -73,7 +74,7 @@ export async function apiRequest(endpoint, options = {}) {
 
         // 전역 HTTP 상태 처리 (4xx, 5xx)
         if (!response.ok) {
-            await handleHttpError(status, apiResponse, skipAuthRedirect);
+            await handleHttpError(status, apiResponse, { skipAuthRedirect, skip404Redirect });
         }
 
         // 성공 응답 반환 (2xx)
@@ -84,8 +85,8 @@ export async function apiRequest(endpoint, options = {}) {
         };
 
     } catch (error) {
-        // 401 에러는 비로그인 사용자의 정상 상태이므로 콘솔 로그 제거
-        if (error.status !== 401) {
+        // 401, 404(skip404Redirect) 에러는 정상 상태일 수 있으므로 콘솔 로그 제거
+        if (error.status !== 401 && !(error.status === 404 && skip404Redirect)) {
             console.error('API request error:', error);
         }
 
@@ -120,13 +121,17 @@ export async function apiRequest(endpoint, options = {}) {
 
 /**
  * HTTP 에러를 처리하고 적절한 액션을 수행합니다.
- * 
+ *
  * @param {number} status - HTTP 상태 코드
  * @param {Object} apiResponse - 파싱된 백엔드 응답 (ApiResponse<T> 형식)
- * @param {boolean} skipAuthRedirect - 401 응답 시 자동 리다이렉트 건너뛰기
+ * @param {Object} options - 옵션
+ * @param {boolean} options.skipAuthRedirect - 401 응답 시 자동 리다이렉트 건너뛰기
+ * @param {boolean} options.skip404Redirect - 404 응답 시 자동 리다이렉트 건너뛰기
  * @throws {Error} 처리된 에러 객체
  */
-async function handleHttpError(status, apiResponse, skipAuthRedirect = false) {
+async function handleHttpError(status, apiResponse, options = {}) {
+    const { skipAuthRedirect = false, skip404Redirect = false } = options;
+
     // 백엔드 ApiResponse에서 에러 정보 추출
     const errorMessage = apiResponse?.message || `HTTP ${status}`;
     const errorReason = apiResponse?.error?.reason || null;
@@ -154,7 +159,10 @@ async function handleHttpError(status, apiResponse, skipAuthRedirect = false) {
 
     // 404 Not Found
     if (status === 404) {
-        window.location.href = config.ROUTES.NOT_FOUND;
+        // skip404Redirect가 true면 리다이렉트하지 않음 (토픽 없음 등 페이지에서 처리)
+        if (!skip404Redirect) {
+            window.location.href = config.ROUTES.NOT_FOUND;
+        }
         throw error;
     }
 
