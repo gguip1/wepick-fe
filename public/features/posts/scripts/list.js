@@ -443,7 +443,7 @@ function updateWriteButtonState() {
 async function handleCreateClick() {
   if (!state.currentUser) {
     // 비로그인 상태: 로그인 페이지로 리다이렉트 (redirect 파라미터 포함)
-    const { storage } = await import('../../utils/storage.js');
+    const { storage } = await import('/shared/utils/storage.js');
     storage.set("redirect_after_signin", "/community/posts/create");
     navigation.goTo("/users/signin");
   } else {
