@@ -12,15 +12,12 @@
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
 ![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
 ![Express](https://img.shields.io/badge/Express-000000?style=for-the-badge&logo=express&logoColor=white)
-![Bootstrap](https://img.shields.io/badge/Bootstrap-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white)
 ![Git](https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 
 - **Frontend**: Vanilla JavaScript (ES6 Modules), CSS3, HTML5
 - **Backend**: Express.js (MPA - Multi-Page Application)
-- **UI Framework**: Bootstrap 5.3.8 (Legacy), Custom CSS (New Features)
-- **Authentication**: HTTP-only Cookie
-- **API Server**: `https://api.wepick.cloud/api`
+- **UI Framework**: Custom CSS (New Features)
 
 ---
 
@@ -28,30 +25,30 @@
 
 ### 1. 랜딩 페이지 (`/`)
 
-![랜딩 페이지 스크린샷](./assets/docs/readme/imgs/landing.png)
+![랜딩 페이지 스크린샷](./assets/readme/imgs/landing.png)
 
 ### 2. 오늘의 선택 (`/today`)
 
-![오늘의 선택 - 투표 전 화면 스크린샷](./assets/docs/readme/imgs/today.png)
+![오늘의 선택 - 투표 전 화면 스크린샷](./assets/readme/imgs/today.png)
 
 ### 3. 커뮤니티 게시판 (`/community` 또는 `/posts`)
 
-![커뮤니티 게시판 - 게시글 리스트 화면 스크린샷](./assets/docs/readme/imgs/community.png)
+![커뮤니티 게시판 - 게시글 리스트 화면 스크린샷](./assets/readme/imgs/community.png)
 
 ### 4. 로그인/회원가입 (`/users/signin`, `/users/signup`)
 
 <div style="display: flex; justify-content: center; gap: 20px;">
-  <img src="./assets/docs/readme/imgs/login.png" alt="로그인 페이지 스크린샷" width="300"/>
-  <img src="./assets/docs/readme/imgs/register.png" alt="회원가입 페이지 스크린샷" width="300"/>
+  <img src="./assets/readme/imgs/login.png" alt="로그인 페이지 스크린샷" width="300"/>
+  <img src="./assets/readme/imgs/register.png" alt="회원가입 페이지 스크린샷" width="300"/>
 </div>
 
 ### 5. 마이페이지 (`/users/mypage`)
 
-![마이페이지 스크린샷](./assets/docs/readme/imgs/mypage.png)
+![마이페이지 스크린샷](./assets/readme/imgs/mypage.png)
 
 ### 6. 개발 중 페이지 (`/topics`, `/topics/:id/chat`)
 
-![개발 중 페이지 스크린샷](./assets/docs/readme/imgs/deving.png)
+![개발 중 페이지 스크린샷](./assets/readme/imgs/deving.png)
 
 ---
 
