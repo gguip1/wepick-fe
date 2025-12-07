@@ -21,36 +21,35 @@ router.get('/today', (req, res) => {
   );
 });
 
-// 이전 토픽 리스트
-// TODO: 구현 예정
-// router.get('/topics', (req, res) => {
-//   res.sendFile(
-//     path.join(__dirname, '..', 'public', 'pages', 'wepick', 'topic-list.html')
-//   );
-// });
+// 이전 토픽 리스트 (개발 중)
+router.get('/topics', (req, res) => {
+  res.sendFile(
+    path.join(__dirname, '..', 'public', 'pages', 'error', 'coming-soon.html')
+  );
+});
 
-// 이전 토픽 상세 (결과)
-// TODO: 구현 예정
-// router.get('/topics/:topicId', (req, res, next) => {
-//   const topicId = req.params.topicId;
-//
-//   // 'chat'은 다음 라우트로 넘김
-//   if (topicId === 'chat') return next();
-//
-//   // 숫자 ID만 허용
-//   if (!/^\d+$/.test(topicId)) return next();
-//
-//   res.sendFile(
-//     path.join(__dirname, '..', 'public', 'pages', 'wepick', 'topic-detail.html')
-//   );
-// });
+// 이전 토픽 상세 (결과) (개발 중)
+router.get('/topics/:topicId', (req, res, next) => {
+  const topicId = req.params.topicId;
 
-// 진영 채팅 페이지
-// TODO: 구현 예정
-// router.get('/topics/:topicId/chat', (req, res) => {
-//   res.sendFile(
-//     path.join(__dirname, '..', 'public', 'pages', 'wepick', 'topic-chat.html')
-//   );
-// });
+  // 'chat'은 다음 라우트로 넘김
+  if (topicId === 'chat') return next();
+
+  // 숫자 ID만 허용
+  if (!/^\d+$/.test(topicId)) {
+    return next();
+  }
+
+  res.sendFile(
+    path.join(__dirname, '..', 'public', 'pages', 'error', 'coming-soon.html')
+  );
+});
+
+// 진영 채팅 페이지 (개발 중)
+router.get('/topics/:topicId/chat', (req, res) => {
+  res.sendFile(
+    path.join(__dirname, '..', 'public', 'pages', 'error', 'coming-soon.html')
+  );
+});
 
 module.exports = router;
