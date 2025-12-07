@@ -1,0 +1,170 @@
+/**
+ * Base API Module
+ * 모든 HTTP 요청의 기본 처리를 담당합니다.
+ * 
+ * - 중앙 집중식 에러 처리
+ * - 일관된 응답 형식
+ * - 자동 인증 처리
+ * - 자동 로딩 인디케이터 표시
+ */
+
+import { config } from '/shared/utils/config.js';
+import { auth } from '/shared/utils/auth.js';
+import { Loading } from '/shared/components/loading.js';
+
+/**
+ * API 요청을 수행하고 일관된 형식으로 응답을 반환합니다.
+ * 
+ * 백엔드 응답 형식:
+ * - 성공: { message: string, data: T, error: null }
+ * - 실패: { message: string, data: null, error: { reason: string } }
+ * 
+ * @param {string} endpoint - API 엔드포인트 (예: '/posts', '/users/me')
+ * @param {Object} options - fetch 옵션
+ * @param {boolean} options.skipAuthRedirect - 401 응답 시 자동 리다이렉트 건너뛰기 (로그인/회원가입 페이지용)
+ * @param {boolean} options.showLoading - 로딩 인디케이터 표시 여부 (기본값: true)
+ * @returns {Promise<{data: any, error: {message: string, reason: string}|null, status: number}>}
+ */
+export async function apiRequest(endpoint, options = {}) {
+    const url = `${config.API_BASE_URL}${endpoint}`;
+
+    const defaultHeaders = {};
+
+    // FormData가 아닌 경우에만 Content-Type 설정
+    if (!(options.body instanceof FormData)) {
+        defaultHeaders['Content-Type'] = 'application/json';
+    }
+
+    const headers = {
+        ...defaultHeaders,
+        ...(options.headers || {}),
+    };
+
+    // skipAuthRedirect, showLoading 옵션 추출 (fetch에 전달하지 않음)
+    const { skipAuthRedirect = false, showLoading = true, ...fetchOptions } = options;
+
+    // 로딩 인디케이터 표시
+    if (showLoading) {
+        Loading.show();
+    }
+
+    try {
+        const response = await fetch(url, {
+            method: fetchOptions.method || 'GET',
+            headers: headers,
+            body: fetchOptions.body,
+            credentials: 'include',
+        });
+
+        const status = response.status;
+
+        // 응답 본문 파싱
+        const text = await response.text();
+        let apiResponse = null;
+        
+        if (text) {
+            try {
+                apiResponse = JSON.parse(text);
+            } catch (err) {
+                // JSON 파싱 실패
+                console.warn('응답을 JSON으로 파싱하는 데 실패했습니다:', err);
+            }
+        }
+
+        // 전역 HTTP 상태 처리 (4xx, 5xx)
+        if (!response.ok) {
+            await handleHttpError(status, apiResponse, skipAuthRedirect);
+        }
+
+        // 성공 응답 반환 (2xx)
+        return {
+            data: apiResponse?.data || null,
+            error: null,
+            status: status
+        };
+
+    } catch (error) {
+        // 401 에러는 비로그인 사용자의 정상 상태이므로 콘솔 로그 제거
+        if (error.status !== 401) {
+            console.error('API request error:', error);
+        }
+
+        // 이미 처리된 HTTP 에러인 경우
+        if (error.handled) {
+            return {
+                data: null,
+                error: {
+                    message: error.message,
+                    reason: error.reason || null
+                },
+                status: error.status
+            };
+        }
+
+        // 네트워크 에러 등
+        return {
+            data: null,
+            error: {
+                message: error.message || '요청 처리 중 오류가 발생했습니다.',
+                reason: null
+            },
+            status: null
+        };
+    } finally {
+        // 로딩 인디케이터 숨김
+        if (showLoading) {
+            Loading.hide();
+        }
+    }
+}
+
+/**
+ * HTTP 에러를 처리하고 적절한 액션을 수행합니다.
+ * 
+ * @param {number} status - HTTP 상태 코드
+ * @param {Object} apiResponse - 파싱된 백엔드 응답 (ApiResponse<T> 형식)
+ * @param {boolean} skipAuthRedirect - 401 응답 시 자동 리다이렉트 건너뛰기
+ * @throws {Error} 처리된 에러 객체
+ */
+async function handleHttpError(status, apiResponse, skipAuthRedirect = false) {
+    // 백엔드 ApiResponse에서 에러 정보 추출
+    const errorMessage = apiResponse?.message || `HTTP ${status}`;
+    const errorReason = apiResponse?.error?.reason || null;
+
+    const error = new Error(errorMessage);
+    error.status = status;
+    error.reason = errorReason;
+    error.handled = true;
+
+    // 401 Unauthorized - 인증 실패
+    if (status === 401) {
+        // skipAuthRedirect가 true면 리다이렉트하지 않음 (로그인/회원가입 페이지용)
+        if (!skipAuthRedirect) {
+            auth.clear();
+            // window.location.href = config.ROUTES.SIGNIN;
+        }
+        throw error;
+    }
+
+    // 403 Forbidden - 권한 없음
+    if (status === 403) {
+        alert('권한이 없습니다.');
+        throw error;
+    }
+
+    // 404 Not Found
+    if (status === 404) {
+        window.location.href = config.ROUTES.NOT_FOUND;
+        throw error;
+    }
+
+    // 500+ Server Error
+    if (status >= 500) {
+        alert('일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+        console.log(error);
+        throw error;
+    }
+
+    // 기타 에러
+    throw error;
+}

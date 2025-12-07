@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WePick - 매일의 선택</title>
+    <meta
+      name="description"
+      content="매일 딱 한 번, 당신의 선택은? 둘 중 하나를 고르고, 실시간 결과를 확인하세요."
+    />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/assets/imgs/wepick-logo-50.png" />
+
+    <!-- Styles -->
+    <!-- <link rel="stylesheet" href="/shared/styles/custom.css" />x -->
+    <link rel="stylesheet" href="/shared/styles/gauge-bar.css" />
+    <link rel="stylesheet" href="/features/wepick/styles/landing.css" />
+  </head>
+  <body>
+    <div class="landing-page">
+      <!-- Logo -->
+      <header class="landing-header">
+        <a href="/" class="back-link">
+          <div class="logo">
+            <img
+              src="/assets/imgs/wepick-logo-64.png"
+              alt="Wepick Logo"
+              class="logo-image"
+            />
+            <span class="logo-text">Wepick</span>
+          </div>
+        </a>
+      </header>
+
+      <!-- Content -->
+      <div class="landing-content">
+        <!-- Gauge Bar Component -->
+        <div class="gauge-bar-component">
+          <div class="gauge-percentages">
+            <div class="gauge-percentage-item gauge-percentage-a">
+              <div class="gauge-option-label">Option A</div>
+              <div class="gauge-option-percentage" data-option="a">50%</div>
+            </div>
+            <div class="gauge-percentage-item gauge-percentage-b">
+              <div class="gauge-option-percentage" data-option="b">50%</div>
+              <div class="gauge-option-label">Option B</div>
+            </div>
+          </div>
+          <div class="gauge-progress-bar">
+            <div class="gauge-bar-fill" data-fill="a"></div>
+          </div>
+        </div>
+
+        <h1 class="landing-title">매일 딱 한 번, 당신의 선택은?</h1>
+        <p class="landing-description">
+          두 가지 선택지 중 하나를 골라주세요.
+          <br/>
+          당신의 선택이 실시간으로 반영됩니다!
+        </p>
+
+        <a href="/today" class="cta-button"> 지금 바로 참여하기 </a>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="/features/wepick/scripts/landing.js"></script>
+  </body>
+</html>

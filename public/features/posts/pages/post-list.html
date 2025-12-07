@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>커뮤니티 - WePick</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/assets/imgs/wepick-logo-50.png" />
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="/shared/styles/header.css" />
+    <link rel="stylesheet" href="/features/posts/styles/list.css" />
+  </head>
+  <body data-page="posts-list" data-active-nav="community">
+    <!-- Global Header -->
+    <header></header>
+
+    <!-- Main Content -->
+    <main class="community-page">
+      <div class="community-container">
+        <!-- Action Bar -->
+        <div class="action-bar">
+          <button class="write-button post-create-btn">
+            <span class="write-icon">✎</span>
+            <span>글쓰기</span>
+          </button>
+        </div>
+
+        <!-- Post List -->
+        <div class="post-list" id="postList">
+          <!-- Posts will be dynamically inserted here -->
+        </div>
+
+        <!-- Loading Indicator (Skeleton) -->
+        <div class="loading-indicator" hidden>
+          <div class="skeleton-post-item">
+            <div class="skeleton-header">
+              <div class="skeleton-author-image"></div>
+              <div class="skeleton-author"></div>
+            </div>
+            <div class="skeleton-title"></div>
+            <div class="skeleton-content">
+              <div class="skeleton-content-line"></div>
+              <div class="skeleton-content-line"></div>
+            </div>
+            <div class="skeleton-stats">
+              <div class="skeleton-stat"></div>
+              <div class="skeleton-stat"></div>
+              <div class="skeleton-stat"></div>
+            </div>
+          </div>
+          <div class="skeleton-post-item">
+            <div class="skeleton-header">
+              <div class="skeleton-author-image"></div>
+              <div class="skeleton-author"></div>
+            </div>
+            <div class="skeleton-title"></div>
+            <div class="skeleton-content">
+              <div class="skeleton-content-line"></div>
+              <div class="skeleton-content-line"></div>
+            </div>
+            <div class="skeleton-stats">
+              <div class="skeleton-stat"></div>
+              <div class="skeleton-stat"></div>
+              <div class="skeleton-stat"></div>
+            </div>
+          </div>
+          <div class="skeleton-post-item">
+            <div class="skeleton-header">
+              <div class="skeleton-author-image"></div>
+              <div class="skeleton-author"></div>
+            </div>
+            <div class="skeleton-title"></div>
+            <div class="skeleton-content">
+              <div class="skeleton-content-line"></div>
+              <div class="skeleton-content-line"></div>
+            </div>
+            <div class="skeleton-stats">
+              <div class="skeleton-stat"></div>
+              <div class="skeleton-stat"></div>
+              <div class="skeleton-stat"></div>
+            </div>
+          </div>
+          <div class="skeleton-post-item">
+            <div class="skeleton-header">
+              <div class="skeleton-author-image"></div>
+              <div class="skeleton-author"></div>
+            </div>
+            <div class="skeleton-title"></div>
+            <div class="skeleton-content">
+              <div class="skeleton-content-line"></div>
+              <div class="skeleton-content-line"></div>
+            </div>
+            <div class="skeleton-stats">
+              <div class="skeleton-stat"></div>
+              <div class="skeleton-stat"></div>
+              <div class="skeleton-stat"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- End Message -->
+        <div class="end-message" hidden>
+          <p>모든 게시물을 불러왔습니다</p>
+        </div>
+
+        <!-- Scroll Trigger (for Intersection Observer) -->
+        <div class="scroll-trigger"></div>
+      </div>
+    </main>
+
+    <!-- Scripts -->
+    <script type="module" src="/features/posts/scripts/list.js"></script>
+  </body>
+</html>

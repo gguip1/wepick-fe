@@ -27,7 +27,7 @@ app.use('/', wepickRouter);
 
 // 404 handler - must be last
 app.use((req, res) => {
-    res.status(404).sendFile(path.join(__dirname, 'public', 'pages', 'error', '404.html'));
+    res.status(404).sendFile(path.join(__dirname, 'public', 'features', 'error', 'pages', '404.html'));
 })
 
 app.listen(port, () => {

@@ -10,21 +10,21 @@ const router = express.Router();
 // 랜딩 페이지 (루트 경로)
 router.get('/', (req, res) => {
   res.sendFile(
-    path.join(__dirname, '..', 'public', 'pages', 'wepick', 'landing.html')
+    path.join(__dirname, '..', 'public', 'features', 'wepick', 'pages', 'landing.html')
   );
 });
 
 // 오늘의 선택/결과 페이지
 router.get('/today', (req, res) => {
   res.sendFile(
-    path.join(__dirname, '..', 'public', 'pages', 'wepick', 'today-choice.html')
+    path.join(__dirname, '..', 'public', 'features', 'wepick', 'pages', 'today-choice.html')
   );
 });
 
 // 이전 토픽 리스트 (개발 중)
 router.get('/topics', (req, res) => {
   res.sendFile(
-    path.join(__dirname, '..', 'public', 'pages', 'error', 'coming-soon.html')
+    path.join(__dirname, '..', 'public', 'features', 'error', 'pages', 'coming-soon.html')
   );
 });
 
@@ -41,14 +41,14 @@ router.get('/topics/:topicId', (req, res, next) => {
   }
 
   res.sendFile(
-    path.join(__dirname, '..', 'public', 'pages', 'error', 'coming-soon.html')
+    path.join(__dirname, '..', 'public', 'features', 'error', 'pages', 'coming-soon.html')
   );
 });
 
 // 진영 채팅 페이지 (개발 중)
 router.get('/topics/:topicId/chat', (req, res) => {
   res.sendFile(
-    path.join(__dirname, '..', 'public', 'pages', 'error', 'coming-soon.html')
+    path.join(__dirname, '..', 'public', 'features', 'error', 'pages', 'coming-soon.html')
   );
 });
 
