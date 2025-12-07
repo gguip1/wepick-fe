@@ -18,6 +18,7 @@ let state = {
   isLoading: false,
   hasNext: true,
   lastPostId: null,
+  currentUser: null, // 현재 사용자 정보
 };
 
 // DOM 요소
@@ -33,8 +34,14 @@ async function init() {
   // DOM 요소 캐싱
   cacheElements();
 
-  // Initialize header auth state
-  await initHeaderAuth();
+  // Initialize header auth state and get current user (한 번만 호출)
+  const user = await initHeaderAuth();
+  if (user) {
+    state.currentUser = user;
+  }
+
+  // 글쓰기 버튼 상태 업데이트
+  updateWriteButtonState();
 
   // 이벤트 리스너 설정
   setupEventListeners();
@@ -44,6 +51,9 @@ async function init() {
 
   // 무한 스크롤 설정
   setupInfiniteScroll();
+
+  // 로그아웃 이벤트 리스너
+  window.addEventListener('userLoggedOut', handleLogout);
 }
 
 /**
@@ -412,10 +422,47 @@ function showErrorMessage(message) {
 }
 
 /**
+ * 로그아웃 처리
+ */
+function handleLogout() {
+  // 현재 사용자 상태 초기화
+  state.currentUser = null;
+
+  // 글쓰기 버튼 상태 업데이트
+  updateWriteButtonState();
+}
+
+/**
+ * 로그인 상태에 따라 글쓰기 버튼 텍스트 업데이트
+ */
+function updateWriteButtonState() {
+  if (!elements.createBtn) return;
+
+  const textSpan = elements.createBtn.querySelector('span:last-child');
+  if (!textSpan) return;
+
+  if (state.currentUser) {
+    // 로그인 상태: 글쓰기
+    textSpan.textContent = '글쓰기';
+  } else {
+    // 비로그인 상태: 로그인하고 글쓰기
+    textSpan.textContent = '로그인하고 글쓰기';
+  }
+}
+
+/**
  * 게시물 작성 버튼 클릭 핸들러
  */
-function handleCreateClick() {
-  navigation.goTo("/community/posts/create");
+async function handleCreateClick() {
+  if (!state.currentUser) {
+    // 비로그인 상태: 로그인 페이지로 리다이렉트 (redirect 파라미터 포함)
+    const { storage } = await import('../../utils/storage.js');
+    storage.set("redirect_after_signin", "/community/posts/create");
+    navigation.goTo("/users/signin");
+  } else {
+    // 로그인 상태: 글쓰기 페이지로 이동
+    navigation.goTo("/community/posts/create");
+  }
 }
 
 // 페이지 로드 시 자동 실행

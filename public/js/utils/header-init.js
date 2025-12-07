@@ -7,7 +7,7 @@ import { UsersAPI } from '../api/users.js';
 
 /**
  * Initialize header authentication state
- * @returns {Promise<void>}
+ * @returns {Promise<Object|null>} 사용자 정보 또는 null
  */
 export async function initHeaderAuth() {
   // Initialize navigation active state
@@ -44,13 +44,16 @@ export async function initHeaderAuth() {
     if (response.status === 200 && response.data) {
       // User is logged in
       showLoggedInState(response.data);
+      return response.data; // 사용자 정보 반환
     } else {
       // User is not logged in
       showLoggedOutState();
+      return null;
     }
   } catch (error) {
     console.error('Failed to check auth status:', error);
     showLoggedOutState();
+    return null;
   }
 
   /**
@@ -139,7 +142,11 @@ export async function initHeaderAuth() {
         const response = await UsersAPI.signOut();
 
         if (response.status >= 200 && response.status < 300) {
-          window.location.href = '/users/signin';
+          // 로그아웃 성공 - 현재 페이지에서 UI만 업데이트
+          showLoggedOutState();
+
+          // 페이지별 로그아웃 후 처리 이벤트 발생
+          window.dispatchEvent(new CustomEvent('userLoggedOut'));
         } else {
           console.error('Logout failed:', response.error);
           alert('로그아웃에 실패했습니다.');

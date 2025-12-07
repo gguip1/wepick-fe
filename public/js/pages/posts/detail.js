@@ -92,16 +92,108 @@ function formatRelativeTime(dateString) {
 }
 
 /**
- * 현재 사용자 정보 가져오기 (서버에서)
+ * 로그아웃 처리
  */
-async function getCurrentUser() {
-  try {
-    const user = await auth.requireAuth();
-    if (user) {
-      state.currentUser = user;
+function handleLogout() {
+  // 현재 사용자 상태 초기화
+  state.currentUser = null;
+
+  // UI 업데이트
+  updateAuthUI();
+
+  // 좋아요 상태 초기화 (필요 시)
+  if (state.post) {
+    state.post.isLiked = false;
+  }
+
+  // 수정/삭제 버튼 숨기기
+  const actions = dom.qs('.post-actions');
+  if (actions) {
+    actions.remove();
+  }
+}
+
+/**
+ * 인증 상태에 따른 UI 업데이트
+ */
+function updateAuthUI() {
+  const commentsSection = dom.qs("#comments-section");
+  if (!commentsSection) return;
+
+  const commentForm = dom.qs("#comment-form");
+  const likeBtn = dom.qs("#like-btn");
+
+  if (!state.currentUser) {
+    // 비로그인 상태: 댓글 폼과 좋아요 버튼 숨기고 로그인 버튼 표시
+    if (commentForm) {
+      commentForm.style.display = 'none';
     }
-  } catch (error) {
-    console.error("Failed to get current user:", error);
+    if (likeBtn) {
+      likeBtn.style.display = 'none';
+    }
+
+    // "로그인하고 댓글 쓰기" 버튼 생성 및 삽입
+    createLoginPrompt(commentsSection, commentForm);
+  } else {
+    // 로그인 상태: 댓글 폼과 좋아요 버튼 표시
+    if (commentForm) {
+      commentForm.style.display = 'block';
+    }
+    if (likeBtn) {
+      likeBtn.style.display = 'inline-flex';
+    }
+
+    // 로그인 프롬프트 제거 (있다면)
+    const loginPrompt = dom.qs("#login-prompt");
+    if (loginPrompt) {
+      loginPrompt.remove();
+    }
+  }
+}
+
+/**
+ * 로그인 프롬프트 생성
+ */
+function createLoginPrompt(commentsSection, commentForm) {
+  // 이미 존재하면 생성하지 않음
+  if (dom.qs("#login-prompt")) return;
+
+  const loginPrompt = document.createElement('div');
+  loginPrompt.id = 'login-prompt';
+  loginPrompt.className = 'login-prompt';
+  loginPrompt.innerHTML = `
+    <div class="login-prompt-content">
+      <p class="login-prompt-text">댓글을 작성하려면 로그인이 필요합니다</p>
+      <button class="login-prompt-btn" id="login-prompt-btn">
+        로그인하고 댓글 쓰기
+      </button>
+    </div>
+  `;
+
+  // 댓글 폼 다음에 삽입
+  if (commentForm && commentForm.nextSibling) {
+    commentsSection.insertBefore(loginPrompt, commentForm.nextSibling);
+  } else if (commentForm) {
+    commentForm.parentNode.insertBefore(loginPrompt, commentForm.nextSibling);
+  } else {
+    // 댓글 폼이 없으면 댓글 섹션 상단에 삽입
+    const commentsHeader = dom.qs(".comments-header", commentsSection);
+    if (commentsHeader && commentsHeader.nextSibling) {
+      commentsSection.insertBefore(loginPrompt, commentsHeader.nextSibling);
+    } else {
+      commentsSection.insertBefore(loginPrompt, commentsSection.firstChild);
+    }
+  }
+
+  // 로그인 버튼 클릭 이벤트
+  const loginBtn = dom.qs("#login-prompt-btn");
+  if (loginBtn) {
+    events.on(loginBtn, "click", async () => {
+      const { storage } = await import("../../utils/storage.js");
+      const currentPath = window.location.pathname;
+      storage.set("redirect_after_signin", currentPath);
+      navigation.goTo("/users/signin");
+    }, { pageId: PAGE_ID });
   }
 }
 
@@ -373,6 +465,14 @@ async function handleDeletePost() {
  */
 async function handleLikeToggle() {
   if (!state.post) return;
+
+  // 로그인 확인
+  if (!state.currentUser) {
+    const { storage } = await import('../../utils/storage.js');
+    storage.set("redirect_after_signin", window.location.pathname);
+    navigation.goTo("/users/signin");
+    return;
+  }
 
   const isLiked = state.post.isLiked;
 
@@ -981,11 +1081,11 @@ async function init() {
   await loadHeader();
   await loadFooter();
 
-  // Initialize header auth state
-  await initHeaderAuth();
-
-  // 인증 필요 및 현재 사용자 정보 가져오기
-  await getCurrentUser();
+  // Initialize header auth state and get current user (한 번만 호출)
+  const user = await initHeaderAuth();
+  if (user) {
+    state.currentUser = user;
+  }
 
   // postId 추출
   state.postId = getPostIdFromUrl();
@@ -1001,8 +1101,14 @@ async function init() {
   // 초기 댓글 로드
   await loadInitialComments();
 
+  // 인증 상태에 따른 UI 업데이트
+  updateAuthUI();
+
   // 이벤트 리스너 설정
   setupEventListeners();
+
+  // 로그아웃 이벤트 리스너
+  window.addEventListener('userLoggedOut', handleLogout);
 }
 
 /**

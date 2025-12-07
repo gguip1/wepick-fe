@@ -12,6 +12,7 @@ import { initHeaderAuth } from '../utils/header-init.js';
 let currentTopic = null;
 let selectedChoice = null;
 let gaugeBar = null;
+let currentUser = null; // 현재 사용자 정보
 
 // DOM Elements (initialized after DOM is ready)
 let loadingSkeleton, voteContent, voteSection, topicQuestion, mainGaugeBar;
@@ -29,8 +30,11 @@ async function init() {
     // Initialize DOM elements
     initializeDOMElements();
 
-    // Initialize header auth state
-    await initHeaderAuth();
+    // Initialize header auth state and get current user (한 번만 호출)
+    const user = await initHeaderAuth();
+    if (user) {
+      currentUser = user;
+    }
 
     // Fetch today's topic
     const response = await TopicsAPI.getTodayTopic();
@@ -55,12 +59,26 @@ async function init() {
     // Setup event listeners
     setupEventListeners();
 
+    // 로그아웃 이벤트 리스너
+    window.addEventListener('userLoggedOut', handleLogout);
+
   } catch (error) {
     console.error('Failed to initialize page:', error);
     loadingSkeleton.style.display = 'none';
     voteContent.removeAttribute('hidden');
     showError('페이지를 불러오는데 실패했습니다.');
   }
+}
+
+/**
+ * 로그아웃 처리
+ */
+function handleLogout() {
+  // 현재 사용자 상태 초기화
+  currentUser = null;
+
+  // 투표 상태 초기화 및 UI 업데이트
+  showVoteUI();
 }
 
 /**
@@ -91,9 +109,7 @@ function updateTopicUI(topic) {
  */
 async function checkVoteStatus() {
   // Check login status first
-  const user = await auth.getAuthUser();
-
-  if (!user) {
+  if (!currentUser) {
     // Not logged in, show vote UI
     showVoteUI();
     return;

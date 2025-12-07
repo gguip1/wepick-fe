@@ -84,8 +84,11 @@ export async function apiRequest(endpoint, options = {}) {
         };
 
     } catch (error) {
-        console.error('API request error:', error);
-        
+        // 401 에러는 비로그인 사용자의 정상 상태이므로 콘솔 로그 제거
+        if (error.status !== 401) {
+            console.error('API request error:', error);
+        }
+
         // 이미 처리된 HTTP 에러인 경우
         if (error.handled) {
             return {

@@ -26,8 +26,22 @@ if (!root) {
  * 페이지 초기화
  */
 async function init() {
+  setupBackButton();
   setupEventListeners();
   setupValidation();
+}
+
+/**
+ * 뒤로가기 버튼 설정
+ */
+function setupBackButton() {
+  const backBtn = dom.qs("#auth-back-btn");
+  if (!backBtn) return;
+
+  backBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    navigation.goBack();
+  });
 }
 
 /**
