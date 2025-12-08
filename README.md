@@ -47,9 +47,9 @@
 
 ### Screenshots
 
-|                   Landing Page                    |                 Today's Vote                 |                       Community                       |
-| :-----------------------------------------------: | :------------------------------------------: | :---------------------------------------------------: |
-| ![Landing](./assets/docs/readme/imgs/landing.png) | ![Vote](./assets/docs/readme/imgs/today.png) | ![Community](./assets/docs/readme/imgs/community.png) |
+|                 Landing Page                 |              Today's Vote               |                    Community                     |
+| :------------------------------------------: | :-------------------------------------: | :----------------------------------------------: |
+| ![Landing](./assets/readme/imgs/landing.png) | ![Vote](./assets/readme/imgs/today.png) | ![Community](./assets/readme/imgs/community.png) |
 
 ---
 
