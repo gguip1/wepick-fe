@@ -1,0 +1,569 @@
+/* ===================================================================
+   WePick Today Choice Page - Component-based Style
+   =================================================================== */
+
+/* Page-specific background only */
+body[data-active-nav="today"] {
+  background-color: #02051c;
+}
+
+/* Page Container */
+.today-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Main Content */
+.today-content {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: var(--spacing-xl, 2rem) var(--spacing-xl, 2rem);
+  padding-top: calc(var(--header-height, 60px) + var(--spacing-lg, 1.5rem));
+  padding-bottom: calc(var(--footer-height, 70px) + var(--spacing-lg, 1.5rem));
+}
+
+/* Topic Question */
+.topic-question {
+  font-size: var(--font-size-3xl, 1.875rem);
+  font-weight: 700;
+  color: white;
+  text-align: center;
+  margin-bottom: var(--spacing-lg, 1.5rem);
+  line-height: 1.4;
+  max-width: 800px;
+}
+
+/* Vote Section */
+.vote-section {
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-lg, 1.5rem);
+}
+
+/* Loading Skeleton */
+.loading-skeleton {
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-2xl, 3rem);
+}
+
+.skeleton-question {
+  width: 80%;
+  max-width: 600px;
+  height: 60px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+  border-radius: var(--bs-border-radius, 8px);
+}
+
+.skeleton-gauge {
+  width: 100%;
+  max-width: 900px;
+  height: 140px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+  border-radius: var(--bs-border-radius, 8px);
+}
+
+.skeleton-cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-xl, 2rem);
+  width: 100%;
+  max-width: 900px;
+}
+
+.skeleton-card {
+  height: 200px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+  border-radius: var(--bs-border-radius, 8px);
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Vote Content Container */
+.vote-content {
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-2xl, 3rem);
+}
+
+@media (max-width: 768px) {
+  .vote-content {
+    padding-bottom: var(--spacing-4xl, 4rem);
+  }
+}
+
+.vote-content:not([hidden]) {
+  display: flex;
+}
+
+.vote-content[hidden] {
+  display: none;
+}
+
+/* Vote Cards Container */
+.vote-cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-xl, 2rem);
+  width: 100%;
+  max-width: 900px;
+}
+
+/* Vote Card */
+.vote-card {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(147, 51, 234, 0.1) 100%);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--bs-border-radius, 8px);
+  padding: var(--spacing-2xl, 3rem) var(--spacing-xl, 2rem);
+  cursor: pointer;
+  transition: all var(--transition-fast, 0.3s) ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.vote-card[data-choice="A"]:hover {
+  box-shadow: 0 12px 40px rgba(59, 130, 246, 0.3);
+  border-color: rgba(59, 130, 246, 0.5);
+}
+
+.vote-card[data-choice="B"]:hover {
+  box-shadow: 0 12px 40px rgba(248, 113, 113, 0.3);
+  border-color: rgba(248, 113, 113, 0.5);
+}
+
+.vote-card[data-choice="A"]:focus {
+  outline: 2px solid rgba(59, 130, 246, 0.8);
+  outline-offset: 4px;
+}
+
+.vote-card[data-choice="B"]:focus {
+  outline: 2px solid rgba(248, 113, 113, 0.8);
+  outline-offset: 4px;
+}
+
+.vote-card[data-choice="A"].selected {
+  border-color: #3b82f6;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(147, 51, 234, 0.2) 100%);
+  box-shadow: 0 8px 32px rgba(59, 130, 246, 0.4);
+}
+
+.vote-card[data-choice="B"].selected {
+  border-color: #f87171;
+  background: linear-gradient(135deg, rgba(248, 113, 113, 0.2) 0%, rgba(251, 146, 60, 0.2) 100%);
+  box-shadow: 0 8px 32px rgba(248, 113, 113, 0.4);
+}
+
+/* Gauge Bar - Before Voting State */
+.gauge-bar-component.before-vote .gauge-progress-bar {
+  background: linear-gradient(
+    90deg,
+    rgba(248, 113, 113, 0.2) 0%,
+    rgba(251, 146, 60, 0.2) 25%,
+    rgba(251, 146, 60, 0.2) 75%,
+    rgba(248, 113, 113, 0.2) 100%
+  );
+  border: 2px dashed rgba(255, 255, 255, 0.2);
+}
+
+.gauge-bar-component.before-vote .gauge-bar-fill {
+  /* width는 JavaScript에서 동적으로 설정 - CSS에서 강제하지 않음 */
+  background: linear-gradient(
+    90deg,
+    rgba(59, 130, 246, 0.2) 0%,
+    rgba(96, 165, 250, 0.2) 90%,
+    rgba(96, 165, 250, 0.1) 95%,
+    rgba(96, 165, 250, 0.05) 98%,
+    transparent 100%
+  );
+}
+
+.gauge-bar-component.before-vote .gauge-option-percentage {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* Gauge Bar - Highlight on selection */
+.gauge-bar-component.before-vote .gauge-option-label,
+.gauge-bar-component.before-vote .gauge-option-percentage {
+  transition: all 0.3s ease;
+}
+
+/* Highlight Option A when selected */
+.gauge-bar-component.before-vote.highlight-a .gauge-percentage-a .gauge-option-label,
+.gauge-bar-component.before-vote.highlight-a .gauge-percentage-a .gauge-option-percentage {
+  color: #60a5fa;
+  transform: scale(1.1);
+}
+
+/* Highlight Option B when selected */
+.gauge-bar-component.before-vote.highlight-b .gauge-percentage-b .gauge-option-label,
+.gauge-bar-component.before-vote.highlight-b .gauge-percentage-b .gauge-option-percentage {
+  color: #f87171;
+  transform: scale(1.1);
+}
+
+/* Gauge Bar - After Voting State (transitions) */
+.gauge-bar-component .gauge-progress-bar {
+  transition: background 0.5s ease, border 0.5s ease;
+}
+
+.gauge-bar-component .gauge-bar-fill {
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+              background 0.5s ease;
+}
+
+.gauge-bar-component .gauge-option-percentage {
+  transition: color 0.3s ease;
+}
+
+.vote-card-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md, 1rem);
+}
+
+.vote-card-title {
+  font-size: var(--font-size-2xl, 1.5rem);
+  font-weight: 700;
+  color: white;
+  text-align: center;
+}
+
+.vote-card-description {
+  font-size: var(--font-size-base, 1rem);
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+  line-height: 1.6;
+}
+
+/* Vote Card Overlay (Check mark) */
+.vote-card-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(59, 130, 246, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity var(--transition-fast, 0.3s) ease;
+  z-index: 1;
+}
+
+.vote-card.selected .vote-card-overlay {
+  opacity: 1;
+}
+
+.vote-card-check[data-choice="A"] {
+  font-size: 3rem;
+  color: #3b82f6;
+  font-weight: bold;
+}
+
+.vote-card-check[data-choice="B"] {
+  font-size: 3rem;
+  color: #f87171;
+  font-weight: bold;
+}
+
+/* Vote Button */
+.vote-button {
+  padding: var(--spacing-md, 1rem) var(--spacing-2xl, 3rem);
+  font-size: var(--font-size-lg, 1.125rem);
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(90deg, #10b981 0%, #34d399 100%);
+  border: none;
+  border-radius: var(--bs-border-radius-lg, 50px);
+  cursor: pointer;
+  transition: all var(--transition-fast, 0.3s) ease;
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+}
+
+.vote-button:hover:not(:disabled) {
+  box-shadow: 0 6px 30px rgba(59, 130, 246, 0.6);
+  transform: translateY(-2px);
+}
+
+.vote-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.vote-button:disabled {
+  background: rgba(255, 255, 255, 0.2);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Result Section */
+.result-section {
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-2xl, 3rem);
+}
+
+.result-section[hidden] {
+  display: none;
+}
+
+/* Result Stats */
+.result-stats {
+  text-align: center;
+  color: white;
+}
+
+.result-total-votes {
+  font-size: var(--font-size-lg, 1.125rem);
+  margin-bottom: var(--spacing-sm, 0.75rem);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.result-total-votes span {
+  font-weight: 700;
+  color: #10b981;
+}
+
+.result-user-choice {
+  font-size: var(--font-size-base, 1rem);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.result-user-choice span {
+  font-weight: 600;
+  color: #10b981;
+}
+
+/* User choice color based on selection */
+.result-user-choice span.choice-a {
+  color: #60a5fa;
+}
+
+.result-user-choice span.choice-b {
+  color: #f87171;
+}
+
+/* Share Button */
+.share-button {
+  padding: var(--spacing-md, 1rem) var(--spacing-2xl, 3rem);
+  font-size: var(--font-size-lg, 1.125rem);
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(90deg, #10b981 0%, #34d399 100%);
+  border: none;
+  border-radius: var(--bs-border-radius-lg, 50px);
+  cursor: pointer;
+  transition: all var(--transition-fast, 0.3s) ease;
+  box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
+}
+
+.share-button:hover {
+  box-shadow: 0 6px 30px rgba(16, 185, 129, 0.6);
+  background: #059669;
+}
+
+.share-button:active {
+  transform: translateY(0);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .today-header {
+    top: var(--spacing-lg, 1.5rem);
+    left: var(--spacing-lg, 1.5rem);
+  }
+
+  /* .today-content {
+    padding: var(--spacing-md, 1rem);
+  } */
+
+  .topic-question {
+    font-size: var(--font-size-2xl, 1.5rem);
+    margin-bottom: var(--spacing-md, 1rem);
+  }
+
+  .vote-cards {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-lg, 1.5rem);
+  }
+
+  .vote-card {
+    padding: var(--spacing-xl, 2rem) var(--spacing-lg, 1.5rem);
+  }
+
+  .vote-card-title {
+    font-size: var(--font-size-xl, 1.25rem);
+  }
+
+  .vote-card-description {
+    font-size: var(--font-size-sm, 0.9375rem);
+  }
+
+
+  .header-nav {
+    display: none;
+  }
+
+  .header-auth {
+    gap: var(--spacing-sm, 0.75rem);
+  }
+
+  .header-auth-link {
+    font-size: var(--font-size-sm, 0.9375rem);
+    padding: var(--spacing-xs, 0.5rem) var(--spacing-sm, 0.75rem);
+  }
+
+  .vote-button,
+  .share-button {
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .skeleton-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .today-header {
+    top: var(--spacing-md, 1rem);
+    left: var(--spacing-md, 1rem);
+  }
+
+  .topic-question {
+    font-size: var(--font-size-xl, 1.25rem);
+  }
+
+  .vote-card {
+    padding: var(--spacing-lg, 1.5rem) var(--spacing-md, 1rem);
+  }
+
+  .vote-card-emoji {
+    font-size: 2.5rem;
+  }
+}
+
+/* ===================================================================
+   No Topic UI - 오늘의 토픽이 없을 때
+   =================================================================== */
+
+.no-topic-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+.no-topic-content {
+  text-align: center;
+  padding: var(--spacing-2xl, 3rem);
+  max-width: 500px;
+}
+
+.no-topic-icon {
+  font-size: 4rem;
+  margin-bottom: var(--spacing-xl, 2rem);
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.no-topic-title {
+  font-size: var(--font-size-2xl, 1.5rem);
+  font-weight: 700;
+  color: white;
+  margin-bottom: var(--spacing-md, 1rem);
+}
+
+.no-topic-description {
+  font-size: var(--font-size-base, 1rem);
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.6;
+  margin-bottom: var(--spacing-xl, 2rem);
+}
+
+.no-topic-button {
+  display: inline-block;
+  padding: var(--spacing-md, 1rem) var(--spacing-xl, 2rem);
+  font-size: var(--font-size-base, 1rem);
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%);
+  border: none;
+  border-radius: var(--bs-border-radius-lg, 50px);
+  text-decoration: none;
+  transition: all var(--transition-fast, 0.3s) ease;
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+}
+
+.no-topic-button:hover {
+  box-shadow: 0 6px 30px rgba(59, 130, 246, 0.6);
+  transform: translateY(-2px);
+  color: white;
+}
+
+@media (max-width: 480px) {
+  .no-topic-icon {
+    font-size: 3rem;
+  }
+
+  .no-topic-title {
+    font-size: var(--font-size-xl, 1.25rem);
+  }
+
+  .no-topic-description {
+    font-size: var(--font-size-sm, 0.9375rem);
+  }
+}

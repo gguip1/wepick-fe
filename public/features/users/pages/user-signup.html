@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>회원가입 - WePick</title>
+    <link rel="icon" type="image/png" href="/assets/imgs/wepick-logo-64.png" />
+
+    <!-- Bootstrap Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+    />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/shared/styles/custom.css" />
+    <link rel="stylesheet" href="/shared/styles/header.css" />
+    <link rel="stylesheet" href="/features/users/styles/auth.css" />
+  </head>
+  <body data-page="users-signup">
+    <div class="auth-wrapper">
+      <!-- Back Button (outside card) -->
+      <button class="auth-back-btn-floating" id="auth-back-btn">
+        <img src="/assets/imgs/back_button.svg" alt="뒤로가기" />
+      </button>
+
+      <div class="auth-container">
+        <!-- Auth Header -->
+        <div class="auth-header">
+          <h1 class="auth-title">회원가입</h1>
+          <p class="auth-subtitle">새 계정을 만들어 시작하세요</p>
+        </div>
+
+        <!-- Step Indicator -->
+        <div class="step-indicator">
+          <div class="step active" data-step="1">
+            <div class="step-circle">1</div>
+            <div class="step-label">이메일</div>
+          </div>
+          <div class="step-line"></div>
+          <div class="step" data-step="2">
+            <div class="step-circle">2</div>
+            <div class="step-label">비밀번호</div>
+          </div>
+          <div class="step-line"></div>
+          <div class="step" data-step="3">
+            <div class="step-circle">3</div>
+            <div class="step-label">닉네임</div>
+          </div>
+        </div>
+
+        <!-- Auth Form -->
+        <form id="sign-up-form" class="auth-form">
+          <!-- Step 1: Email -->
+          <div class="form-step active" data-step="1">
+            <div class="form-group">
+              <label for="email" class="form-label">
+                이메일 <span class="required">*</span>
+              </label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                class="form-input"
+                placeholder="name@example.com"
+                required
+                autocomplete="email"
+                data-validate="email"
+              />
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+
+          <!-- Step 2: Password -->
+          <div class="form-step" data-step="2">
+            <div class="form-group">
+              <label for="password" class="form-label">
+                비밀번호 <span class="required">*</span>
+              </label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                class="form-input"
+                placeholder="••••••••"
+                required
+                autocomplete="new-password"
+                data-validate="password"
+              />
+              <!-- Password Validation Chips -->
+              <div class="password-chips">
+                <span class="password-chip" data-rule="length">8-20자</span>
+                <span class="password-chip" data-rule="uppercase">대문자</span>
+                <span class="password-chip" data-rule="lowercase">소문자</span>
+                <span class="password-chip" data-rule="number">숫자</span>
+                <span class="password-chip" data-rule="symbol">특수문자</span>
+              </div>
+              <div class="invalid-feedback"></div>
+            </div>
+
+            <div class="form-group">
+              <label for="password2" class="form-label">
+                비밀번호 확인 <span class="required">*</span>
+              </label>
+              <input
+                type="password"
+                id="password2"
+                name="password2"
+                class="form-input"
+                placeholder="••••••••"
+                required
+                autocomplete="new-password"
+                data-validate="required"
+              />
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+
+          <!-- Step 3: Nickname -->
+          <div class="form-step" data-step="3">
+            <div class="form-group">
+              <label for="nickname" class="form-label">
+                닉네임 <span class="required">*</span>
+              </label>
+              <input
+                type="text"
+                id="nickname"
+                name="nickname"
+                class="form-input"
+                placeholder="닉네임을 입력하세요"
+                required
+                autocomplete="nickname"
+                data-validate="nickname"
+              />
+              <div class="invalid-feedback"></div>
+            </div>
+          </div>
+
+          <!-- Navigation Buttons -->
+          <div class="form-navigation">
+            <button type="button" id="prev-btn" class="btn btn-secondary btn-full hidden">
+              이전
+            </button>
+            <button type="button" id="next-btn" class="btn btn-primary btn-full">
+              다음
+            </button>
+            <button type="submit" id="submit-btn" class="btn btn-primary btn-full hidden">
+              회원가입
+            </button>
+          </div>
+
+          <!-- 메시지 영역 (에러/성공) -->
+          <div id="form-message" class="form-message"></div>
+        </form>
+
+        <!-- Auth Footer -->
+        <div class="auth-footer">
+          <p class="auth-footer-text">
+            이미 계정이 있으신가요?
+            <a href="/users/signin" class="auth-footer-link">로그인</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="/features/users/scripts/signup.js"></script>
+  </body>
+</html>

@@ -1,0 +1,124 @@
+<!-- Global Header Component -->
+<header class="global-header" id="globalHeader">
+  <div class="header-container">
+    <!-- Back Button (Mobile Only) -->
+    <button class="header-back-btn" id="headerBackBtn" hidden>
+      <img src="/assets/imgs/back_button.svg" alt="뒤로가기" class="header-back-icon" />
+    </button>
+
+    <!-- Logo -->
+    <a href="/today" class="header-logo">
+      <img
+        src="/assets/imgs/wepick-logo-text-white.png"
+        alt="WePick"
+        class="header-logo-image"
+      />
+    </a>
+
+    <!-- Desktop Navigation -->
+    <nav class="header-nav">
+      <a href="/today" class="header-nav-link">오늘의 선택</a>
+      <a href="/topics" class="header-nav-link">이전 토픽</a>
+      <a href="/community/posts" class="header-nav-link">커뮤니티</a>
+    </nav>
+
+    <!-- User Menu -->
+    <div class="header-user-menu">
+      <!-- Not Logged In -->
+      <div class="header-auth-links" id="headerAuthLinks">
+        <a href="/users/signin" class="header-auth-link">로그인</a>
+        <a href="/users/signup" class="header-auth-link header-signup">
+          회원가입
+        </a>
+      </div>
+
+      <!-- Logged In -->
+      <div class="header-user-dropdown" id="headerUserDropdown" hidden>
+        <button class="header-user-button" id="headerUserButton">
+          <img
+            id="headerUserImage"
+            src="/assets/imgs/profile_icon.svg"
+            alt="Profile"
+            class="header-user-image"
+          />
+          <span id="headerUserName">사용자</span>
+          <span class="header-dropdown-arrow">▼</span>
+        </button>
+        <div class="header-dropdown-menu" id="headerDropdownMenu" hidden>
+          <div class="header-dropdown-user-info">
+            <img
+              id="headerDropdownImage"
+              src="/assets/imgs/profile_icon.svg"
+              alt="Profile"
+              class="header-dropdown-image"
+            />
+            <div class="header-dropdown-user-details">
+              <span class="header-dropdown-username" id="headerDropdownUserName">사용자</span>
+              <span class="header-dropdown-useremail" id="headerDropdownUserEmail">user@example.com</span>
+            </div>
+          </div>
+          <div class="header-dropdown-divider"></div>
+          <div class="header-dropdown-items">
+            <a href="/users/mypage" class="header-dropdown-item">마이페이지</a>
+            <button class="header-dropdown-item logout-item" id="headerLogoutButton">로그아웃</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Menu Toggle -->
+    <div class="header-mobile-user-section">
+      <!-- Not Logged In -->
+      <div class="header-mobile-auth-buttons" id="headerMobileAuthButtons">
+        <a href="/users/signin" class="header-mobile-signin-btn">로그인</a>
+      </div>
+
+      <!-- Logged In -->
+      <button class="header-mobile-toggle" id="headerMobileToggle" hidden>
+        <img
+          id="headerMobileToggleImage"
+          src="/assets/imgs/profile_icon.svg"
+          alt="Profile"
+          class="header-mobile-toggle-image"
+        />
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile User Menu (Logged In Only) -->
+  <div class="header-mobile-menu" id="headerMobileMenu" hidden>
+    <div class="header-mobile-user-info">
+      <img
+        id="headerMobileMenuImage"
+        src="/assets/imgs/profile_icon.svg"
+        alt="Profile"
+        class="header-mobile-menu-image"
+      />
+      <div class="header-mobile-user-details">
+        <span class="header-mobile-username" id="headerMobileUserName">사용자</span>
+        <span class="header-mobile-useremail" id="headerMobileUserEmail">user@example.com</span>
+      </div>
+    </div>
+    <div class="header-mobile-menu-divider"></div>
+    <div class="header-mobile-menu-items">
+      <a href="/users/mypage" class="header-mobile-menu-item">마이페이지</a>
+      <button class="header-mobile-menu-item logout-item" id="headerMobileLogoutButton">로그아웃</button>
+    </div>
+  </div>
+</header>
+
+<!-- Bottom Navigation (Mobile Only) -->
+<nav class="bottom-nav" id="bottomNav">
+  <a href="/today" class="bottom-nav-item">
+    <span class="bottom-nav-icon">🎯</span>
+    <span class="bottom-nav-label">오늘의 선택</span>
+  </a>
+  <a href="/topics" class="bottom-nav-item">
+    <span class="bottom-nav-icon">📋</span>
+    <span class="bottom-nav-label">이전 토픽</span>
+  </a>
+  <a href="/community/posts" class="bottom-nav-item">
+    <span class="bottom-nav-icon">💬</span>
+    <span class="bottom-nav-label">커뮤니티</span>
+  </a>
+</nav>

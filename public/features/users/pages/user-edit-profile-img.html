@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>프로필 사진 변경 - WePick</title>
+    <link rel="icon" type="image/png" href="/assets/imgs/wepick-logo-64.png" />
+
+    <!-- Bootstrap Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+    />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/shared/styles/custom.css" />
+    <link rel="stylesheet" href="/shared/styles/header.css" />
+    <link rel="stylesheet" href="/features/users/styles/auth.css" />
+    <link rel="stylesheet" href="/features/users/styles/user-edit-profile.css" />
+  </head>
+  <body data-page="users-edit-profile-img">
+    <div class="auth-wrapper">
+      <!-- Back Button (outside card) -->
+      <button class="auth-back-btn-floating" id="auth-back-btn">
+        <img src="/assets/imgs/back_button.svg" alt="뒤로가기" />
+      </button>
+
+      <div class="auth-container">
+        <!-- Auth Header -->
+        <div class="auth-header">
+          <h1 class="auth-title">프로필 사진 변경</h1>
+          <p class="auth-subtitle">프로필 사진을 변경하세요</p>
+        </div>
+
+        <!-- Profile Image Form -->
+        <form id="profile-img-form" class="auth-form">
+          <!-- Profile Image Upload -->
+          <div class="form-group">
+            <div class="profile-image-wrapper">
+              <!-- Clickable profile image area -->
+              <div
+                class="profile-image-circle"
+                id="profileImageWrapper"
+              >
+                <!-- Default placeholder -->
+                <div class="profile-placeholder" id="profilePlaceholder">
+                  <i class="bi bi-camera"></i>
+                  <small>사진 업로드</small>
+                </div>
+
+                <!-- Preview image (hidden initially) -->
+                <img
+                  id="previewImg"
+                  src=""
+                  alt="프로필 미리보기"
+                  class="profile-preview hidden"
+                />
+
+                <!-- Remove button (shown when image exists) -->
+                <button
+                  type="button"
+                  id="removeImageBtn"
+                  class="profile-remove-btn hidden"
+                  title="이미지 제거"
+                >
+                  ×
+                </button>
+              </div>
+
+              <!-- Hidden file input -->
+              <input
+                type="file"
+                id="profileImage"
+                name="profileImage"
+                class="hidden"
+                accept=".webp,.jpeg,.jpg,.png,image/webp,image/jpeg,image/png"
+              />
+
+              <small class="form-help text-center">
+                선택사항 (webp, jpeg, jpg, png만 가능)
+              </small>
+            </div>
+          </div>
+
+          <!-- Message Area -->
+          <div id="form-message" class="form-message"></div>
+
+          <!-- Buttons -->
+          <div class="form-navigation">
+            <button type="button" id="cancel-btn" class="btn btn-secondary btn-full">
+              취소
+            </button>
+            <button type="submit" class="btn btn-primary btn-full">
+              변경하기
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script type="module" src="/features/users/scripts/editProfileImg.js"></script>
+  </body>
+</html>
