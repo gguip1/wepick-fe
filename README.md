@@ -4,66 +4,21 @@
 
 > 매일 새로운 A/B 투표와 커뮤니티 기능을 제공하는 프론트엔드 웹 애플리케이션
 
-<<<<<<< HEAD
-## 🛠 Tech Stack
-
-![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
-![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
-![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
-![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
-![Express](https://img.shields.io/badge/Express-000000?style=for-the-badge&logo=express&logoColor=white)
-![Git](https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
-
-- **Frontend**: Vanilla JavaScript (ES6 Modules), CSS3, HTML5
-- **Backend**: Express.js (MPA - Multi-Page Application)
-- **UI Framework**: Custom CSS (New Features)
-=======
 ![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-F7DF1E?style=flat-square&logo=javascript&logoColor=black)
 ![Express](https://img.shields.io/badge/Express_5.1-000000?style=flat-square&logo=express&logoColor=white)
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat-square&logo=css3&logoColor=white)
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white)
->>>>>>> dev
 
 ---
 
 ## 목차
 
-<<<<<<< HEAD
-### 1. 랜딩 페이지 (`/`)
-
-![랜딩 페이지 스크린샷](./assets/readme/imgs/landing.png)
-
-### 2. 오늘의 선택 (`/today`)
-
-![오늘의 선택 - 투표 전 화면 스크린샷](./assets/readme/imgs/today.png)
-
-### 3. 커뮤니티 게시판 (`/community` 또는 `/posts`)
-
-![커뮤니티 게시판 - 게시글 리스트 화면 스크린샷](./assets/readme/imgs/community.png)
-
-### 4. 로그인/회원가입 (`/users/signin`, `/users/signup`)
-
-<div style="display: flex; justify-content: center; gap: 20px;">
-  <img src="./assets/readme/imgs/login.png" alt="로그인 페이지 스크린샷" width="300"/>
-  <img src="./assets/readme/imgs/register.png" alt="회원가입 페이지 스크린샷" width="300"/>
-</div>
-
-### 5. 마이페이지 (`/users/mypage`)
-
-![마이페이지 스크린샷](./assets/readme/imgs/mypage.png)
-
-### 6. 개발 중 페이지 (`/topics`, `/topics/:id/chat`)
-
-![개발 중 페이지 스크린샷](./assets/readme/imgs/deving.png)
-=======
 1. [Project Introduction](#1-project-introduction)
 2. [Frontend Architecture](#2-frontend-architecture)
 3. [Internal Logic & Design System](#3-internal-logic--design-system)
 4. [Key Technical Challenges](#4-key-technical-challenges)
 5. [Documentation](#5-documentation)
->>>>>>> dev
 
 ---
 
