@@ -46,43 +46,66 @@ body[data-page="posts-list"] {
 }
 
 /* ═══════════════════════════════════
-   FLOATING WRITE BUTTON
+   FLOATING ACTION BAR
    ═══════════════════════════════════ */
-.action-bar {
+.floating-action-bar {
   position: fixed;
   bottom: 2rem;
-  right: 2rem;
+  left: 0;
+  right: 0;
   z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none; /* 버튼만 클릭 가능하도록 */
+  transition: transform 0.3s ease, bottom 0.3s ease;
 }
 
-.write-button {
+/* 헤더/네비 숨김에 따라 플로팅 바도 이동 */
+.floating-action-bar.fab-hidden {
+  transform: translateY(calc(100% + 2rem));
+}
+
+.fab-button {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.875rem 1.75rem;
+  padding: 0.875rem 1.5rem;
   font-size: 1rem;
   font-weight: 600;
   color: white;
-  background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
   border: none;
   border-radius: 50px;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
   white-space: nowrap;
+  pointer-events: auto; /* 버튼은 클릭 가능 */
 }
 
-.write-button:hover {
-  box-shadow: 0 8px 28px rgba(16, 185, 129, 0.6);
+.fab-button:hover {
   transform: translateY(-2px);
 }
 
-.write-button:active {
+.fab-button:active {
   transform: translateY(0);
 }
 
-.write-icon {
+/* 글쓰기 버튼 */
+.fab-write {
+  background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+}
+
+.fab-write:hover {
+  box-shadow: 0 8px 28px rgba(16, 185, 129, 0.6);
+}
+
+.fab-icon {
   font-size: 1.25rem;
+}
+
+.fab-label {
+  font-size: 0.9375rem;
 }
 
 /* ═══════════════════════════════════
@@ -369,9 +392,8 @@ body[data-page="posts-list"] {
     padding: 0 clamp(1rem, 3vw, 1.5rem);
   }
 
-  .action-bar {
-    bottom: 6.5rem;
-    right: clamp(1rem, 3vw, 2rem);
+  .floating-action-bar {
+    bottom: 5.5rem;
   }
 }
 
@@ -385,18 +407,20 @@ body[data-page="posts-list"] {
     padding: 0 1rem;
   }
 
-  .action-bar {
-    bottom: 6.5rem;
-    right: 1rem;
+  .floating-action-bar {
+    bottom: 5.5rem;
   }
 
-  .write-button {
-    padding: 0.75rem 1.5rem;
-    font-size: 0.9375rem;
+  .fab-button {
+    padding: 0.75rem 1.25rem;
   }
 
-  .write-icon {
+  .fab-icon {
     font-size: 1.125rem;
+  }
+
+  .fab-label {
+    font-size: 0.875rem;
   }
 
   .post-card {

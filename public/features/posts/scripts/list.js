@@ -69,6 +69,7 @@ function cacheElements() {
     loadingIndicator: document.querySelector(".loading-indicator"),
     endMessage: document.querySelector(".end-message"),
     scrollTrigger: document.querySelector(".scroll-trigger"),
+    floatingBar: document.getElementById("floatingActionBar"),
   };
 
   // 초기 상태: 로딩 인디케이터 명시적으로 숨김
@@ -96,6 +97,61 @@ function setupEventListeners() {
   if (elements.createBtn) {
     elements.createBtn.addEventListener("click", handleCreateClick);
   }
+
+  // 플로팅 바 스크롤 처리
+  setupFloatingBarScroll();
+}
+
+/**
+ * 플로팅 바 스크롤 처리 설정 (모바일에서 헤더/네비와 함께 숨김)
+ */
+function setupFloatingBarScroll() {
+  const isMobile = () => window.innerWidth <= 1024;
+
+  let lastScrollY = window.scrollY;
+  let ticking = false;
+  const scrollThreshold = 10;
+
+  function handleScroll() {
+    const currentScrollY = window.scrollY;
+    const scrollDiff = currentScrollY - lastScrollY;
+
+    // 모바일에서만 플로팅 바 숨김 처리
+    if (!isMobile() || Math.abs(scrollDiff) < scrollThreshold) {
+      ticking = false;
+      return;
+    }
+
+    // 플로팅 바 숨김/표시 (헤더/네비와 동기화)
+    if (elements.floatingBar) {
+      if (currentScrollY <= 0) {
+        elements.floatingBar.classList.remove('fab-hidden');
+      } else if (scrollDiff > 0) {
+        elements.floatingBar.classList.add('fab-hidden');
+      } else {
+        elements.floatingBar.classList.remove('fab-hidden');
+      }
+    }
+
+    lastScrollY = currentScrollY;
+    ticking = false;
+  }
+
+  function onScroll() {
+    if (!ticking) {
+      requestAnimationFrame(handleScroll);
+      ticking = true;
+    }
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  // 화면 크기 변경 시 상태 리셋
+  window.addEventListener('resize', () => {
+    if (!isMobile() && elements.floatingBar) {
+      elements.floatingBar.classList.remove('fab-hidden');
+    }
+  });
 }
 
 /**
@@ -420,21 +476,10 @@ function handleLogout() {
 }
 
 /**
- * 로그인 상태에 따라 글쓰기 버튼 텍스트 업데이트
+ * 글쓰기 버튼 상태 업데이트 (현재는 항상 "글쓰기"로 표시)
  */
 function updateWriteButtonState() {
-  if (!elements.createBtn) return;
-
-  const textSpan = elements.createBtn.querySelector('span:last-child');
-  if (!textSpan) return;
-
-  if (state.currentUser) {
-    // 로그인 상태: 글쓰기
-    textSpan.textContent = '글쓰기';
-  } else {
-    // 비로그인 상태: 로그인하고 글쓰기
-    textSpan.textContent = '로그인하고 글쓰기';
-  }
+  // 버튼 텍스트는 항상 "글쓰기"로 유지
 }
 
 /**
