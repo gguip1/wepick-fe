@@ -57,35 +57,7 @@
 
 ### System Overview
 
-```mermaid
-flowchart TB
-    subgraph Client["Browser (Client)"]
-        HTML[HTML Pages]
-        JS[ES6 Modules]
-        CSS[Custom CSS + Bootstrap]
-    end
-
-    subgraph Express["Express Server (MPA)"]
-        Routes[View Routes]
-        Static[Static Files]
-    end
-
-    subgraph Backend["Backend API"]
-        API["https://api.wepick.cloud/api"]
-    end
-
-    subgraph AWS["AWS Infrastructure"]
-        S3[S3 - Images]
-        CDN[CloudFront]
-    end
-
-    HTML --> JS
-    JS -->|fetch + credentials| API
-    JS -->|Presigned URL Upload| S3
-    Routes -->|sendFile| HTML
-    Static --> CSS
-    S3 --> CDN
-```
+**_(작성 예정)_**
 
 ### Architecture Components
 
