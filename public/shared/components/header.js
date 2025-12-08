@@ -75,6 +75,9 @@ export async function initHeader(pageId) {
     events.on(logoutBtn, 'click', handleLogout, { pageId });
   }
 
+  // 스크롤 시 헤더/네비게이션 숨김 초기화 (모바일)
+  initScrollHide(pageId);
+
   // 드롭다운 토글
   function toggleDropdown() {
     const isExpanded = profileBtn.getAttribute('aria-expanded') === 'true';
@@ -127,6 +130,78 @@ export async function initHeader(pageId) {
       console.error('Logout error:', error);
     }
   }
+}
+
+/**
+ * 스크롤 방향에 따른 헤더/네비게이션 바 숨김 처리 (모바일 전용)
+ * @param {string} pageId - 페이지 식별자 (이벤트 정리용)
+ */
+function initScrollHide(pageId) {
+  // 모바일에서만 동작 (1024px 이하)
+  const isMobile = () => window.innerWidth <= 1024;
+
+  let lastScrollY = window.scrollY;
+  let ticking = false;
+  const scrollThreshold = 10; // 최소 스크롤 감지 거리
+
+  const header = dom.qs('.global-header');
+  const bottomNav = dom.qs('.bottom-nav');
+
+  if (!header && !bottomNav) return;
+
+  function handleScroll() {
+    if (!isMobile()) {
+      // 데스크탑에서는 항상 보이게
+      if (header) header.classList.remove('header-hidden');
+      if (bottomNav) bottomNav.classList.remove('nav-hidden');
+      return;
+    }
+
+    const currentScrollY = window.scrollY;
+    const scrollDiff = currentScrollY - lastScrollY;
+
+    // 스크롤 변화가 threshold 이상일 때만 처리
+    if (Math.abs(scrollDiff) < scrollThreshold) {
+      ticking = false;
+      return;
+    }
+
+    // 페이지 최상단에서는 항상 보이게
+    if (currentScrollY <= 0) {
+      if (header) header.classList.remove('header-hidden');
+      if (bottomNav) bottomNav.classList.remove('nav-hidden');
+    }
+    // 아래로 스크롤 → 숨기기
+    else if (scrollDiff > 0) {
+      if (header) header.classList.add('header-hidden');
+      if (bottomNav) bottomNav.classList.add('nav-hidden');
+    }
+    // 위로 스크롤 → 보이기
+    else {
+      if (header) header.classList.remove('header-hidden');
+      if (bottomNav) bottomNav.classList.remove('nav-hidden');
+    }
+
+    lastScrollY = currentScrollY;
+    ticking = false;
+  }
+
+  function onScroll() {
+    if (!ticking) {
+      requestAnimationFrame(handleScroll);
+      ticking = true;
+    }
+  }
+
+  events.on(window, 'scroll', onScroll, { pageId, passive: true });
+
+  // 화면 크기 변경 시 상태 리셋
+  events.on(window, 'resize', () => {
+    if (!isMobile()) {
+      if (header) header.classList.remove('header-hidden');
+      if (bottomNav) bottomNav.classList.remove('nav-hidden');
+    }
+  }, { pageId });
 }
 
 /**

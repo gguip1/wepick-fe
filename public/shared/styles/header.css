@@ -15,6 +15,12 @@ body {
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     z-index: 1000;
     padding: 1rem 0;
+    transition: transform 0.3s ease;
+}
+
+/* Header hidden state (scroll down) */
+.global-header.header-hidden {
+    transform: translateY(-100%);
 }
 
 .header-container {
@@ -23,8 +29,8 @@ body {
     padding: 0 2rem;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 2rem;
+    justify-content: center;
+    position: relative;
 }
 
 /* Back Button (Mobile Only) */
@@ -63,26 +69,15 @@ body {
 .header-logo {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    justify-content: center;
     text-decoration: none;
     flex-shrink: 0;
 }
 
 .header-logo-image {
-    height: 40px;
-    width: 40px;
+    height: 48px;
+    width: auto;
     object-fit: contain;
-}
-
-.header-logo-text {
-    color: white;
-    font-weight: 700 !important;
-    font-size: 1.5rem !important;
-    font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
-    white-space: nowrap;
-    letter-spacing: -0.02em;
-    -webkit-font-smoothing: auto !important;
-    -moz-osx-font-smoothing: auto !important;
 }
 
 /* Desktop Navigation */
@@ -90,6 +85,8 @@ body {
     display: flex;
     align-items: center;
     gap: 1.5rem;
+    position: absolute;
+    left: 2rem;
 }
 
 .header-nav-link {
@@ -117,6 +114,8 @@ body {
     display: flex;
     align-items: center;
     gap: 1rem;
+    position: absolute;
+    right: 2rem;
 }
 
 /* Auth Links (Not Logged In) */
@@ -473,6 +472,12 @@ body {
     padding: 0.5rem 0;
     z-index: 1000;
     backdrop-filter: blur(10px);
+    transition: transform 0.3s ease;
+}
+
+/* Bottom nav hidden state (scroll down) */
+.bottom-nav.nav-hidden {
+    transform: translateY(100%);
 }
 
 .bottom-nav-item {
