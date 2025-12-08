@@ -223,9 +223,9 @@ function handleCardClick(e) {
   mainGaugeBar.classList.remove('highlight-a', 'highlight-b');
   mainGaugeBar.classList.add(`highlight-${choice.toLowerCase()}`);
 
-  // Enable vote button
+  // Enable vote button with appropriate text based on login status
   voteButton.disabled = false;
-  voteButton.textContent = '투표하기';
+  voteButton.textContent = currentUser ? '투표하기' : '로그인 후 투표하기';
 }
 
 /**
