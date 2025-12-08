@@ -40,8 +40,7 @@ function setupBackButton() {
 
   backBtn.addEventListener("click", (e) => {
     e.preventDefault();
-    // 로그인 페이지에서는 홈으로 이동 (순환 방지)
-    navigation.goTo('/today');
+    navigation.goBack();
   });
 }
 

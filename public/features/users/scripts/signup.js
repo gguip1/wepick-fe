@@ -47,8 +47,7 @@ function setupBackButton() {
 
   backBtn.addEventListener("click", (e) => {
     e.preventDefault();
-    // 회원가입 페이지에서는 로그인 페이지로 이동 (순환 방지)
-    navigation.goTo('/users/signin');
+    navigation.goBack();
   });
 }
 
