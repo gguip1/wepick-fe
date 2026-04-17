@@ -3,66 +3,21 @@ name: FE CD - PROD
 on:
   workflow_run:
     workflows: ["FE CI - PROD"]
-    types:
-      - completed
-    paths-ignore:
-      - "docs/**"
-      - "**.md"
+    types: [completed]
 
 jobs:
-  deploy:
-    runs-on: ubuntu-24.04-arm
+  trigger-infra-deploy:
+    runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-northeast-2
-
-      # - name: Install Session Manager Plugin
-      #   run: |
-      #     curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_64bit/session-manager-plugin.deb" -o "session-manager-plugin.deb"
-      #     sudo dpkg -i session-manager-plugin.deb
-
-      - name: Upload Docker Compose file to S3
-        # ECR_REGISTRY_IMAGE 변수를 실제 이미지 URI로 치환
-        # 현재는 GitHub Secrets에 저장된 값을 사용하지만 AWS SSM Parameter Store 등을 활용할 수도 있음
+      - name: Trigger wepick-infra deploy.yml
+        env:
+          GH_TOKEN: ${{ secrets.INFRA_DISPATCH_TOKEN }}
+          IMAGE_TAG: ${{ github.event.workflow_run.head_sha }}
         run: |
-          aws s3 cp docker/prod/docker-compose.yml s3://${{ secrets.AWS_S3_BUCKET_NAME }}/fe/docker-compose.yml
-
-      - name: Deploy to EC2 with Docker
-        run: |
-          aws ssm send-command \
-            --region ap-northeast-2 \
-            --instance-ids ${{ secrets.AWS_EC2_INSTANCE_ID }} \
-            --document-name "AWS-RunShellScript" \
-            --comment "Executed by Github Actions" \
-            --parameters '{
-              "commands": [
-                "aws s3 cp s3://${{ secrets.AWS_S3_BUCKET_NAME }}/fe/docker-compose.yml /home/ubuntu/docker-compose.yml",
-                "sudo su - ubuntu -c \"cd /home/ubuntu && docker compose pull && docker compose up -d && docker image prune -f\""
-              ]
-            }'
-
-      # Health Check Step
-      # 실제 적절한 버전이 반영되었는지 확인 불가능
-      # 추후 github.sha 태그를 활용한 검증 로직 추가 고려
-      - name: Health Check
-        run: |
-          aws ssm send-command \
-            --region ap-northeast-2 \
-            --instance-ids ${{ secrets.AWS_EC2_INSTANCE_ID }} \
-            --document-name "AWS-RunShellScript" \
-            --comment "Health Check by Github Actions" \
-            --parameters '{
-              "commands": [
-                "sleep 15",
-                "curl -f http://localhost:3000/health || exit 1"
-              ]
-            }'
+          gh api repos/gguip1/wepick-infra/dispatches \
+            -f event_type='deploy-fe' \
+            -f client_payload[image_tag]="$IMAGE_TAG" \
+            -f client_payload[source_repo]="${{ github.repository }}" \
+            -f client_payload[source_sha]="$IMAGE_TAG"
