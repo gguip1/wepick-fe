@@ -1,6 +1,7 @@
 name: FE CI - PROD
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
