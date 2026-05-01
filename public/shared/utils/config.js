@@ -8,13 +8,13 @@
 
 export const config = Object.freeze({
   // API 설정
-  API_BASE_URL: "https://api.wepick.cloud/api",
+  API_BASE_URL: "https://wepick.cloud/api",
   // API_BASE_URL: "http://localhost:8080/api",
   TIMEOUT: 6000,
 
   // 애플리케이션 설정
-  APP_NAME: "community-fe",
-  STORAGE_PREFIX: "community_",
+  APP_NAME: "wepick-fe",
+  STORAGE_PREFIX: "wepick_",
 
   // 페이지네이션 설정
   PAGINATION: Object.freeze({
