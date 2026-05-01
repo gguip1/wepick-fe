@@ -104,7 +104,7 @@
         if (!footerContainer) return;
 
         try {
-          const response = await fetch('/components/footer.html');
+          const response = await fetch('/shared/components/footer.html');
           const html = await response.text();
           footerContainer.innerHTML = html;
         } catch (error) {

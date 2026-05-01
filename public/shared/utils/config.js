@@ -27,7 +27,7 @@ export const config = Object.freeze({
     HOME: "/posts",
     SIGNIN: "/users/signin",
     SIGNUP: "/users/signup",
-    NOT_FOUND: "/pages/error/404.html",
+    NOT_FOUND: "/features/error/pages/404.html",
 
     // Navigation routes
     NAV: Object.freeze({
