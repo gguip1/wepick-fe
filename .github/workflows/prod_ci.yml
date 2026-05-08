@@ -68,3 +68,17 @@ jobs:
             -t $REGISTRY/$REPO:latest \
             --push \
             .
+
+  notify:
+    needs: [test, build-and-push]
+    if: always() && failure()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify Discord (alerts)
+        continue-on-error: true
+        run: |
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          curl -H "Content-Type: application/json" -X POST \
+            -d "{\"embeds\":[{\"title\":\"🚨 [FE CI ❌] ${{ github.ref_name }} @ ${SHORT_SHA} (${{ github.actor }})\",\"description\":\"[👉 GitHub에서 바로 확인하기](${RUN_URL})\",\"color\":15548997}]}" \
+            "${{ secrets.DISCORD_ALERTS_WEBHOOK_URL }}"
